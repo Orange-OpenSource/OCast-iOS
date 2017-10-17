@@ -30,7 +30,7 @@ Here are the main functionalities of the Example project:
 
 ```
 
-You don't need to have a stick to run the Exmaple project or to start developping your own application: use our simulator to get started.
+You don't need to have a stick to run the Exmaple project or to start developping your own application: use our simulator to get started : See [OCast-DongleTV-JS](https://github.com/Orange-OpenSource/OCast-DongleTV-JS)
 
 ## Example
 
