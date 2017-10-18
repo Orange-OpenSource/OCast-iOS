@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MediaController Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Class/MediaController" class="dashAnchor"></a>
+    <a title="MediaController Class Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">OCast Docs</a> (69% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">OCast Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        MediaController Class Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/ApplicationController.html">ApplicationController</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/CertificateInfo.html">CertificateInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Device.html">Device</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/DeviceDiscovery.html">DeviceDiscovery</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/DeviceDiscovery/Reliability.html">– Reliability</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/DeviceManager.html">DeviceManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MediaController.html">MediaController</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MediaPrepare.html">MediaPrepare</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MetaDataChanged.html">MetaDataChanged</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/PlaybackStatus.html">PlaybackStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/ReferenceDriver.html">ReferenceDriver</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TrackDescription.html">TrackDescription</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Enums.html">Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/MediaErrorCode.html">MediaErrorCode</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/MediaType.html">MediaType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/PlayerState.html">PlayerState</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/TrackType.html">TrackType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/TransferMode.html">TransferMode</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/DataStreamable.html">DataStreamable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/DeviceDiscoveryProtocol.html">DeviceDiscoveryProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/DeviceManagerProtocol.html">DeviceManagerProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MediaControllerProtocol.html">MediaControllerProtocol</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>MediaController</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">MediaController</span><span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt"><a href="../Protocols/DataStreamable.html">DataStreamable</a></span></code></pre>
+
+                </div>
+              </div>
+            <p>Provides basic media control.</p>
+<pre class="highlight plaintext"><code> mediaController = deviceManager.getMediaController()
+</code></pre>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Public%20interface"></a>
+                <a name="//apple_ref/swift/Section/Public interface" class="dashAnchor"></a>
+                <a href="#/Public%20interface">
+                  <h3 class="section-name">Public interface</h3>
+                </a>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)prepareFor:onSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/prepare(for:onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)prepareFor:onSuccess:onError:">prepare(for:onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Prepares a cast command</p>
+
+<ul>
+<li>data: the data representing the media to be casted. See <code><a href="../Classes/MediaPrepare.html">MediaPrepare</a></code> class.</li>
+<li>onSuccess: the closure to be called in case of success.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">prepare</span><span class="p">(</span><span class="k">for</span> <span class="nv">data</span><span class="p">:</span> <span class="kt"><a href="../Classes/MediaPrepare.html">MediaPrepare</a></span><span class="p">,</span> <span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)pauseOnSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/pause(onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)pauseOnSuccess:onError:">pause(onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Pauses the current media</p>
+
+<ul>
+<li>onSuccess: the closure to be called in case of success.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">pause</span><span class="p">(</span><span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)stopOnSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/stop(onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)stopOnSuccess:onError:">stop(onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Stops the current media</p>
+
+<ul>
+<li>onSuccess: the closure to be called in case of success.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">stop</span><span class="p">(</span><span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)resumeOnSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/resume(onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)resumeOnSuccess:onError:">resume(onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Resumes the current media cast</p>
+
+<ul>
+<li>onSuccess: the closure to be called in case of success.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">resume</span><span class="p">(</span><span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)playTo:onSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/play(to:onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)playTo:onSuccess:onError:">play(to:onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Plays the current media from a given position</p>
+
+<ul>
+<li>position: starting position (in seconds)</li>
+<li>onSuccess: the closure to be called in case of success.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">play</span><span class="p">(</span><span class="n">to</span> <span class="nv">position</span><span class="p">:</span> <span class="kt">UInt</span><span class="p">,</span> <span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)volumeTo:onSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/volume(to:onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)volumeTo:onSuccess:onError:">volume(to:onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Sets the vomume level</p>
+
+<ul>
+<li>volume: volume level in a [0..1] interval.</li>
+<li>onSuccess: the closure to be called in case of success.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">volume</span><span class="p">(</span><span class="n">to</span> <span class="nv">level</span><span class="p">:</span> <span class="kt">Float</span><span class="p">,</span> <span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)seekTo:onSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/seek(to:onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)seekTo:onSuccess:onError:">seek(to:onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Seeks the current media to a given position</p>
+
+<ul>
+<li>position: position</li>
+<li>onSuccess: the closure to be called in case of success.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">seek</span><span class="p">(</span><span class="n">to</span> <span class="nv">position</span><span class="p">:</span> <span class="kt">UInt</span><span class="p">,</span> <span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)trackWithType:id:enabled:onSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/track(type:id:enabled:onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)trackWithType:id:enabled:onSuccess:onError:">track(type:id:enabled:onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Sets a media track</p>
+
+<ul>
+<li>type: track type (See <code><a href="../Enums/TrackType.html">TrackType</a></code> for description)</li>
+<li>id: track ID</li>
+<li>enabled: <code>true</code> to enable the track, <code>false</code> to disable the track.</li>
+<li>onSuccess: the closure to be called in case of success.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">track</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/TrackType.html">TrackType</a></span><span class="p">,</span> <span class="nv">id</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">enabled</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">,</span> <span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)muteWithIsMuted:onSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/mute(isMuted:onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)muteWithIsMuted:onSuccess:onError:">mute(isMuted:onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Mutes the current media</p>
+
+<ul>
+<li>isMuted: <code>true</code> to mute the media, <code>false</code> to unmute the media.</li>
+<li>onSuccess: the closure to be called in case of success.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">mute</span><span class="p">(</span><span class="nv">isMuted</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">,</span> <span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)getMetadataOnSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/getMetadata(onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)getMetadataOnSuccess:onError:">getMetadata(onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Gets current media metadata. See <code><a href="../Classes/MetaDataChanged.html">MetaDataChanged</a></code> for details.</p>
+
+<ul>
+<li>onSuccess: the closure to be called in case of success. Return the metadata description.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getMetadata</span><span class="p">(</span><span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="nv">_</span><span class="p">:</span> <span class="kt"><a href="../Classes/MetaDataChanged.html">MetaDataChanged</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)MediaController(im)getPlaybackStatusOnSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/getPlaybackStatus(onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)MediaController(im)getPlaybackStatusOnSuccess:onError:">getPlaybackStatus(onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Gets current media status. See <code><a href="../Classes/PlaybackStatus.html">PlaybackStatus</a></code> for details.</p>
+
+<ul>
+<li>onSuccess: the closure to be called in case of success. Return the media status description.</li>
+<li>onError: the closure to be called in case of error</li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getPlaybackStatus</span><span class="p">(</span><span class="nv">onSuccess</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="nv">_</span><span class="p">:</span> <span class="kt"><a href="../Classes/PlaybackStatus.html">PlaybackStatus</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="nv">onError</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">NSError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2017 <a class="link" href="https://github.com/Orange-OpenSource/OCast-iOS" target="_blank" rel="external">Orange Labs</a>. All rights reserved. (Last updated: 2017-10-18)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

@@ -30,8 +30,19 @@ Here are the main functionalities of the Example project:
 
 ```
 
-You don't need to have a stick to run the Exmaple project or to start developping your own application: use our simulator to get started : See [OCast-DongleTV-JS](https://github.com/Orange-OpenSource/OCast-DongleTV-JS)
+You don't need to have a stick to run the Exmaple project or to start developping your own application. You can use our simulator to get started (see [OCast-DongleTV-JS](https://github.com/Orange-OpenSource/OCast-DongleTV-JS) for more details).
 
+Quick steps to get the simulator up and running:
+
+```
+$git clone https://github.com/Orange-OpenSource/OCast-DongleTV-JS.git
+
+$cd OCast-DongleTV-JS
+
+$npm install
+
+$npm start
+```
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
