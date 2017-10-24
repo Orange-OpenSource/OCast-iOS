@@ -1,0 +1,11 @@
+This project uses the following open source libraries.
+
+SocketRocket - https://github.com/facebook/SocketRocket
+Copyright 2012 Square Inc.
+Licensed under BSD 3-clause "New" or "Revised" License
+
+CocoaAsyncSocket - https://github.com/robbiehanson/CocoaAsyncSocket
+Originally created by Robbie Hanson
+Updated and maintained by Deusty LLC and the Apple development community.
+Licensed under the BSD license
+
