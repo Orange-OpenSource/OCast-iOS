@@ -1,0 +1,15 @@
+osx_image: xcode9
+language: swift
+
+branches:
+  only:
+    - master
+
+before_install:
+    - cd Example
+install:
+    - pod install
+
+script:
+  - set -o pipefail
+  - xcodebuild build -workspace OCastExample.xcworkspace -scheme OCastExample-Swift -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 7,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
