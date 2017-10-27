@@ -1,9 +1,9 @@
 # OCast
 
-[![License](https://img.shields.io/badge/licence-APACHE--2-lightgrey.svg)](https://github.com/Orange-OpenSource/OCast-iOS/blob/travisBranch/LICENSE)
+[![License](https://img.shields.io/badge/licence-APACHE--2-lightgrey.svg)](https://github.com/Orange-OpenSource/OCast-iOS/blob/master/LICENSE)
 
 [![Pod version](https://badge.fury.io/co/OCast.svg)](https://badge.fury.io/co/OCast)
-[![Build Status](https://travis-ci.org/Orange-OpenSource/OCast-iOS.png)](https://travis-ci.org/Orange-OpenSource/OCast-iOS)
+[![Build Status](https://travis-ci.org/Orange-OpenSource/OCast-iOS.svg?branch=master)](https://travis-ci.org/Orange-OpenSource/OCast-iOS)
 
 The Orange OCast SDK provides all required API methods to implement cast applications for the Orange stick.
 
