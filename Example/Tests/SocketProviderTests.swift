@@ -19,6 +19,7 @@
 import XCTest
 import SocketRocket
 @testable import OCast
+@testable import OCastReferenceDriver
 
 class SocketProviderTests: XCTestCase, SocketProviderProtocol {
     

@@ -31,15 +31,17 @@ import Foundation
  */
 
 @objc public final class DeviceManager: NSObject, DriverProtocol, HttpProtocol, XMLHelperProtocol {
+    
 
     // MARK: - Public interface
 
     /**
      Initializes a new DeviceManager.
+
      - Parameters:
-     - sender: module that will receive further notifications
-     - device: the device to be managed
-     - certificateInfo: Optional. An array of certificates to establish secured connections to the device.
+         - sender: module that will receive further notifications
+         - device: the device to be managed
+         - certificateInfo: Optional. An array of certificates to establish secured connections to the device.
      */
 
     public init? (from sender: Any, with device: Device, withCertificateInfo certificateInfo: CertificateInfo?) {
@@ -60,9 +62,8 @@ import Foundation
      
      Used to get a reference to the publicSettingController class
      - Parameters:
-     - onSuccess: the closure to be called in case of success. Returns a reference to the publicSettingController.
-
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success. Returns a reference to the publicSettingController.
+         - onError: the closure to be called in case of error
      */
 
     public func getPublicSettingsController(onSuccess: @escaping (_: DriverPublicSettingsProtocol) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
@@ -98,8 +99,8 @@ import Foundation
      
      Used to release the reference to the publicSettingController class.
      - Parameters:
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func releasePublicSettingsController(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
@@ -112,8 +113,8 @@ import Foundation
      
      Used to get a reference to the privateSettingController class
      - Parameters:
-     - onSuccess: the closure to be called in case of success; Returns a reference to the privateSettingController.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success; Returns a reference to the privateSettingController.
+         - onError: the closure to be called in case of error
      */
 
     public func getPrivateSettingsController(onSuccess: @escaping (_: DriverPrivateSettingsProtocol) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
@@ -155,8 +156,8 @@ import Foundation
      
      Used to release the reference to the privateSettingController class.
      - Parameters:
-     - onSuccess: the closure to be called in case of success
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success
+         - onError: the closure to be called in case of error
      */
 
     public func releasePrivateSettingsController(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
@@ -166,8 +167,8 @@ import Foundation
     /**
      Used to get a reference to the applicationController class
      - Parameters:
-     - onSuccess: the closure to be called in case of success. Returns a reference to the applicationController.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success. Returns a reference to the applicationController.
+         - onError: the closure to be called in case of error
      */
 
     public func getApplicationController(for applicationName: String, onSuccess: @escaping (_: ApplicationController) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
@@ -197,30 +198,18 @@ import Foundation
     }
 
     /**
-     Registers the default reference driver to connect to a device.
-     */
-
-    public static func registerReferenceDriver() -> Bool {
-        return registerDriver(forName: ReferenceDriver.manufacturer)
-    }
-
-    /**
      Registers a driver to connect to a device.
 
-     - Parameter name: Driver manufacturer's name. Caps sensitive. This value must match the manufacturer name present in the response to a MSEARCH Target.
+     - Parameters:
+        - name: Driver manufacturer's name. Caps sensitive. This value must match the manufacturer name present in the response to a MSEARCH Target.
+        - factory: The factory instance that is in chrage of buildng a driver instance.
      */
 
-    public static func registerDriver(forName name: String) -> Bool {
-
-        switch name {
-        case ReferenceDriver.manufacturer:
-            registeredDriver[name] = ReferenceDriverFactory.sharedInstance
-        default:
-            return false
-        }
+  
+   public static func registerDriver(forName name: String, factory: DriverFactoryProtocol) -> Bool {
+        registeredDriver[name] = factory
         return true
     }
-
     /*--------------------------------------------------------------------------------------------------------------------------------------*/
 
     // MARK: - Internal
@@ -229,7 +218,7 @@ import Foundation
     var currentApplicationData: ApplicationDescription!
     var currentApplicationName: String!
     var applicationControllers: [ApplicationController] = []
-    var successCallback: () -> Void = { _ in }
+    var successCallback: () -> Void = {  }
     var errorCallback: (_ error: NSError?) -> Void = { _ in }
 
     var managedDevice: Device
@@ -320,11 +309,21 @@ import Foundation
 
     // MARK: Driver Protocol
 
-    func onFailure(error _: NSError?) {
+    public func onFailure(error _: NSError?) {
         OCastLog.debug("DeviceMgr: Received a Driver failure indication.")
         reconnectAllSessions()
     }
+    
+    // Default implementation - Should be implemented by the driver.
+    
+    public func privateSettingsAllowed() -> Bool {return false}
+    public func connect(for module: DriverModule, with info: ApplicationDescription, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {}
+    public func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {}
+    public func getState(for module: DriverModule) -> DriverState {return .disconnected}
+    public func register(for delegate: DriverProtocol, with module: DriverModule) {}
 
+   // MARK: Miscellaneous
+    
     @objc func onFailureTimerExpiry(timer _: Timer) {
         OCastLog.debug("DeviceMgr: onFailureTimerExpiry")
 
@@ -362,15 +361,15 @@ import Foundation
             failureTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(onFailureTimerExpiry), userInfo: nil, repeats: false)
 
             if !applicationControllers.isEmpty {
-                driver?.connect(for: .application, with: currentApplicationData, onSuccess: { _ in self.resetFailureTimer() }, onError: { _ in })
+                driver?.connect(for: .application, with: currentApplicationData, onSuccess: {  self.resetFailureTimer() }, onError: { _ in })
             }
 
             if publicSettingsCtrl != nil {
-                driver?.connect(for: .publicSettings, with: currentApplicationData, onSuccess: { _ in self.resetFailureTimer() }, onError: { _ in })
+                driver?.connect(for: .publicSettings, with: currentApplicationData, onSuccess: {  self.resetFailureTimer() }, onError: { _ in })
             }
 
             if privateSettingsCtrl != nil {
-                driver?.connect(for: .privateSettings, with: currentApplicationData, onSuccess: { _ in self.resetFailureTimer() }, onError: { _ in })
+                driver?.connect(for: .privateSettings, with: currentApplicationData, onSuccess: {  self.resetFailureTimer() }, onError: { _ in })
             }
         }
     }

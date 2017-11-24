@@ -30,12 +30,12 @@ import Foundation
 }
 
 // MARK: - Internal Driver protocols
-
-internal protocol DriverFactoryProtocol {
+/// :nodoc:
+@objc public protocol DriverFactoryProtocol: class {
     func make(from sender: DriverProtocol, for ipAddress: String, with certificateInfo: CertificateInfo?) -> DriverProtocol
 }
-
-protocol DriverProtocol {
+/// :nodoc:
+@objc public protocol DriverProtocol: class {
     func privateSettingsAllowed() -> Bool
     func connect(for module: DriverModule, with info: ApplicationDescription, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
     func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
@@ -44,23 +44,24 @@ protocol DriverProtocol {
     func onFailure(error: NSError?)
 }
 
-protocol DriverBrowserProtocol {
+/// :nodoc:
+public protocol DriverBrowserProtocol {
     func sendBrowserData(data: DriverDataStructure, onSuccess: @escaping (DriverDataStructure) -> Void, onError: @escaping (NSError?) -> Void)
     func onData(with data: DriverDataStructure)
     func registerBrowser(for browser: DriverBrowserProtocol)
 }
 
 // MARK: - Driver states
-
-enum DriverState {
-    case connecting
+/// :nodoc:
+@objc public enum DriverState:Int {
+    case connecting = 0
     case connected
     case disconnecting
     case disconnected
 }
-
-enum DriverModule {
-    case application
+/// :nodoc:
+@objc public enum DriverModule:Int {
+    case application = 0
     case privateSettings
     case publicSettings
 }
@@ -78,17 +79,10 @@ public extension DriverPrivateSettingsProtocol {
     // Not yet implemented on stick side
 }
 
-extension DriverProtocol {
-    func privateSettingsAllowed() -> Bool { return false }
-    func connect(for _: DriverModule, with _: ApplicationDescription, onSuccess _: @escaping () -> Void, onError _: @escaping (NSError?) -> Void) {}
-    func disconnect(for _: DriverModule, onSuccess _: @escaping () -> Void, onError _: @escaping (NSError?) -> Void) {}
-    func getState(for _: DriverModule) -> DriverState { return .disconnected }
-    func register(for _: DriverProtocol, with _: DriverModule) {}
-    func onFailure(error _: NSError?) {}
-}
-
 extension DriverBrowserProtocol {
     func sendBrowserData(data _: DriverDataStructure, onSuccess _: @escaping (DriverDataStructure) -> Void, onError _: @escaping (NSError?) -> Void) {}
     func onData(with _: DriverDataStructure) {}
     func registerBrowser(for _: DriverBrowserProtocol) {}
 }
+
+

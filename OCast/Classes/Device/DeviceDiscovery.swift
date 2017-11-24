@@ -26,16 +26,16 @@ import CocoaAsyncSocket
     /**
      Gets called when a new device is found.
      - Parameters:
-     - deviceDiscovery: module (delegate) registered for notifications
-     - device: added device information . See `Device` for details.
+         - deviceDiscovery: module (delegate) registered for notifications
+         - device: added device information . See `Device` for details.
      */
     func onDeviceAdded(from deviceDiscovery: DeviceDiscovery, forDevice device: Device)
 
     /**
      Gets called when a device is lost.
      - Parameters:
-     - deviceDiscovery: module (delegate) registered for notifications
-     - device: lost device information . See `Device` for details.
+         - deviceDiscovery: module (delegate) registered for notifications
+         - device: lost device information . See `Device` for details.
      */
     func onDeviceRemoved(from deviceDiscovery: DeviceDiscovery, forDevice device: Device)
 }
@@ -69,9 +69,9 @@ import CocoaAsyncSocket
     /**
      Initializes a new deviceDiscoevry class.
      - Parameters:
-     - sender: module that will receive further notifications
-     - mSearchTargets: List of device targets to search for
-     - policy:  `Reliability` level for discovery process
+         - sender: module that will receive further notifications
+         - mSearchTargets: list of device targets to search for
+         - policy:  `Reliability` level for discovery process
      */
 
     @objc public init(for sender: Any, forTargets mSearchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
@@ -93,14 +93,14 @@ import CocoaAsyncSocket
             mSearchRetry = ReliabilityParams.low.mSearchRetry
         }
 
-        print("OCast SDK: Version 0.1.0")
+        print("OCast SDK: Version 0.2.0")
     }
 
     /**
      Initializes a new deviceDiscoevry class. The `Reliability` level is set to `.high` by default (a MSEARCH is sent every 3s. If no anwser after 6s, the device is considered as lost).
      - Parameters:
-     - sender: module that will receive further notifications
-     - mSearchTargets: List of device targets to search for
+         - sender: module that will receive further notifications
+         - mSearchTargets: List of device targets to search for
      */
     public convenience init(for sender: DeviceDiscoveryProtocol, forTargets searchTargets: Array<String>) {
         self.init(for: sender, forTargets: searchTargets, withPolicy: DeviceDiscovery.Reliability.high)
@@ -119,8 +119,8 @@ import CocoaAsyncSocket
     /**
      Starts a discovery process.
      - Returns:
-     - true if the discovery process could start.
-     - false if the discovery process could not be started.
+         - true if the discovery process could start.
+         - false if the discovery process could not be started.
      */
 
     public func start() -> Bool {
@@ -182,8 +182,8 @@ import CocoaAsyncSocket
 
     /**
      - Returns:
-     - true if the discovery process is started.
-     - false if the discovery process is not started.
+         - true if the discovery process is started.
+         - false if the discovery process is not started.
      */
 
     public func isStarted() -> Bool {
@@ -307,7 +307,7 @@ import CocoaAsyncSocket
 
     // MARK: - Timer management
 
-    func mSearchTimerExpiry(timer _: Timer!) {
+    @objc func mSearchTimerExpiry(timer _: Timer!) {
 
         _ = currentDevices.map { (deviceId, cachedDevice) -> Void in
 
@@ -457,7 +457,7 @@ import CocoaAsyncSocket
             return nil
         }
 
-        return searchTargetElement[result.upperBound ..< (searchTargetElement.endIndex)]
+        return String(searchTargetElement[result.upperBound ..< (searchTargetElement.endIndex)])
     }
 
     func getStickLocation(fromUDPData dataString: String) -> String? {
@@ -475,7 +475,7 @@ import CocoaAsyncSocket
             return nil
         }
 
-        return locationElement[result.lowerBound ..< locationElement.endIndex]
+        return String(locationElement[result.lowerBound ..< locationElement.endIndex])
     }
 
     func isTargetMatching(for searchTarget: String) -> Bool {

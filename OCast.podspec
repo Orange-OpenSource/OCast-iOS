@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
 s.name             = 'OCast'
-s.version          = '0.1.0'
-s.summary          = 'OCast SDK provides an application with all necessary functions to cast media contents to an Orange stick.'
+s.version          = '0.2.0'
+s.summary          = 'OCast SDK provides an application with all necessary functions to cast any contents to an Orange stick.'
 
 # This description is used to generate tags and improve search results.
 
@@ -40,12 +40,9 @@ s.homepage         = 'https://github.com/Orange-OpenSource/OCast-iOS'
 s.license          = { :type => 'Apache V2', :file => 'LICENSE' }
 s.author           = { 'Orange Labs' => 'philippe.besombe@orange.com' }
 s.source           = { :git => 'https://github.com/Orange-OpenSource/OCast-iOS.git', :tag => s.version.to_s }
+
 s.ios.deployment_target = '8.0'
 s.source_files = 'OCast/**/*'
 
-s.libraries = 'icucore'
-
 s.dependency 'CocoaAsyncSocket', '~>7.6.1'
-s.dependency 'SocketRocket', '~>0.5.1'
-
 end

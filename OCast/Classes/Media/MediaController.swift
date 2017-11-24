@@ -49,9 +49,9 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Prepares a cast command
      - Parameters:
-     - data: the data representing the media to be casted. See `MediaPrepare` class.
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - data: the data representing the media to be casted. See `MediaPrepare` class.
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func prepare(for data: MediaPrepare, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
@@ -92,8 +92,8 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Pauses the current media
      - Parameters:
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func pause(onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
@@ -152,8 +152,8 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Resumes the current media cast
      - Parameters:
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func resume(onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
@@ -182,9 +182,9 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Plays the current media from a given position
      - Parameters:
-     - position: starting position (in seconds)
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - position: starting position (in seconds)
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func play(to position: UInt, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
@@ -214,9 +214,9 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Sets the vomume level
      - Parameters:
-     - volume: volume level in a [0..1] interval.
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - volume: volume level in a [0..1] interval.
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func volume(to level: Float, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
@@ -246,9 +246,9 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Seeks the current media to a given position
      - Parameters:
-     - position: position
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - position: position
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func seek(to position: UInt, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
@@ -278,11 +278,11 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Sets a media track
      - Parameters:
-     - type: track type (See `TrackType` for description)
-     - id: track ID
-     - enabled: `true` to enable the track, `false` to disable the track.
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - type: track type (See `TrackType` for description)
+         - id: track ID
+         - enabled: `true` to enable the track, `false` to disable the track.
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func track(type: TrackType, id: String, enabled: Bool, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
@@ -314,9 +314,9 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Mutes the current media
      - Parameters:
-     - isMuted: `true` to mute the media, `false` to unmute the media.
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - isMuted: `true` to mute the media, `false` to unmute the media.
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func mute(isMuted: Bool, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
@@ -346,8 +346,8 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Gets current media metadata. See `MetaDataChanged` for details.
      - Parameters:
-     - onSuccess: the closure to be called in case of success. Return the metadata description.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success. Return the metadata description.
+         - onError: the closure to be called in case of error
      */
 
     public func getMetadata(onSuccess: @escaping (_: MetaDataChanged) -> Void, onError: @escaping (NSError?) -> Void) {
@@ -381,8 +381,8 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Gets current media status. See `PlaybackStatus` for details.
      - Parameters:
-     - onSuccess: the closure to be called in case of success. Return the media status description.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success. Return the media status description.
+         - onError: the closure to be called in case of error
      */
 
     public func getPlaybackStatus(onSuccess: @escaping (_: PlaybackStatus) -> Void, onError: @escaping (NSError?) -> Void) {

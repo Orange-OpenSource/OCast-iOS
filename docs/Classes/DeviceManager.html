@@ -14,7 +14,7 @@
     <a title="DeviceManager Class Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">OCast Docs</a> (69% documented)</p>
+        <p><a href="../index.html">OCast Docs</a> (63% documented)</p>
       </div>
     </header>
     <div class="content-wrapper">
@@ -59,9 +59,6 @@
               </li>
               <li class="nav-group-task">
                 <a href="../Classes/PlaybackStatus.html">PlaybackStatus</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Classes/ReferenceDriver.html">ReferenceDriver</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Classes/TrackDescription.html">TrackDescription</a>
@@ -503,36 +500,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:@M@OCast@objc(cs)DeviceManager(cm)registerReferenceDriver"></a>
-                    <a name="//apple_ref/swift/Method/registerReferenceDriver()" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@OCast@objc(cs)DeviceManager(cm)registerReferenceDriver">registerReferenceDriver()</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Registers the default reference driver to connect to a device.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">registerReferenceDriver</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/c:@M@OCast@objc(cs)DeviceManager(cm)registerDriverForName:"></a>
-                    <a name="//apple_ref/swift/Method/registerDriver(forName:)" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@OCast@objc(cs)DeviceManager(cm)registerDriverForName:">registerDriver(forName:)</a>
+                    <a name="/c:@M@OCast@objc(cs)DeviceManager(cm)registerDriverForName:factory:"></a>
+                    <a name="//apple_ref/swift/Method/registerDriver(forName:factory:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)DeviceManager(cm)registerDriverForName:factory:">registerDriver(forName:factory:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -547,7 +517,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">registerDriver</span><span class="p">(</span><span class="n">forName</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">registerDriver</span><span class="p">(</span><span class="n">forName</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">factory</span><span class="p">:</span> <span class="kt">DriverFactoryProtocol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
@@ -567,8 +537,193 @@
                                 </div>
                               </td>
                             </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>factory</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The factory instance that is in chrage of buildng a driver instance.</p>
+                                </div>
+                              </td>
+                            </tr>
                           </tbody>
                         </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Driver%20Protocol"></a>
+                <a name="//apple_ref/swift/Section/Driver Protocol" class="dashAnchor"></a>
+                <a href="#/Driver%20Protocol">
+                  <h3 class="section-name">Driver Protocol</h3>
+                </a>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)DeviceManager(im)onFailureWithError:"></a>
+                    <a name="//apple_ref/swift/Method/onFailure(error:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)DeviceManager(im)onFailureWithError:">onFailure(error:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">@objc</span> <span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">DeviceManager</span><span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt">DriverProtocol</span><span class="p">,</span> <span class="kt">HttpProtocol</span><span class="p">,</span> <span class="kt">XMLHelperProtocol</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)DeviceManager(im)privateSettingsAllowed"></a>
+                    <a name="//apple_ref/swift/Method/privateSettingsAllowed()" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)DeviceManager(im)privateSettingsAllowed">privateSettingsAllowed()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">@objc</span> <span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">DeviceManager</span><span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt">DriverProtocol</span><span class="p">,</span> <span class="kt">HttpProtocol</span><span class="p">,</span> <span class="kt">XMLHelperProtocol</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)DeviceManager(im)connectFor:with:onSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/connect(for:with:onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)DeviceManager(im)connectFor:with:onSuccess:onError:">connect(for:with:onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">@objc</span> <span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">DeviceManager</span><span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt">DriverProtocol</span><span class="p">,</span> <span class="kt">HttpProtocol</span><span class="p">,</span> <span class="kt">XMLHelperProtocol</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)DeviceManager(im)disconnectFor:onSuccess:onError:"></a>
+                    <a name="//apple_ref/swift/Method/disconnect(for:onSuccess:onError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)DeviceManager(im)disconnectFor:onSuccess:onError:">disconnect(for:onSuccess:onError:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">@objc</span> <span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">DeviceManager</span><span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt">DriverProtocol</span><span class="p">,</span> <span class="kt">HttpProtocol</span><span class="p">,</span> <span class="kt">XMLHelperProtocol</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)DeviceManager(im)getStateFor:"></a>
+                    <a name="//apple_ref/swift/Method/getState(for:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)DeviceManager(im)getStateFor:">getState(for:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">@objc</span> <span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">DeviceManager</span><span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt">DriverProtocol</span><span class="p">,</span> <span class="kt">HttpProtocol</span><span class="p">,</span> <span class="kt">XMLHelperProtocol</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@OCast@objc(cs)DeviceManager(im)registerFor:with:"></a>
+                    <a name="//apple_ref/swift/Method/register(for:with:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@OCast@objc(cs)DeviceManager(im)registerFor:with:">register(for:with:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">@objc</span> <span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">DeviceManager</span><span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt">DriverProtocol</span><span class="p">,</span> <span class="kt">HttpProtocol</span><span class="p">,</span> <span class="kt">XMLHelperProtocol</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -578,7 +733,7 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2017 <a class="link" href="https://github.com/Orange-OpenSource/OCast-iOS" target="_blank" rel="external">Orange Labs</a>. All rights reserved. (Last updated: 2017-10-24)</p>
+          <p>&copy; 2017 <a class="link" href="https://github.com/Orange-OpenSource/OCast-iOS" target="_blank" rel="external">Orange Labs</a>. All rights reserved. (Last updated: 2017-11-24)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </article>

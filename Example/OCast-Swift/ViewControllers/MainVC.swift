@@ -18,6 +18,7 @@
 
 import UIKit
 import OCast
+import OCastReferenceDriver
 
 class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol, DeviceManagerProtocol, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
@@ -78,12 +79,12 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
         
         setupUI ()
         
-        if !DeviceManager.registerDriver(forName: ReferenceDriver.manufacturer) {
+        if !DeviceManager.registerDriver(forName: ReferenceDriver.manufacturer, factory: ReferenceDriverFactory.sharedInstance) {
             return
         }
- 
+
         deviceDiscovery = DeviceDiscovery.init(for: self, forTargets: [referenceST])
-        
+
         guard deviceDiscovery.start() else {
             return
         }
@@ -298,6 +299,8 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
         
         if sender.text == "" {
             applicationName = "Orange-DefaultReceiver-DEV"
+        } else {
+            applicationName = sender.text!
         }
         
         webAppLabel.placeholder = applicationName

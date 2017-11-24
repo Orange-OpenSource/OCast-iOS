@@ -76,9 +76,9 @@ public extension DataStreamable {
     /**
      Used to send data to the web application.
      - Parameters:
-     - message: the message to be sent. Needs to be in a [String:Any] format.
-     - onSuccess: closure to be called in case of success
-     - onFailure: closure to be called in case of error
+         - message: the message to be sent. Needs to be in a [String:Any] format.
+         - onSuccess: closure to be called in case of success
+         - onFailure: closure to be called in case of error
      */
     public func sendMessage(with message: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
         messageSender?.send(message: message, onSuccess: onSuccess, onError: onError)

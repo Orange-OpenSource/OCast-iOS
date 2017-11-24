@@ -58,8 +58,8 @@ public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLH
      Starts the web application on the device and opens a dedicated connection at driver level to communicate with the stick.
      Restart the web application if it is already running on the device.
      - Parameters:
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func start(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
@@ -80,8 +80,8 @@ public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLH
     /**
      Joins the web application on the device. Fails if another web application is already running on the device.
      - Parameters:
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func join(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
@@ -102,8 +102,8 @@ public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLH
     /**
      Stops the web application on the device. Releases the dedicated web application connection at driver level.
      - Parameters:
-     - onSuccess: the closure to be called in case of success.
-     - onError: the closure to be called in case of error
+         - onSuccess: the closure to be called in case of success.
+         - onError: the closure to be called in case of error
      */
 
     public func stop(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {

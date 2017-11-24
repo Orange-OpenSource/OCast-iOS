@@ -17,6 +17,8 @@
 //
 #import "OBJCMainVC.h"
 @import OCast;
+@import OCastReferenceDriver;
+
 
 @interface OBJCMainVC ()<DeviceDiscoveryProtocol, DataStreamable, MediaControllerProtocol, DeviceManagerProtocol, UIPickerViewDelegate, UIPickerViewDataSource>
 
@@ -52,13 +54,19 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 
     [_stickIcon setEnabled:NO];
     
-    if ([DeviceManager registerDriverForName:ReferenceDriver.manufacturer] == NO) {
+    if ([DeviceManager registerDriverForName:ReferenceDriver.manufacturer factory:ReferenceDriverFactory.sharedInstance] == NO) {
         NSLog(@"-> Driver could not be registered.");
         return;
     }
     
-    deviceDiscovery = [[DeviceDiscovery alloc] initFor:self forTargets: @[ReferenceDriver.searchTarget]];
+//    if ([DeviceManager registerDriverForName:CaviumDriver.manufacturer factory:CaviumDriverFactory.sharedInstance] == NO) {
+//        NSLog(@"-> Driver could not be registered.");
+//        return;
+//    }
     
+//    deviceDiscovery = [[DeviceDiscovery alloc] initFor:self forTargets: @[ReferenceDriver.searchTarget, CaviumDriver.searchTarget]];
+    deviceDiscovery = [[DeviceDiscovery alloc] initFor:self forTargets: @[ReferenceDriver.searchTarget]];
+
     if ([deviceDiscovery start] == NO) {
         NSLog(@"-> Discovery process could not be started.");
         return;

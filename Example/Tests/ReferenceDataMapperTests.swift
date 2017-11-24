@@ -18,6 +18,7 @@
 
 import XCTest
 @testable import OCast
+@testable import OCastReferenceDriver
 
 class ReferecnceDataMapperTests: XCTestCase {
     
