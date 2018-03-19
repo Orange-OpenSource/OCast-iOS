@@ -1,11 +1,16 @@
 OCast Release notes
 
 ============================
+Version 0.3.0, March 2018
+============================
+- fix volume settings
+- App2AppURL and Version fields are properly formatted
+
+============================
 Version 0.2.0, November 2017
 ============================
 - Drivers are now set in the Podfile. 
 This impacts the driver registration method (registerDriver(for: with:) as it now needs a factory.
-
 
 ===========================
 Version 0.1.0, October 2017
