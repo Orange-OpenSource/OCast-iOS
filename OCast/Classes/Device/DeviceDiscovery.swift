@@ -93,7 +93,7 @@ import CocoaAsyncSocket
             mSearchRetry = ReliabilityParams.low.mSearchRetry
         }
 
-        print("OCast SDK: Version 0.2.0")
+        print("OCast SDK: Version 0.3.0")
     }
 
     /**

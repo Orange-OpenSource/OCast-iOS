@@ -212,7 +212,7 @@ public final class MediaController: NSObject, DataStreamable {
     }
 
     /**
-     Sets the vomume level
+     Sets the volume level
      - Parameters:
          - volume: volume level in a [0..1] interval.
          - onSuccess: the closure to be called in case of success.
@@ -220,7 +220,7 @@ public final class MediaController: NSObject, DataStreamable {
      */
 
     public func volume(to level: Float, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        let params: [String: Any] = ["level": level]
+        let params: [String: Any] = ["volume": level]
         let dict: [String: Any] = ["name": "volume", "params": params, "options": []]
         sendMessage(with: dict,
 

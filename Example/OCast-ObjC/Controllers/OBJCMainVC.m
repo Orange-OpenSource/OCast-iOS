@@ -59,18 +59,13 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         return;
     }
     
-//    if ([DeviceManager registerDriverForName:CaviumDriver.manufacturer factory:CaviumDriverFactory.sharedInstance] == NO) {
-//        NSLog(@"-> Driver could not be registered.");
-//        return;
-//    }
-    
-//    deviceDiscovery = [[DeviceDiscovery alloc] initFor:self forTargets: @[ReferenceDriver.searchTarget, CaviumDriver.searchTarget]];
     deviceDiscovery = [[DeviceDiscovery alloc] initFor:self forTargets: @[ReferenceDriver.searchTarget]];
 
     if ([deviceDiscovery start] == NO) {
         NSLog(@"-> Discovery process could not be started.");
         return;
     }
+    
 }
 
 - (void)didReceiveMemoryWarning {

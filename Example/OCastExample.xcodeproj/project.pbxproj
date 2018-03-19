@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D81D8417A027D94E2AC9EA8 /* Pods_OCast_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD4912E97E4FF7769A7421D7 /* Pods_OCast_Tests.framework */; };
 		6A920FA77F7DEBA12D57E1D4 /* Pods_OCastExample_Swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DFE8B95065147479834B5A4 /* Pods_OCastExample_Swift.framework */; };
 		BA6E3B09E6EFA3C46B745F34 /* Pods_OCast_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C40D1C51114CD38FE0875BA /* Pods_OCast_Tests.framework */; };
 		E4A1887DAFDD0FA7EA70D844 /* Pods_OCastExample_ObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D7D172A0BFB019AD2463665 /* Pods_OCastExample_ObjC.framework */; };
@@ -44,12 +45,12 @@
 			containerPortal = 607FACC81AFB9204008FA782 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 607FACCF1AFB9204008FA782;
-			remoteInfo = OpenCast;
+			remoteInfo = OCast;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		017F94ADF5D4655D38CB8B24 /* Pods_OpenCast_Swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenCast_Swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		017F94ADF5D4655D38CB8B24 /* Pods_OCast_Swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCast_Swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C40D1C51114CD38FE0875BA /* Pods_OCast_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCast_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A26ED220A03A373ECC86E62 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		3D7D172A0BFB019AD2463665 /* Pods_OCastExample_ObjC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCastExample_ObjC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -60,7 +61,7 @@
 		82AF091B8C2218D2B1A7DD27 /* Pods-OCastExample-ObjC.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastExample-ObjC.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OCastExample-ObjC/Pods-OCastExample-ObjC.debug.xcconfig"; sourceTree = "<group>"; };
 		A3E3AA525894734CE6837834 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		C41A90A9AF4E1C6BEC1D1827 /* Pods-OCastExample-ObjC.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastExample-ObjC.release.xcconfig"; path = "Pods/Target Support Files/Pods-OCastExample-ObjC/Pods-OCastExample-ObjC.release.xcconfig"; sourceTree = "<group>"; };
-		C96E29BEBF4C0BCB435C183F /* Pods_OpenCast_ObjC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenCast_ObjC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C96E29BEBF4C0BCB435C183F /* Pods_OCast_ObjC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCast_ObjC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D019F4225292760FB52AC2C4 /* Pods-OCast_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OCast_Tests/Pods-OCast_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		DAF25F86B104DCF6BFC04D48 /* Pods-OCast_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-OCast_Tests/Pods-OCast_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		DC16678DD5D94DD6D063C339 /* Pods-OCastExample-Swift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastExample-Swift.release.xcconfig"; path = "Pods/Target Support Files/Pods-OCastExample-Swift/Pods-OCastExample-Swift.release.xcconfig"; sourceTree = "<group>"; };
@@ -95,7 +96,7 @@
 		EBD65F471F67E2AB00F7B5EB /* MediaVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaVC.swift; sourceTree = "<group>"; };
 		EBDB55B31F603F71006FC8AB /* ApplicationManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationManagerTests.swift; sourceTree = "<group>"; };
 		F7ADF1085F0EF5CBBCBE4199 /* Pods-OCastExample-Swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastExample-Swift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OCastExample-Swift/Pods-OCastExample-Swift.debug.xcconfig"; sourceTree = "<group>"; };
-		FD4912E97E4FF7769A7421D7 /* Pods_OpenCast_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenCast_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD4912E97E4FF7769A7421D7 /* Pods_OCast_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCast_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +113,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BA6E3B09E6EFA3C46B745F34 /* Pods_OCast_Tests.framework in Frameworks */,
+				0D81D8417A027D94E2AC9EA8 /* Pods_OCast_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,9 +203,9 @@
 			isa = PBXGroup;
 			children = (
 				EBD3468B1EE84E5B0001377B /* libicucore.tbd */,
-				FD4912E97E4FF7769A7421D7 /* Pods_OpenCast_Tests.framework */,
-				C96E29BEBF4C0BCB435C183F /* Pods_OpenCast_ObjC.framework */,
-				017F94ADF5D4655D38CB8B24 /* Pods_OpenCast_Swift.framework */,
+				FD4912E97E4FF7769A7421D7 /* Pods_OCast_Tests.framework */,
+				C96E29BEBF4C0BCB435C183F /* Pods_OCast_ObjC.framework */,
+				017F94ADF5D4655D38CB8B24 /* Pods_OCast_Swift.framework */,
 				3D7D172A0BFB019AD2463665 /* Pods_OCastExample_ObjC.framework */,
 				4DFE8B95065147479834B5A4 /* Pods_OCastExample_Swift.framework */,
 				1C40D1C51114CD38FE0875BA /* Pods_OCast_Tests.framework */,
@@ -287,7 +289,7 @@
 			dependencies = (
 			);
 			name = "OCastExample-Swift";
-			productName = OpenCast;
+			productName = OCast;
 			productReference = 607FACD01AFB9204008FA782 /* OCastExample-Swift.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -328,7 +330,7 @@
 			dependencies = (
 			);
 			name = "OCastExample-ObjC";
-			productName = "OpenCast-ObjC";
+			productName = "OCast-ObjC";
 			productReference = EB1573321F27439800F6B174 /* OCastExample-ObjC.app */;
 			productType = "com.apple.product-type.application";
 		};

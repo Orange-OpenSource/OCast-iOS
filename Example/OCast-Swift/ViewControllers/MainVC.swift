@@ -72,22 +72,24 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
     
     var devices: [Device] = []
    
-    var applicationName =  "Orange-DefaultReceiver-DEV"
+    var applicationName =  "Orange-OrangeTVReceiverDev-SDK2018" // Orange-DefaultReceiver-DEV"
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI ()
-        
+
         if !DeviceManager.registerDriver(forName: ReferenceDriver.manufacturer, factory: ReferenceDriverFactory.sharedInstance) {
             return
         }
-
+        
         deviceDiscovery = DeviceDiscovery.init(for: self, forTargets: [referenceST])
 
         guard deviceDiscovery.start() else {
             return
         }
+        
+        
     }
 
     

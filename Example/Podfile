@@ -5,7 +5,7 @@ platform :ios, '8.0'
 target 'OCastExample-Swift' do
     pod 'OCast', :path => '../'
     pod 'OCastReferenceDriver'
-  
+
   target 'OCast_Tests' do
     inherit! :search_paths
   end
@@ -15,6 +15,7 @@ end
 target 'OCastExample-ObjC' do
     pod 'OCast', :path => '../'
     pod 'OCastReferenceDriver'
+    
 end
 
 post_install do |installer|

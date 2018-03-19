@@ -156,7 +156,7 @@ extension MainVC {
         // https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8
         
         let prepareMedia = MediaPrepare (
-            url: URL(string: "http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8")!,
+            url: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4")!,
             frequency : 1,
             title: "Movie sample",
             subtitle: "Brought to you by Orange OCast",

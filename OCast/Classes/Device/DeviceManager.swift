@@ -297,13 +297,15 @@ import Foundation
 
     func didEndParsing(for _: String, result: [String: String], attributes: [String: [String: String]]) {
 
-        let app2URL = result["ocast:X_OCAST_App2AppURL"]!
-        let version = result["ocast:X_OCAST_Version"]!
+        let app2URL = result["ocast:X_OCAST_App2AppURL"]!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        let version = result["ocast:X_OCAST_Version"]!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         let linkAttributes = attributes["link"]!
         let rel = linkAttributes["rel"] ?? "run"
         let href = linkAttributes["href"] ?? ""
+        
+       let newURL = app2URL.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
 
-        currentApplicationData = ApplicationDescription(app2appURL: app2URL, version: version, rel: rel, href: href, name: currentApplicationName)
+        currentApplicationData = ApplicationDescription(app2appURL: newURL, version: version, rel: rel, href: href, name: currentApplicationName)
         successCallback()
     }
 
