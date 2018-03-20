@@ -44,5 +44,5 @@ s.source           = { :git => 'https://github.com/Orange-OpenSource/OCast-iOS.g
 s.ios.deployment_target = '8.0'
 s.source_files = 'OCast/**/*'
 
-s.dependency 'CocoaAsyncSocket', '~>7.6.1'
+s.dependency 'CocoaAsyncSocket', '~>7.6.2'
 end
