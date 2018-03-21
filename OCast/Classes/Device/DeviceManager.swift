@@ -29,7 +29,7 @@ import Foundation
  ```
 
  */
-
+@objcMembers
 @objc public final class DeviceManager: NSObject, DriverProtocol, HttpProtocol, XMLHelperProtocol {
     
 

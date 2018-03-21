@@ -42,7 +42,7 @@ import Foundation
 
  ```
  */
-
+@objcMembers
 public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLHelperProtocol {
 
     // MARK: - Public interface

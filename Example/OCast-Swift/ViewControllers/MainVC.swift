@@ -164,7 +164,7 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
     func startApplication () {
         
         appliMgr!.start (
-            onSuccess: { _ in
+            onSuccess: { 
                 DispatchQueue.main.async {
                     self.deviceDiscovery.stop()
                     self.webAppStatusLabel.text = "Start-OK"
@@ -212,7 +212,7 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
     func joinApplication () {
         
         appliMgr!.join (
-            onSuccess: { _ in
+            onSuccess: { 
             
                 DispatchQueue.main.async {
                     self.webAppStatusLabel.text = "Join-OK"
@@ -247,7 +247,7 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
         self.errorMessageLabel.text = ""
         
         appliMgr.stop(
-            onSuccess: { _ in
+            onSuccess: { 
             
                 DispatchQueue.main.async {
                     OCastLog.debug(("-> Web App STOP is OK"))

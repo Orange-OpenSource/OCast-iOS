@@ -21,12 +21,12 @@ import Foundation
  Used to transfer certificate information from the DeviceManager to the Driver.
  Not implemented in this version.
  */
-
+@objcMembers
 @objc public final class CertificateInfo: NSObject {
 
     public var clientCertificate: String
     public var serverCACertificate: String
-    public var serevrRootCACertificate: String
+    public var serverRootCACertificate: String
     public var password: String
 
     /**
@@ -42,23 +42,13 @@ import Foundation
     public init(clientCert: String, serverCACert: String, serverRootCACert: String, password: String) {
         clientCertificate = clientCert
         serverCACertificate = serverCACert
-        serevrRootCACertificate = serverRootCACert
+        serverRootCACertificate = serverRootCACert
         self.password = password
     }
 }
 
-/**
- Used to describe a device.
- - Parameters:
-     - baseURL: base URL of the device
-     - ipAddress: IP address
-     - servicePort: service port
-     - deviceID: unique device ID (aka USN)
-     - friendlyName: friendly name
-     - manufacturer: manufacturer's name
-     - modelName: model name
- */
-
+/// Describes a Device
+@objcMembers
 @objc public final class Device: NSObject {
     /// base URL of the device
     public var baseURL: URL
@@ -75,6 +65,17 @@ import Foundation
     /// model name
     public var modelName: String
 
+    
+    /// Create a Device
+    ///
+    /// - Parameters:
+    ///   - baseURL: baseURL of the device
+    ///   - ipAddress: IP address
+    ///   - servicePort: service port
+    ///   - deviceID: unique device ID (aka USN)
+    ///   - friendlyName: friendly name
+    ///   - manufacturer: manufacturer's name
+    ///   - modelName: model name
     init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String?) {
         self.baseURL = baseURL
         self.ipAddress = ipAddress
@@ -87,6 +88,7 @@ import Foundation
 }
 
 /// :nodoc:
+@objcMembers
 @objc public final class ApplicationDescription: NSObject {
     public let app2appURL: String
     public let version: String
@@ -105,6 +107,7 @@ import Foundation
 
 /// :nodoc:
 // Not impemented in this version.
+@objcMembers
 @objc public final class StatusInfo: NSObject {
     public let version: String?
     public let state: String?
@@ -175,7 +178,7 @@ import Foundation
 }
 
 /// Describes the media to be casted.
-
+@objcMembers
 @objc public final class MediaPrepare: NSObject {
 
     /**
@@ -233,6 +236,7 @@ import Foundation
 }
 
 /// Describes the status of the current media.
+@objcMembers
 @objc public final class PlaybackStatus: NSObject {
     /// media duration in seconds
     public let duration: Double
@@ -272,7 +276,7 @@ import Foundation
 }
 
 /// Describes a media track.
-
+@objcMembers
 @objc public final class TrackDescription: NSObject {
     /// track id
     public let id: String
@@ -292,7 +296,7 @@ import Foundation
 }
 
 /// Describes the metadata of the current media.
-
+@objcMembers
 @objc public final class MetaDataChanged: NSObject {
     /// media title
     public let title: String
