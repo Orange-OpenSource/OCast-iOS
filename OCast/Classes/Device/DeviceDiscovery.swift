@@ -47,7 +47,7 @@ import CocoaAsyncSocket
  deviceDiscovery = DeviceDiscovery.init(for: self, forTargets: [ReferenceDriver.searchTarget])
  ```
  */
-
+@objcMembers
 @objc public class DeviceDiscovery: NSObject, GCDAsyncUdpSocketDelegate, XMLHelperProtocol, HttpProtocol {
 
     // MARK: - Initialization
@@ -59,7 +59,7 @@ import CocoaAsyncSocket
      - `.medium`: Sends a MSEARCH every 5s. If no anwser after 15s, device is considered as lost.
      - `.low`: Sends a MSEARCH every 10s. If no anwser after 50s, device is considered as lost.
      */
-
+    
     @objc public enum Reliability: Int {
         case high
         case medium
@@ -70,15 +70,15 @@ import CocoaAsyncSocket
      Initializes a new deviceDiscoevry class.
      - Parameters:
          - sender: module that will receive further notifications
-         - mSearchTargets: list of device targets to search for
+         - searchTargets: list of device targets to search for
          - policy:  `Reliability` level for discovery process
      */
 
-    @objc public init(for sender: Any, forTargets mSearchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
+    @objc public init(for sender: Any, forTargets searchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
 
         delegates.append(sender as? DeviceDiscoveryProtocol)
         mSearchIdx = 0
-        self.mSearchTargets = mSearchTargets
+        self.mSearchTargets = searchTargets
         isRunning = false
 
         switch policy {
@@ -100,7 +100,7 @@ import CocoaAsyncSocket
      Initializes a new deviceDiscoevry class. The `Reliability` level is set to `.high` by default (a MSEARCH is sent every 3s. If no anwser after 6s, the device is considered as lost).
      - Parameters:
          - sender: module that will receive further notifications
-         - mSearchTargets: List of device targets to search for
+         - searchTargets: List of device targets to search for
      */
     public convenience init(for sender: DeviceDiscoveryProtocol, forTargets searchTargets: Array<String>) {
         self.init(for: sender, forTargets: searchTargets, withPolicy: DeviceDiscovery.Reliability.high)
@@ -123,7 +123,7 @@ import CocoaAsyncSocket
          - false if the discovery process could not be started.
      */
 
-    public func start() -> Bool {
+    @objc public func start() -> Bool {
 
         guard !isRunning else {
             OCastLog.error("This instance is alreay running. Aborting.")
@@ -170,7 +170,7 @@ import CocoaAsyncSocket
      Stops a discovery process.
      */
 
-    public func stop() {
+    @objc public func stop() {
 
         if let ssdpSocket = self.ssdpSocket {
             ssdpSocket.close()
@@ -186,21 +186,20 @@ import CocoaAsyncSocket
          - false if the discovery process is not started.
      */
 
-    public func isStarted() -> Bool {
+    @objc public func isStarted() -> Bool {
         return isRunning
     }
 
     // MARK: - UDP management
 
     /// :nodoc:
-    public func udpSocket(_: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext _: Any?) {
-        var host: NSString?
-        var port: UInt16 = 0
+    public func udpSocket(_ udpSocket : GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext _: Any?) {
+        
+        guard let udpData: NSString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else {
+            return
+        }
 
-        GCDAsyncUdpSocket.getHost(&host, port: &port, fromAddress: address as Data)
-
-        let udpData: NSString = NSString(data: data as Data, encoding: String.Encoding.utf8.rawValue)!
-        OCastLog.debug("\n >> From \(host!) on port \(port)\n\(udpData)")
+        OCastLog.debug("\n >> From \(udpSocket.localHost() ?? "") on port \(udpSocket.localPort())\n\(udpData)")
 
         guard let searchTarget = getStickSearchTarget(fromUDPData: udpData as String) else {
             OCastLog.error("Search Target is missing or corrputed. Aborting.")
@@ -293,11 +292,10 @@ import CocoaAsyncSocket
         if mSearchIdx == type(of: mSearchIdx).max {
 
             OCastLog.debug("mSearchIdx reached the maximum allowed value.")
-
-            _ = currentDevicesIdx.map { (idxFromList, _) -> Void in
-                currentDevicesIdx[idxFromList] = 0
-                return
-            }
+            
+            currentDevicesIdx.keys.forEach({
+                currentDevicesIdx[$0] = 0
+            })
 
             mSearchIdx = 0
         }
@@ -348,11 +346,8 @@ import CocoaAsyncSocket
 
         if let applicationURL = httpResponse?.allHeaderFields["Application-DIAL-URL"] {
             return applicationURL as? String
-        } else {
-
-            if let applicationURL = httpResponse?.allHeaderFields["Application-URL"] {
-                return applicationURL as? String
-            }
+        } else if let applicationURL = httpResponse?.allHeaderFields["Application-URL"] {
+            return applicationURL as? String
         }
 
         return nil
@@ -449,11 +444,7 @@ import CocoaAsyncSocket
             return element.hasPrefix("ST:")
         }
 
-        guard let searchTargetElement = searchTargetArray.first else {
-            return nil
-        }
-
-        guard let result = searchTargetElement.range(of: "urn:") else {
+        guard let searchTargetElement = searchTargetArray.first, let result = searchTargetElement.range(of: "urn:") else {
             return nil
         }
 
@@ -467,11 +458,7 @@ import CocoaAsyncSocket
             return element.hasPrefix("LOCATION:")
         }
 
-        guard let locationElement = locationArray.first else {
-            return nil
-        }
-
-        guard let result = locationElement.range(of: "http") else {
+        guard let locationElement = locationArray.first, let result = locationElement.range(of: "http") else {
             return nil
         }
 

@@ -67,7 +67,7 @@ extension MainVC {
         let position = sender.value * Float (mediaDuration)
         
         mediaController?.seek(to: UInt(position),
-                              onSuccess: {_ in
+                              onSuccess: {
                                 OCastLog.debug("->Seek is OK.")
                               },
                               onError: {error in
@@ -81,7 +81,7 @@ extension MainVC {
     @IBAction func onVolumeSlider(_ sender: UISlider) {
         
         mediaController?.volume(to: sender.value,
-                                onSuccess: {_ in
+                                onSuccess: {
                                     OCastLog.debug("->Volume is OK.")
                                 },
                                 onError: {error in
@@ -110,7 +110,7 @@ extension MainVC {
             autoplay: true)
         
         mediaController?.prepare(for: prepareMedia,
-                                 onSuccess: {_ in
+                                 onSuccess: {
                                     OCastLog.debug("->Prepare for music is OK.")
         },
                                  onError: {error in
@@ -133,7 +133,7 @@ extension MainVC {
             autoplay: true)
         
         mediaController?.prepare(for: prepareMedia,
-                                 onSuccess: {_ in
+                                 onSuccess: {
                                     DispatchQueue.main.async {
                                     OCastLog.debug("->Prepare for picture is OK.")
                                     self.pictureLabel.text = "Picture sent."}
@@ -166,7 +166,7 @@ extension MainVC {
             autoplay: true)
 
         mediaController?.prepare(for: prepareMedia,
-                                 onSuccess: {_ in
+                                 onSuccess: {
                                     OCastLog.debug("->Prepare for film is OK.")
                                 },
                                  onError: {error in
@@ -181,7 +181,7 @@ extension MainVC {
         if shouldPause {
             
             
-            mediaController?.pause(onSuccess: {_ in
+            mediaController?.pause(onSuccess: {
                                     OCastLog.debug("->Pause is OK.")
                                     },
                                    
@@ -192,7 +192,7 @@ extension MainVC {
             
         } else {
             
-            mediaController?.resume(onSuccess: {_ in
+            mediaController?.resume(onSuccess: {
                                     OCastLog.debug("->Resume is OK.")
                                     },
                                     
@@ -207,7 +207,7 @@ extension MainVC {
     
     @IBAction func onMute(_ sender: Any) {
         mediaController?.mute(isMuted: shouldMute,
-                              onSuccess: {_ in
+                              onSuccess: {
                                 
                                 if self.shouldMute {
                                     OCastLog.debug("->Mute is OK.")
@@ -226,7 +226,7 @@ extension MainVC {
     }
     
     @IBAction func onMediaCtrlStop(_ sender: Any) {
-        mediaController?.stop(onSuccess: {_ in
+        mediaController?.stop(onSuccess: {
                                 OCastLog.debug("->Stop is OK.")
                             },
                             onError: {error in

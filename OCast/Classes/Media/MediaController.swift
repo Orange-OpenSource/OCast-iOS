@@ -41,7 +41,7 @@ import Foundation
  mediaController = deviceManager.getMediaController()
  ```
  */
-
+@objcMembers
 public final class MediaController: NSObject, DataStreamable {
 
     // MARK: - Public interface
@@ -214,7 +214,7 @@ public final class MediaController: NSObject, DataStreamable {
     /**
      Sets the volume level
      - Parameters:
-         - volume: volume level in a [0..1] interval.
+         - level: volume level in a [0..1] interval.
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
