@@ -54,7 +54,7 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func prepare(for data: MediaPrepare, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+    public func prepare(for data: MediaPrepare, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
 
         let params: [String: Any] = [
             "url": data.url.absoluteString,
@@ -67,7 +67,7 @@ public final class MediaController: NSObject, DataStreamable {
             "autoplay": data.autoplay,
         ]
 
-        let dict: [String: Any] = ["name": "prepare", "params": params, "options": []]
+        let dict: [String: Any] = ["name": "prepare", "params": params, "options": options]
 
         sendMessage(with: dict,
                     onSuccess: { response in
@@ -96,8 +96,8 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func pause(onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        let dict: [String: Any] = ["name": "pause", "params": [], "options": []]
+    public func pause(withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+        let dict: [String: Any] = ["name": "pause", "params": [], "options": options]
         sendMessage(with: dict,
 
                     onSuccess: { response in
@@ -126,8 +126,8 @@ public final class MediaController: NSObject, DataStreamable {
      - onError: the closure to be called in case of error
      */
 
-    public func stop(onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        let dict: [String: Any] = ["name": "stop", "params": [], "options": []]
+    public func stop(withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+        let dict: [String: Any] = ["name": "stop", "params": [], "options": options]
         sendMessage(with: dict,
 
                     onSuccess: { response in
@@ -156,8 +156,8 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func resume(onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        let dict: [String: Any] = ["name": "resume", "params": [], "options": []]
+    public func resume(withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+        let dict: [String: Any] = ["name": "resume", "params": [], "options": options]
         sendMessage(with: dict,
 
                     onSuccess: { response in
@@ -187,9 +187,9 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func play(to position: UInt, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+    public func play(to position: UInt, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let params: [String: Any] = ["position": position]
-        let dict: [String: Any] = ["name": "play", "params": params, "options": []]
+        let dict: [String: Any] = ["name": "play", "params": params, "options": options]
         sendMessage(with: dict,
 
                     onSuccess: { response in
@@ -219,9 +219,9 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func volume(to level: Float, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+    public func volume(to level: Float, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let params: [String: Any] = ["volume": level]
-        let dict: [String: Any] = ["name": "volume", "params": params, "options": []]
+        let dict: [String: Any] = ["name": "volume", "params": params, "options": options]
         sendMessage(with: dict,
 
                     onSuccess: { response in
@@ -251,9 +251,9 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func seek(to position: UInt, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+    public func seek(to position: UInt, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let params: [String: Any] = ["position": position]
-        let dict: [String: Any] = ["name": "seek", "params": params, "options": []]
+        let dict: [String: Any] = ["name": "seek", "params": params, "options": options]
         sendMessage(with: dict,
 
                     onSuccess: { response in
@@ -285,10 +285,10 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func track(type: TrackType, id: String, enabled: Bool, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+    public func track(type: TrackType, id: String, enabled: Bool, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let params: [String: Any] = ["type": type.toString(), "trackId": id, "enabled": enabled]
 
-        let dict: [String: Any] = ["name": "track", "params": params, "options": []]
+        let dict: [String: Any] = ["name": "track", "params": params, "options": options]
 
         sendMessage(with: dict,
 
@@ -319,9 +319,9 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func mute(isMuted: Bool, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+    public func mute(isMuted: Bool, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let params: [String: Any] = ["mute": isMuted]
-        let dict: [String: Any] = ["name": "mute", "params": params, "options": []]
+        let dict: [String: Any] = ["name": "mute", "params": params, "options": options]
         sendMessage(with: dict,
 
                     onSuccess: { response in
@@ -350,8 +350,8 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func getMetadata(onSuccess: @escaping (_: MetaDataChanged) -> Void, onError: @escaping (NSError?) -> Void) {
-        let dict: [String: Any] = ["name": "getMetadata", "params": [], "options": []]
+    public func getMetadata(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: MetaDataChanged) -> Void, onError: @escaping (NSError?) -> Void) {
+        let dict: [String: Any] = ["name": "getMetadata", "params": [], "options": options]
         sendMessage(with: dict,
 
                     onSuccess: { response in
@@ -385,8 +385,8 @@ public final class MediaController: NSObject, DataStreamable {
          - onError: the closure to be called in case of error
      */
 
-    public func getPlaybackStatus(onSuccess: @escaping (_: PlaybackStatus) -> Void, onError: @escaping (NSError?) -> Void) {
-        let dict: [String: Any] = ["name": "getPlaybackStatus", "params": [], "options": []]
+    public func getPlaybackStatus(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: PlaybackStatus) -> Void, onError: @escaping (NSError?) -> Void) {
+        let dict: [String: Any] = ["name": "getPlaybackStatus", "params": [], "options": options]
         sendMessage(with: dict,
 
                     onSuccess: { response in
