@@ -44,5 +44,15 @@ s.source           = { :git => 'https://github.com/Orange-OpenSource/OCast-iOS.g
 s.ios.deployment_target = '8.0'
 s.source_files = 'OCast/**/*'
 
-s.dependency 'CocoaAsyncSocket', '~>7.6.2'
+s.subspec 'Core' do |core|
+    core.source_files   = 'OCast/Core/**/*'
+    core.dependency 'CocoaAsyncSocket', '7.6.2'
+end
+
+s.subspec 'ReferenceDriver' do |reference|
+    reference.source_files   = 'OCast/Core/**/*'
+    reference.dependency 'SocketRocket' , '0.5.1'
+    reference.dependency 'OCast/Core'
+end
+
 end

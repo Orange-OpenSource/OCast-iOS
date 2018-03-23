@@ -17,7 +17,6 @@
 //
 #import "OBJCMainVC.h"
 @import OCast;
-@import OCastReferenceDriver;
 
 
 @interface OBJCMainVC ()<DeviceDiscoveryProtocol, DataStreamable, MediaControllerProtocol, DeviceManagerProtocol, UIPickerViewDelegate, UIPickerViewDataSource>

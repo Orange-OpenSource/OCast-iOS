@@ -18,7 +18,6 @@
 
 import UIKit
 import OCast
-import OCastReferenceDriver
 
 class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol, DeviceManagerProtocol, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     

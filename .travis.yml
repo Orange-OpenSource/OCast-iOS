@@ -7,8 +7,9 @@ branches:
 
 before_install:
     - cd Example
+    - pod repo update
 install:
-    - pod update
+    - pod install
 
 script:
   - set -o pipefail
