@@ -4,7 +4,6 @@ platform :ios, '8.0'
 
 target 'OCastExample-Swift' do
     pod 'OCast', :path => '../'
-    pod 'OCastReferenceDriver', :git => 'https://github.com/Orange-OpenSource/OCastReferenceDriver-iOS.git', :branch => 'master'
 
   target 'OCast_Tests' do
     inherit! :search_paths
@@ -14,8 +13,6 @@ end
 
 target 'OCastExample-ObjC' do
     pod 'OCast', :path => '../'
-    pod 'OCastReferenceDriver', :git => 'https://github.com/Orange-OpenSource/OCastReferenceDriver-iOS.git', :branch => 'master'
-    
 end
 
 post_install do |installer|
