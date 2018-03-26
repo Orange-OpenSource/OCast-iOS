@@ -16,8 +16,6 @@
 //
 
 import Foundation
-import OCast
-
 
 // Data structure for link layer
 

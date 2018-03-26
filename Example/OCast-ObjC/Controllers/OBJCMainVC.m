@@ -285,9 +285,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     ErrorBlockType errorBlock = ^(NSError *error){
         NSLog(@"->Prepare NOK");
     };
-    
-    [mediaCtrl prepareFor:mediaPrepare onSuccess:successBlock onError:errorBlock];
-    
+
+    [mediaCtrl prepareFor:mediaPrepare withOptions:@{} onSuccess:successBlock onError:errorBlock];
     [self getPlaybackStatus];
     [self getMetaData];
 }
@@ -303,7 +302,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Stop film is NOK");
     };
     
-    [mediaCtrl stopOnSuccess:successBlock onError:errorBlock];
+    [mediaCtrl stopWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 #pragma mark -  DataStreamable protocol
@@ -398,7 +397,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     };
     
     if (metaData.audioTracks.count > 0) {
-        [mediaCtrl trackWithType: TrackTypeAudio id:@"0" enabled:YES onSuccess:successBlock onError:errorBlock];
+        [mediaCtrl trackWithType:TrackTypeAudio id:@"0" enabled:YES withOptions:@{} onSuccess:successBlock onError:errorBlock];
     }
 }
 
@@ -419,7 +418,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the Playback status Info");
     };
     
-    [mediaCtrl getPlaybackStatusOnSuccess:successBlock onError:errorBlock];
+    [mediaCtrl getPlaybackStatusWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 -(void)getMetaData {
@@ -466,8 +465,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the MetaDataChanged Info");
     };
     
-    [mediaCtrl getMetadataOnSuccess:successBlock onError:errorBlock];
-    
+    [mediaCtrl getMetadataWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 @end

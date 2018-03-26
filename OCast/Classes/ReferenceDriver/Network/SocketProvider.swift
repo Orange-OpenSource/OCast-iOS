@@ -17,7 +17,6 @@
 
 import Foundation
 import SocketRocket
-import OCast
 
 protocol SocketProviderProtocol {
     func onDisconnected(from socket: SocketProvider, code: Int, reason: String!)

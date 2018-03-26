@@ -53,6 +53,7 @@ s.subspec 'ReferenceDriver' do |reference|
     reference.source_files   = 'OCast/Core/**/*'
     reference.dependency 'SocketRocket' , '0.5.1'
     reference.dependency 'OCast/Core'
+    reference.summary = 'ReferenceDriver provides a reference driver implementation for the OCast SDK.'
 end
 
 end
