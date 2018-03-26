@@ -42,7 +42,7 @@ import Foundation
  ```
  */
 @objcMembers
-public final class MediaController: NSObject, DataStreamable {
+public final class MediaController: NSObject, DataStream {
 
     // MARK: - Public interface
 
@@ -69,7 +69,7 @@ public final class MediaController: NSObject, DataStreamable {
 
         let dict: [String: Any] = ["name": "prepare", "params": params, "options": options]
         
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
                     onSuccess: { response in
 
                         guard let errorCode = self.getCode(from: response) else {
@@ -98,7 +98,7 @@ public final class MediaController: NSObject, DataStreamable {
 
     public func pause(withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let dict: [String: Any] = ["name": "pause", "params": [], "options": options]
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -128,7 +128,7 @@ public final class MediaController: NSObject, DataStreamable {
 
     public func stop(withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let dict: [String: Any] = ["name": "stop", "params": [], "options": options]
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -158,7 +158,7 @@ public final class MediaController: NSObject, DataStreamable {
 
     public func resume(withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let dict: [String: Any] = ["name": "resume", "params": [], "options": options]
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -190,7 +190,7 @@ public final class MediaController: NSObject, DataStreamable {
     public func play(to position: UInt, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let params: [String: Any] = ["position": position]
         let dict: [String: Any] = ["name": "play", "params": params, "options": options]
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -222,7 +222,7 @@ public final class MediaController: NSObject, DataStreamable {
     public func volume(to level: Float, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let params: [String: Any] = ["volume": level]
         let dict: [String: Any] = ["name": "volume", "params": params, "options": options]
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -254,7 +254,7 @@ public final class MediaController: NSObject, DataStreamable {
     public func seek(to position: UInt, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let params: [String: Any] = ["position": position]
         let dict: [String: Any] = ["name": "seek", "params": params, "options": options]
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -290,7 +290,7 @@ public final class MediaController: NSObject, DataStreamable {
 
         let dict: [String: Any] = ["name": "track", "params": params, "options": options]
 
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -322,7 +322,7 @@ public final class MediaController: NSObject, DataStreamable {
     public func mute(isMuted: Bool, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         let params: [String: Any] = ["mute": isMuted]
         let dict: [String: Any] = ["name": "mute", "params": params, "options": options]
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -352,7 +352,7 @@ public final class MediaController: NSObject, DataStreamable {
 
     public func getMetadata(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: MetaDataChanged) -> Void, onError: @escaping (NSError?) -> Void) {
         let dict: [String: Any] = ["name": "getMetadata", "params": [], "options": options]
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -387,7 +387,7 @@ public final class MediaController: NSObject, DataStreamable {
 
     public func getPlaybackStatus(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: PlaybackStatus) -> Void, onError: @escaping (NSError?) -> Void) {
         let dict: [String: Any] = ["name": "getPlaybackStatus", "params": [], "options": options]
-        sendMessage(with: dict,
+        dataSender?.send(message: dict,
 
                     onSuccess: { response in
 
@@ -416,7 +416,7 @@ public final class MediaController: NSObject, DataStreamable {
     // MARK: - DataStreamable Protocol
 
     /// :nodoc:
-    public var messageSender: MessagerSender?
+    public var dataSender: DataSender?
 
     /// :nodoc:
     public let serviceId = "org.ocast.media"
@@ -449,9 +449,7 @@ public final class MediaController: NSObject, DataStreamable {
     /*--------------------------------------------------------------------------------------------------------------------------------------*/
 
     // MARK: - Internal
-
     let delegate: MediaControllerDelegate
-    var commandId: Int = 0
 
     init(with delegate: MediaControllerDelegate) {
         self.delegate = delegate

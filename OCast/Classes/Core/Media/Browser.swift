@@ -24,7 +24,7 @@ protocol BrowserDelegate {
 
 final class Browser: NSObject, DriverDelegate {
     
-    var streams: [String: DataStreamable] = [:]
+    var streams: [String: DataStream] = [:]
     let driver: BrowserDelegate
 
     init(withDriver driver: BrowserDelegate) {
@@ -33,7 +33,7 @@ final class Browser: NSObject, DriverDelegate {
         self.driver.registerBrowser(for: self)
     }
 
-    func registerStream(for stream: DataStreamable) {
+    func registerStream(for stream: DataStream) {
         streams[stream.serviceId] = stream
     }
 

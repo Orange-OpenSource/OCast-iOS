@@ -19,7 +19,7 @@
 @import OCast;
 
 
-@interface OBJCMainVC ()<DeviceDiscoveryProtocol, DataStreamable, MediaControllerDelegate, DeviceManagerProtocol, UIPickerViewDelegate, UIPickerViewDataSource>
+@interface OBJCMainVC ()<DeviceDiscoveryProtocol, DataStream, MediaControllerDelegate, DeviceManagerProtocol, UIPickerViewDelegate, UIPickerViewDataSource>
 
 @property (strong, nonatomic) IBOutlet UIPickerView *stickPickerView;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *stickIcon;
@@ -33,7 +33,7 @@
 
 @implementation OBJCMainVC
 
-@synthesize messageSender; // For DataStreamable protocol
+@synthesize dataSender; // For DataStream protocol
 
 typedef void(^ErrorBlockType)(NSError*);
 
@@ -259,7 +259,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the Custom response");
     };
     
-    [self.messageSender sendWithMessage:dict onSuccess:successBlock onError:errorBlock];
+    [self.dataSender sendWithMessage:dict onSuccess:successBlock onError:errorBlock];
 }
 
 

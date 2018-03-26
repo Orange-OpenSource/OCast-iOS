@@ -26,7 +26,7 @@ internal final class DefaultDataStream: DataStreamable {
     
     var browser: Browser?
     
-    var messageSender: MessagerSender?
+    var messageSender: StreamEmitter?
     
     init(forService serviceId: String) {
         self.serviceId = serviceId

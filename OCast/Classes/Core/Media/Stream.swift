@@ -59,11 +59,11 @@ final class CustomStream : DataStreamable {
  ```
  */
 
-@objc public protocol DataStreamable {
+@objc public protocol DataStream {
     /// The service ID representing the customized messages
     var serviceId: String { get }
     /// Provides access to the internal send mechanism. It just needs to be declared.
-    var messageSender: MessagerSender? { get set }
+    var dataSender: DataSender? { get set }
 
     /**
      Gets called when data matching your service ID is received from the web application.
@@ -72,6 +72,7 @@ final class CustomStream : DataStreamable {
     func onMessage(data: [String: Any])
 }
 
+/*
 public extension DataStreamable {
     /**
      Used to send data to the web application.
@@ -83,10 +84,10 @@ public extension DataStreamable {
     public func sendMessage(with message: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
         messageSender?.send(message: message, onSuccess: onSuccess, onError: onError)
     }
-}
+}*/
 
 /// :nodoc:
 
-@objc public protocol MessagerSender {
+@objc public protocol DataSender {
     func send(message: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void)
 }

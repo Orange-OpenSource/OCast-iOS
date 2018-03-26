@@ -20,11 +20,10 @@ import Foundation
 import OCast
 
 
-final class CustomStream : DataStreamable {
+final class CustomStream : DataStream {
+    var dataSender: DataSender?
     
     let serviceId = "org.ocast.custom"
-
-    var messageSender: MessagerSender?
 
     var onDone : ([String : Any])->() = {_ in }
     
@@ -33,7 +32,7 @@ final class CustomStream : DataStreamable {
         let dict = ["command":"START_APPLICATION \(param)","cmd_id":0, "url":"http://myWeb/myPage.htm"] as [String : Any]
         
         self.onDone = onDone
-        sendMessage(with: dict, onSuccess: onSuccess(data:), onError: onError(error:))
+        dataSender?.send(message: dict, onSuccess: onSuccess(data:), onError: onError(error:))
     }
     
     //MARK: - DataStream methods implementation

@@ -43,7 +43,7 @@ import Foundation
  ```
  */
 @objcMembers
-public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLHelperProtocol {
+public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelperProtocol {
 
     // MARK: - Public interface
 
@@ -146,10 +146,10 @@ public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLH
         - Parameter stream: custom stream to be managed
      */
 
-    public func manageStream(for stream: DataStreamable) {
+    public func manageStream(for stream: DataStream) {
         OCastLog.debug("ApplicationMgr: manage Stream for \(stream.serviceId)")
         startBrowser()
-        stream.messageSender = DefaultMessagerSender(browser: browser!, serviceId: stream.serviceId)
+        stream.dataSender = DefaultMessagerSender(browser: browser!, serviceId: stream.serviceId)
         browser?.registerStream(for: stream)
     }
 
@@ -161,7 +161,7 @@ public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLH
     public let serviceId = ApplicationController.applicationServiceId
 
     /// :nodoc:
-    public var messageSender: MessagerSender?
+    public var dataSender: DataSender?
 
     /// :nodoc:
     public func onMessage(data: [String: Any]) {
@@ -308,7 +308,7 @@ public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLH
         }
     }
 
-    fileprivate final class DefaultMessagerSender: MessagerSender {
+    fileprivate final class DefaultMessagerSender: DataSender {
 
         let browser: Browser
         let serviceId: String
