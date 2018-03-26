@@ -17,7 +17,7 @@
 
 import Foundation
 
-extension ReferenceDriver: DriverBrowserProtocol {
+extension ReferenceDriver: BrowserDelegate {
     
     public func onData(with data: DriverDataStructure) {
     }
@@ -49,7 +49,7 @@ extension ReferenceDriver: DriverBrowserProtocol {
         })
     }
 
-    public func registerBrowser(for browser: DriverBrowserProtocol) {
+    public func registerBrowser(for browser: DriverDelegate) {
         self.browser = browser
     }
 }

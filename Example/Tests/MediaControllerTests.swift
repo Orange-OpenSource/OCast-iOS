@@ -19,7 +19,7 @@
 import XCTest
 @testable import OCast
 
-class MediaControllerTests: XCTestCase, MediaControllerProtocol {
+class MediaControllerTests: XCTestCase, MediaControllerDelegate {
     
     override func setUp() {
         super.setUp()

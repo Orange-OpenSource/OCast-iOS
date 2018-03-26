@@ -21,7 +21,7 @@ import Foundation
  Provides information on media.
  */
 
-@objc public protocol MediaControllerProtocol {
+@objc public protocol MediaControllerDelegate {
     /**
      Gets called when a media status has been received from the web application
      - Parameter data: data with the status information. See `PlaybackStatus` for details.
@@ -68,7 +68,7 @@ public final class MediaController: NSObject, DataStreamable {
         ]
 
         let dict: [String: Any] = ["name": "prepare", "params": params, "options": options]
-
+        
         sendMessage(with: dict,
                     onSuccess: { response in
 
@@ -432,14 +432,14 @@ public final class MediaController: NSObject, DataStreamable {
 
         case "playbackStatus":
             let playbackStatus = DataMapper().getPlaybackStatus(with: mediaData)
-            sender.onPlaybackStatus(data: playbackStatus)
+            delegate.onPlaybackStatus(data: playbackStatus)
 
         case "metadataChanged":
             guard let metaData = DataMapper().getMetaData(from: mediaData) else {
                 return
             }
 
-            sender.onMetaDataChanged(data: metaData)
+            delegate.onMetaDataChanged(data: metaData)
 
         default:
             return
@@ -450,11 +450,11 @@ public final class MediaController: NSObject, DataStreamable {
 
     // MARK: - Internal
 
-    let sender: MediaControllerProtocol
+    let delegate: MediaControllerDelegate
     var commandId: Int = 0
 
-    init(from sender: Any) {
-        self.sender = sender as! MediaControllerProtocol
+    init(with delegate: MediaControllerDelegate) {
+        self.delegate = delegate
     }
 
     func getCode(from response: [String: Any]?) -> MediaErrorCode? {

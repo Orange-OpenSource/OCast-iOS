@@ -19,7 +19,7 @@
 import UIKit
 import OCast
 
-class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol, DeviceManagerProtocol, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerDelegate, DeviceManagerProtocol, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
     @IBOutlet var webAppLabel: UITextField!
     @IBOutlet var webAppStatusLabel: UILabel!

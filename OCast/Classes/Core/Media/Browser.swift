@@ -18,22 +18,22 @@
 
 import Foundation
 
-protocol BrowserProtocol {
-    func onMessage(data: [String: Any])
-}
+protocol BrowserDelegate {
+    func sendBrowserData(data: DriverDataStructure, onSuccess: @escaping (DriverDataStructure) -> Void, onError: @escaping (NSError?) -> Void)
+    func registerBrowser(for browser: DriverDelegate)}
 
-final class Browser: NSObject, DriverBrowserProtocol {
+final class Browser: NSObject, DriverDelegate {
+    
     var streams: [String: DataStreamable] = [:]
-    let driver: DriverBrowserProtocol
+    let driver: BrowserDelegate
 
-    init(withDriver driver: DriverBrowserProtocol) {
+    init(withDriver driver: BrowserDelegate) {
         self.driver = driver
         super.init()
         self.driver.registerBrowser(for: self)
     }
 
     func registerStream(for stream: DataStreamable) {
-
         streams[stream.serviceId] = stream
     }
 
@@ -60,8 +60,7 @@ final class Browser: NSObject, DriverBrowserProtocol {
         )
     }
 
-    // MARK: - Driver Browser protocol
-
+    // MARK: - DriverDelegate methods
     func onData(with data: DriverDataStructure) {
 
         guard let browserData = DataMapper().getBrowserData(with: data) else {

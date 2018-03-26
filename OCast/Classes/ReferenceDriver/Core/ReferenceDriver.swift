@@ -67,7 +67,7 @@ import Foundation
     // MARK: - Internal
 
     var links: [LinkId: LinkBuildProtocol] = [:]
-    var browser: DriverBrowserProtocol?
+    var browser: DriverDelegate?
 
     enum LinkId: Int8 {
         case genericLink

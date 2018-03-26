@@ -122,10 +122,10 @@ public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLH
      - Returns: A pointer to the mediaController class
      */
 
-    public func getMediaController(for sender: MediaControllerProtocol) -> MediaController {
+    public func getMediaController(for sender: MediaControllerDelegate) -> MediaController {
 
         if mediaController == nil {
-            mediaController = MediaController(from: sender)
+            mediaController = MediaController(with: sender)
             manageStream(for: mediaController!)
         }
 
@@ -303,7 +303,8 @@ public class ApplicationController: NSObject, DataStreamable, HttpProtocol, XMLH
     func startBrowser() {
 
         if browser == nil {
-            browser = Browser(withDriver: driver as! DriverBrowserProtocol)
+            // FIXME: !!!
+            browser = Browser(withDriver: driver as! BrowserDelegate)
         }
     }
 

@@ -19,7 +19,7 @@
 @import OCast;
 
 
-@interface OBJCMainVC ()<DeviceDiscoveryProtocol, DataStreamable, MediaControllerProtocol, DeviceManagerProtocol, UIPickerViewDelegate, UIPickerViewDataSource>
+@interface OBJCMainVC ()<DeviceDiscoveryProtocol, DataStreamable, MediaControllerDelegate, DeviceManagerProtocol, UIPickerViewDelegate, UIPickerViewDataSource>
 
 @property (strong, nonatomic) IBOutlet UIPickerView *stickPickerView;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *stickIcon;

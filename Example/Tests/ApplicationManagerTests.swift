@@ -37,7 +37,7 @@ internal final class DefaultDataStream: DataStreamable {
     }
 }
 
-class ApplicationManagerTests: XCTestCase, MediaControllerProtocol {
+class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
 
     var testID = 0
     

@@ -45,10 +45,8 @@ import Foundation
 }
 
 /// :nodoc:
-public protocol DriverBrowserProtocol {
-    func sendBrowserData(data: DriverDataStructure, onSuccess: @escaping (DriverDataStructure) -> Void, onError: @escaping (NSError?) -> Void)
+public protocol DriverDelegate {
     func onData(with data: DriverDataStructure)
-    func registerBrowser(for browser: DriverBrowserProtocol)
 }
 
 // MARK: - Driver states
@@ -79,10 +77,5 @@ public extension DriverPrivateSettingsProtocol {
     // Not yet implemented on stick side
 }
 
-extension DriverBrowserProtocol {
-    func sendBrowserData(data _: DriverDataStructure, onSuccess _: @escaping (DriverDataStructure) -> Void, onError _: @escaping (NSError?) -> Void) {}
-    func onData(with _: DriverDataStructure) {}
-    func registerBrowser(for _: DriverBrowserProtocol) {}
-}
 
 
