@@ -1,5 +1,5 @@
 //
-// DriverProtocols.swift
+// Driver.swift
 //
 // Copyright 2017 Orange
 //
@@ -32,21 +32,7 @@ import Foundation
 // MARK: - Internal Driver protocols
 /// :nodoc:
 @objc public protocol DriverFactoryProtocol: class {
-    func make(from sender: DriverProtocol, for ipAddress: String, with certificateInfo: CertificateInfo?) -> DriverProtocol
-}
-/// :nodoc:
-@objc public protocol DriverProtocol: class {
-    func privateSettingsAllowed() -> Bool
-    func connect(for module: DriverModule, with info: ApplicationDescription, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
-    func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
-    func getState(for module: DriverModule) -> DriverState
-    func register(for delegate: DriverProtocol, with module: DriverModule)
-    func onFailure(error: NSError?)
-}
-
-/// :nodoc:
-public protocol DriverDelegate {
-    func onData(with data: DriverDataStructure)
+    func make(for ipAddress: String, with certificateInfo: CertificateInfo?) -> Driver
 }
 
 // MARK: - Driver states
@@ -64,18 +50,26 @@ public protocol DriverDelegate {
     case publicSettings
 }
 
-// MARK: - Protocol default implementations
-
-/// :nodoc:
-public extension DriverPublicSettingsProtocol {
-    // Not yet implemented on stick side
-    func getUpdateStatus(onSuccess _: @escaping (StatusInfo) -> Void, onError _: @escaping (NSError?) -> Void) {}
+@objc public protocol DriverDelegate {
+    func onFailure(error: NSError?)
 }
 
 /// :nodoc:
-public extension DriverPrivateSettingsProtocol {
-    // Not yet implemented on stick side
+@objc public protocol DriverReceiverDelegate {
+    func onData(with data: [String: Any])
 }
+
+/// :nodoc:
+@objc public protocol Driver: BrowserDelegate {
+    var delegate: DriverReceiverDelegate? { get set }
+    func privateSettingsAllowed() -> Bool
+    func connect(for module: DriverModule, with info: ApplicationDescription, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
+    func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
+    func getState(for module: DriverModule) -> DriverState
+    func register(_ delegate: DriverDelegate, forModule module: DriverModule)
+}
+
+
 
 
 

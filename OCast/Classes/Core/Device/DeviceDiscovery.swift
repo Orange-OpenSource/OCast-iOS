@@ -130,9 +130,7 @@ import CocoaAsyncSocket
             return false
         }
 
-        if let socket = ssdpSocket {
-            socket.close()
-        }
+        ssdpSocket?.close()
 
         ssdpSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.main)
 

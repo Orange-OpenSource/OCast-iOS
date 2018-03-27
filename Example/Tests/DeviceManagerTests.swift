@@ -29,7 +29,7 @@ class DeviceManagerTests: XCTestCase {
     func testDeviceManaegCreation () {
         
         var device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "theDriver", modelName: "")
-        var deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+        var deviceMgr = DeviceManager (with: device)
         
         // Must fail: The manufacturer does not macth any existing driver.
         
@@ -38,7 +38,7 @@ class DeviceManagerTests: XCTestCase {
         }
         
         device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+        deviceMgr = DeviceManager (with: device)
 
         XCTAssert(deviceMgr != nil)
       
@@ -48,7 +48,7 @@ class DeviceManagerTests: XCTestCase {
     func testApplicationController () {
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+        let deviceMgr = DeviceManager(with: device)
         
         XCTAssert(deviceMgr != nil)
         XCTAssert (deviceMgr?.driver != nil)

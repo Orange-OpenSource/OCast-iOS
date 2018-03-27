@@ -26,8 +26,8 @@ import Foundation
         // private initializer to force the use of the singleton instance
     }
 
-   public func make(from sender: DriverProtocol, for ipAddress: String, with certificateInfo: CertificateInfo?) -> DriverProtocol {
-        return ReferenceDriver(from: sender, ipAddress: ipAddress, with: certificateInfo)
+   public func make(for ipAddress: String, with certificateInfo: CertificateInfo?) -> Driver {
+        return ReferenceDriver(ipAddress: ipAddress, with: certificateInfo)
     }
 }
 
@@ -41,11 +41,8 @@ import Foundation
 
  */
 @objcMembers
-@objc public final class ReferenceDriver: NSObject, DriverProtocol, LinkProtocol {
-    public func onFailure(error: NSError?) {
-    }
+@objc public final class ReferenceDriver: NSObject, Driver, LinkProtocol {
     
-
     // MARK: - Public interface
 
     /*
@@ -67,7 +64,7 @@ import Foundation
     // MARK: - Internal
 
     var links: [LinkId: LinkBuildProtocol] = [:]
-    var browser: DriverDelegate?
+    public var delegate: DriverReceiverDelegate?
 
     enum LinkId: Int8 {
         case genericLink
@@ -77,7 +74,7 @@ import Foundation
         return false
     }
 
-    public func register(for delegate: DriverProtocol, with module: DriverModule) {
+    public func register(_ delegate: DriverDelegate, forModule module: DriverModule) {
         delegates[module] = delegate
     }
 
@@ -206,13 +203,12 @@ import Foundation
     // MARK: - Private interface
 
     private var ipAddress: String
-    private var delegate: DriverProtocol?
     private var certificateInfo: CertificateInfo?
 
     private var onLinkConnect: () -> Void = {}
     private var onLinkDisconnect: () -> Void = {}
 
-    private var delegates: [DriverModule: DriverProtocol] = [:]
+    private var delegates: [DriverModule : DriverDelegate] = [:]
     private var successConnect: [DriverModule: () -> Void] = [:]
     private var successDisconnect: [DriverModule: () -> Void] = [:]
 
@@ -223,9 +219,8 @@ import Foundation
 
     // MARK: - Initialization
 
-    init(from sender: DriverProtocol, ipAddress: String, with certificateInfo: CertificateInfo?) {
+    init(ipAddress: String, with certificateInfo: CertificateInfo?) {
         self.ipAddress = ipAddress
-        delegate = sender
         self.certificateInfo = certificateInfo
         linksState[LinkId.genericLink] = .disconnected
     }
@@ -274,34 +269,17 @@ import Foundation
 
         let newError = NSError(domain: "Reference driver", code: 0, userInfo: ["Error": "Unexpected link disconnection"])
 
-        for delegate in delegates {
-
-            switch delegate.key {
-            case .application, .publicSettings:
-
-                if identifier == LinkId.genericLink.rawValue {
-                    linksState[LinkId.genericLink] = .disconnected
-                    delegate.value.onFailure(error: newError)
-                }
-
-            default:
-                break
-            }
+        if identifier == LinkId.genericLink.rawValue {
+            linksState[LinkId.genericLink] = .disconnected
+            delegates[.application]?.onFailure(error: newError)
+            delegates[.publicSettings]?.onFailure(error: newError)
         }
+
     }
 
     func onEvent(payload: EventStructure) {
-
-        switch payload.domain {
-
-        case "browser":
-
-            if let browser = browser {
-                browser.onData(with: payload.message)
-            }
-
-        default:
-            return
+        if payload.domain == "browser" {
+            delegate?.onData(with: payload.message)
         }
     }
 }

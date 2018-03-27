@@ -31,16 +31,16 @@ struct ReferenceLinkStructure {
 // Used for Event messages
 struct EventStructure {
     let domain: String
-    var message: DriverDataStructure
+    var message: [String: Any]
 }
 
 // Used for Command request and response
 struct CommandStructure {
     
     let command: String
-    var params: DriverDataStructure
+    var params: [String: Any]
     
-    init(command: String = "", params: DriverDataStructure) {
+    init(command: String = "", params: [String: Any]) {
         self.command = command
         self.params = params
     }

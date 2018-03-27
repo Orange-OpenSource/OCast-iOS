@@ -23,16 +23,16 @@ struct DataMapper {
 
     // MARK: - Generic, ie, not hardware/manufacturer dependant
 
-    func getBrowserData(with data: DriverDataStructure) -> BrowserStructure? {
+    func getBrowserData(with data: [String: Any]?) -> BrowserStructure? {
 
-        guard let browserData = data.message as? [String: Any]? else {
+        guard let browserData = data else {
 
             OCastLog.error("DataMapper: Received data is not of the expected format.")
             return nil
         }
 
-        let service = browserData?["service"] as? String
-        let data = browserData?["data"] as? [String: Any]
+        let service = browserData["service"] as? String
+        let data = browserData["data"] as? [String: Any]
         return BrowserStructure(service: service, data: data)
     }
 

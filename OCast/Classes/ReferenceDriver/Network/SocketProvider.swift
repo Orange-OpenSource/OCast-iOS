@@ -163,7 +163,7 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     func webSocket(_ webSocket: SRWebSocket!, didReceiveMessage message: Any!) {
 
         if webSocket == socket {
-            delegate?.onMessageReceived(from: self, message: message as! String)
+            delegate?.onMessageReceived(from: self, message: message as? String ?? "")
         }
     }
 

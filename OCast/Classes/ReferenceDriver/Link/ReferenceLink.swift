@@ -221,7 +221,7 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
             Logger.debug("WS: Ignoring the Command frame. This message Type is not implemented.")
 
         case .event:
-            linkDelegate?.onEvent(payload: EventStructure(domain: dataLink.source, message: DriverDataStructure(message: message)))
+            linkDelegate?.onEvent(payload: EventStructure(domain: dataLink.source, message: message))
 
         case .reply:
 
@@ -230,7 +230,7 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
             if status == "OK" {
 
                 if let successCallback = successCallbacks[dataLink.identifier] {
-                    let response = CommandStructure(command: "", params: DriverDataStructure(message: message))
+                    let response = CommandStructure(command: "", params: message)
                     successCallback(response)
                 }
 
@@ -258,7 +258,7 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
             "src": linkUUID,
             "type": "command",
             "id": sequenceId,
-            "message": payload.params.message ?? [:],
+            "message": payload.params,
         ]
 
         do {

@@ -45,9 +45,25 @@ import Foundation
 @objcMembers
 public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelperProtocol {
 
+    var device: Device
+    var driver: Driver?
+    var target: String
+    var successCallback: () -> Void = {}
+    var errorCallback: (_ error: NSError?) -> Void = { _ in }
+    var currentAction: Action = .start
+    var applicationData: ApplicationDescription
+    
+    var browser: Browser?
+    var mediaController: MediaController?
+    
+    enum Action: String {
+        case start
+        case join
+        case stop
+    }
+    
     // MARK: - Public interface
-
-    init(for device: Device, with applicationData: ApplicationDescription, andDriver driver: DriverProtocol?) {
+    init(for device: Device, with applicationData: ApplicationDescription, andDriver driver: Driver?) {
         self.device = device
         self.applicationData = applicationData
         self.driver = driver
@@ -148,63 +164,60 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
 
     public func manageStream(for stream: DataStream) {
         OCastLog.debug("ApplicationMgr: manage Stream for \(stream.serviceId)")
-        startBrowser()
-        stream.dataSender = DefaultMessagerSender(browser: browser!, serviceId: stream.serviceId)
+        if browser == nil && driver != nil {
+            browser = Browser(withDelegate: driver!)
+        }
+        stream.dataSender = DefaultDataSender(browser: browser!, serviceId: stream.serviceId)
         browser?.registerStream(for: stream)
     }
 
-    // MARK: - DataStreamable Protocol
-
+    // MARK: - Internal
+    func reset() {
+        browser = nil
+        mediaController = nil
+    }
+    
+    
+    func onDeleteResponse(response _: HTTPURLResponse, data _: Data?) {
+        OCastLog.debug("ApplicationMgr: Got a response to the Delete command.")
+        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: didReceiveHttpResponse(response:with:), onError: errorCallback)
+    }
+    
+    func onPostResponse(response _: HTTPURLResponse, data _: Data?) {
+        OCastLog.debug("ApplicationMgr: Got a response to the Post command. Waiting for the 'Connected' webapp message.")
+    }
+    
+    func onJoinError(_ error: NSError?) {
+        
+        if error?.code == 404 {
+            start(onSuccess: successCallback, onError: errorCallback)
+        }
+    }
+    
+    func onConnectOK() {
+        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: didReceiveHttpResponse(response:with:), onError: errorCallback)
+    }
+    
+    // MARK: - DataStream methods
     static let applicationServiceId = "org.ocast.webapp"
-
     /// :nodoc:
     public let serviceId = ApplicationController.applicationServiceId
-
     /// :nodoc:
     public var dataSender: DataSender?
-
     /// :nodoc:
     public func onMessage(data: [String: Any]) {
-
-        let name = data["name"] as? String ?? ""
-
+        
+        let name = data["name"] as? String
         if name == "connectionStatus" {
-
-            let params = data["params"] as? [String: String] ?? [:]
-
-            if params["status"] == "connected" {
+            let params = data["params"] as? [String: String]
+            if params?["status"] == "connected" {
                 OCastLog.debug("ApplicationMgr: Got the 'Connected' webapp message.")
                 successCallback()
             }
         }
     }
 
-    // MARK: - Internal
-
-    var device: Device
-    var driver: DriverProtocol?
-    var target: String
-    var successCallback: () -> Void = {}
-    var errorCallback: (_ error: NSError?) -> Void = { _ in }
-    var currentAction: Action = .start
-    var applicationData: ApplicationDescription
-
-    var browser: Browser?
-    var mediaController: MediaController?
-
-    enum Action: String {
-        case start
-        case join
-        case stop
-    }
-
-    func reset() {
-        browser = nil
-        mediaController = nil
-    }
-
     // MARK: - HTTP Request protocol and related methods
-
     func didReceiveHttpResponse(response _: HTTPURLResponse, with data: Data?) {
 
         guard let data = data else {
@@ -220,19 +233,14 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
         parserHelper.parseDocument(data: data, withKeyList: [key1, key2])
     }
 
-    // MARK: - XML Protocol
-
+    // MARK: - XMLHelperProtocol methods
     func didParseWithError(for _: String, with error: Error, diagnostic: [String]) {
         OCastLog.error("ApplicationMgr: Parsing failed with error = \(error). Diagnostic: \(diagnostic)")
     }
 
     func didEndParsing(for _: String, result: [String: String], attributes _: [String: [String: String]]) {
 
-        guard let state = result["state"] else {
-            return
-        }
-
-        guard let name = result["name"] else {
+        guard let state = result["state"], let name = result["name"] else {
             return
         }
 
@@ -266,7 +274,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
                 driver?.disconnect(for: .application, onSuccess: successCallback, onError: errorCallback)
 
             case .join:
-
                 if applicationData.name == name {
                     start(onSuccess: successCallback, onError: errorCallback)
                 } else {
@@ -280,35 +287,9 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
         }
     }
 
-    func onDeleteResponse(response _: HTTPURLResponse, data _: Data?) {
-        OCastLog.debug("ApplicationMgr: Got a response to the Delete command.")
-        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: didReceiveHttpResponse(response:with:), onError: errorCallback)
-    }
-
-    func onPostResponse(response _: HTTPURLResponse, data _: Data?) {
-        OCastLog.debug("ApplicationMgr: Got a response to the Post command. Waiting for the 'Connected' webapp message.")
-    }
-
-    func onJoinError(_ error: NSError?) {
-
-        if error?.code == 404 {
-            start(onSuccess: successCallback, onError: errorCallback)
-        }
-    }
-
-    func onConnectOK() {
-        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: didReceiveHttpResponse(response:with:), onError: errorCallback)
-    }
-
-    func startBrowser() {
-
-        if browser == nil {
-            // FIXME: !!!
-            browser = Browser(withDriver: driver as! BrowserDelegate)
-        }
-    }
-
-    fileprivate final class DefaultMessagerSender: DataSender {
+    
+    // MARK: DataSender inner class
+    fileprivate final class DefaultDataSender: DataSender {
 
         let browser: Browser
         let serviceId: String

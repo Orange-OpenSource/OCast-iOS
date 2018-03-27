@@ -20,13 +20,10 @@
 import XCTest
 @testable import OCast
 
-internal final class DefaultDataStream: DataStreamable {
-    
+internal final class DefaultDataStream: DataStream {
+    var dataSender: DataSender?
     let serviceId: String
-    
     var browser: Browser?
-    
-    var messageSender: StreamEmitter?
     
     init(forService serviceId: String) {
         self.serviceId = serviceId
@@ -43,11 +40,11 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
     
     func testMutliStream () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+        let deviceMgr = DeviceManager(with: device)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
         
-        let stream = DefaultDataStream (forService: "serviceExample")
+        let stream = DefaultDataStream(forService: "serviceExample")
         appliMgr.manageStream(for: stream)
         
         let stream2 = DefaultDataStream (forService: "serviceExample-2")
@@ -62,14 +59,12 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
     func testMediaControllerCreation () {
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+        let deviceMgr = DeviceManager (with: device)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
         
         let mediaController = appliMgr.getMediaController(for: self)
         
-        
-        XCTAssert (mediaController.commandId == 0)
         XCTAssert(mediaController.serviceId == "org.ocast.media")
         
         // 1 Stream must be created at browser level
@@ -80,9 +75,9 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
     
     func testMultiMediaController () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+        let deviceMgr = DeviceManager (with: device)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
         
         let mediaController = appliMgr.getMediaController(for: self)
         
@@ -97,9 +92,9 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         testID = 1
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+        let deviceMgr = DeviceManager (with: device)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
         
         appliMgr.start(onSuccess: onSuccess, onError: onError(error:))
         
@@ -113,9 +108,9 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         testID = 2
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+        let deviceMgr = DeviceManager (with: device)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
         
         appliMgr.start(onSuccess: onSuccess, onError: onError(error:))
         

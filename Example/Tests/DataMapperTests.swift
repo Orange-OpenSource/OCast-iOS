@@ -38,7 +38,7 @@ class DataMapperTests: XCTestCase {
                                  "data"    : ["name"    :"connectionStatus",
                                               "params"  :["status":"connected"]]]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
+        guard let browserData = DataMapper().getBrowserData(with: msg)  else {
             XCTAssert(false)
             return
         }
@@ -62,7 +62,7 @@ class DataMapperTests: XCTestCase {
             "data"    : ["name"    :"connectionStatus",
                          "params"  :["status":"connected"]]]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
+        guard let browserData = DataMapper().getBrowserData(with: msg)  else {
             XCTAssert(false)
             return
         }
@@ -76,7 +76,7 @@ class DataMapperTests: XCTestCase {
         // "data" is missing
         let msg: [String:Any] = ["service" : "org.ocast.webapp"]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
+        guard let browserData = DataMapper().getBrowserData(with: msg)  else {
             XCTAssert(false)
             return
         }
@@ -89,7 +89,7 @@ class DataMapperTests: XCTestCase {
         // "service" and "data" are missing
         let msg: [String:Any] = [:]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
+        guard let browserData = DataMapper().getBrowserData(with: msg)  else {
             XCTAssert(false)
             return
         }
@@ -105,7 +105,7 @@ class DataMapperTests: XCTestCase {
                                  "data"    : ["name"    :"connectionStatus",
                                               "params"  :["status":"connected"]]]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
+        guard let browserData = DataMapper().getBrowserData(with: msg)  else {
             XCTAssert(false)
             return
         }
@@ -122,7 +122,7 @@ class DataMapperTests: XCTestCase {
         let msg: [String:Any] = ["service" : "org.ocast.webapp",
                                  "data"    : 5]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
+        guard let browserData = DataMapper().getBrowserData(with: msg)  else {
             XCTAssert(false)
             return
         }
@@ -130,20 +130,6 @@ class DataMapperTests: XCTestCase {
         XCTAssert(browserData.data == nil)
         
         XCTAssert(browserData.service != nil)
-    }
-    
-    func testBrowser07 () {
-        
-        // Message is not a dictionnary.
-        
-        let msg = "a message"
-        
-        guard let _ = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
-            XCTAssert(true)
-            return
-        }
-        
-        XCTAssert(false)
     }
 
     func testPlayBackStatus01 () {

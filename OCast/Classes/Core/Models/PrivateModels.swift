@@ -20,16 +20,6 @@ import Foundation
 // MARK: - Internal Generic model structure
 
 
-/// :nodoc:
-// Used to transfer data from/to the driver north interface
-public struct DriverDataStructure {
-    public let message: Any?
-
-    public init(message: Any = [:]) {
-        self.message = message
-    }
-}
-
 // Used to transfer data from/to the browser north interface
 struct BrowserStructure {
     let service: String?

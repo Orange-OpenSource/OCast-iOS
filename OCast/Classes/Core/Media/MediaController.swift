@@ -44,6 +44,12 @@ import Foundation
 @objcMembers
 public final class MediaController: NSObject, DataStream {
 
+    let delegate: MediaControllerDelegate
+    
+    init(with delegate: MediaControllerDelegate) {
+        self.delegate = delegate
+    }
+
     // MARK: - Public interface
 
     /**
@@ -412,15 +418,48 @@ public final class MediaController: NSObject, DataStream {
                     onError: { error in onError(error) }
         )
     }
+    
+    // MARK: - Internal
+    func getCode(from response: [String: Any]?) -> MediaErrorCode? {
+        guard
+            let response = response,
+            let data = response["data"] as? [String: Any],
+            let mediaData = DataMapper().getMediaControllerData(data: data),
+            let code = mediaData.params["code"],
+            let codeAsInt = code as? Int,
+            let errorCode = MediaErrorCode(rawValue: codeAsInt) else {
+                return nil
+        }
+        return errorCode
+    }
+    
+    func getMetaData(from response: [String: Any]?) -> MetaDataChanged? {
+        guard
+            let response = response,
+            let data = response["data"] as? [String: Any],
+            let mediaData = DataMapper().getMediaControllerData(data: data),
+            let metaData = DataMapper().getMetaData(from: mediaData) else {
+                return nil
+        }
+        return metaData
+    }
+    
+    func getPlaybackInfo(from response: [String: Any]?) -> PlaybackStatus? {
+        guard
+            let response = response,
+            let data = response["data"] as? [String: Any],
+            let mediaData = DataMapper().getMediaControllerData(data: data) else {
+                return nil
+        }
+        return DataMapper().getPlaybackStatus(with: mediaData)
+    }
 
-    // MARK: - DataStreamable Protocol
+    // MARK: - DataStream implementation
 
     /// :nodoc:
     public var dataSender: DataSender?
-
     /// :nodoc:
     public let serviceId = "org.ocast.media"
-
     /// :nodoc:
     public func onMessage(data: [String: Any]) {
 
@@ -444,83 +483,5 @@ public final class MediaController: NSObject, DataStream {
         default:
             return
         }
-    }
-
-    /*--------------------------------------------------------------------------------------------------------------------------------------*/
-
-    // MARK: - Internal
-    let delegate: MediaControllerDelegate
-
-    init(with delegate: MediaControllerDelegate) {
-        self.delegate = delegate
-    }
-
-    func getCode(from response: [String: Any]?) -> MediaErrorCode? {
-
-        guard let response = response else {
-            return nil
-        }
-
-        guard let data = response["data"] as? [String: Any] else {
-            return nil
-        }
-
-        guard let mediaData = DataMapper().getMediaControllerData(data: data) else {
-            return nil
-        }
-
-        guard let code = mediaData.params["code"] else {
-            return nil
-        }
-
-        if let codeAsInt = code as? Int {
-
-            guard let errorCode = MediaErrorCode(rawValue: codeAsInt) else {
-                return nil
-            }
-
-            return errorCode
-        }
-
-        return nil
-    }
-
-    func getMetaData(from response: [String: Any]?) -> MetaDataChanged? {
-
-        guard let response = response else {
-            return nil
-        }
-
-        guard let data = response["data"] as? [String: Any] else {
-            return nil
-        }
-
-        guard let mediaData = DataMapper().getMediaControllerData(data: data) else {
-            return nil
-        }
-
-        guard let metaData = DataMapper().getMetaData(from: mediaData) else {
-            return nil
-        }
-
-        return metaData
-    }
-
-    func getPlaybackInfo(from response: [String: Any]?) -> PlaybackStatus? {
-
-        guard let response = response else {
-            return nil
-        }
-
-        guard let data = response["data"] as? [String: Any] else {
-            return nil
-        }
-
-        guard let mediaData = DataMapper().getMediaControllerData(data: data) else {
-            return nil
-        }
-
-        let playbackInfo = DataMapper().getPlaybackStatus(with: mediaData)
-        return playbackInfo
     }
 }

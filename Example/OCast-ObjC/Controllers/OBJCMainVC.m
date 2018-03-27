@@ -19,7 +19,7 @@
 @import OCast;
 
 
-@interface OBJCMainVC ()<DeviceDiscoveryProtocol, DataStream, MediaControllerDelegate, DeviceManagerProtocol, UIPickerViewDelegate, UIPickerViewDataSource>
+@interface OBJCMainVC ()<DeviceDiscoveryProtocol, DataStream, MediaControllerDelegate, DeviceManagerDelegate, UIPickerViewDelegate, UIPickerViewDataSource>
 
 @property (strong, nonatomic) IBOutlet UIPickerView *stickPickerView;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *stickIcon;
@@ -175,8 +175,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     }
     
     // Create a device manager, then get an application controller to start the Web application.
-    
-    DeviceManager *deviceMgr = [[DeviceManager alloc] initFrom:self with:selectedDevice withCertificateInfo:nil];
+    DeviceManager * deviceMgr = [[DeviceManager alloc] initWith:selectedDevice withCertificateInfo:nil];
     
     if (deviceMgr == nil) {
         NSLog(@"->Could not instanciate a device manager");

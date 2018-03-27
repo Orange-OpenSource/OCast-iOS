@@ -19,12 +19,12 @@ import Foundation
 
 extension ReferenceDriver: BrowserDelegate {
     
-    public func onData(with data: DriverDataStructure) {
+    public func onData(with data: [String: Any]) {
     }
     
     // MARK: - DriverBrowser Protocol
 
-    public func sendBrowserData(data: DriverDataStructure, onSuccess: @escaping (DriverDataStructure) -> Void, onError: @escaping (NSError?) -> Void) {
+    public func send(data: [String: Any], onSuccess: @escaping ([String: Any]) -> Void, onError: @escaping (NSError?) -> Void) {
 
         guard let link = links[LinkId.genericLink] as? ReferenceLink else {
             Logger.error("Reference Driver: Could not get the generic link.")
@@ -49,7 +49,7 @@ extension ReferenceDriver: BrowserDelegate {
         })
     }
 
-    public func registerBrowser(for browser: DriverDelegate) {
-        self.browser = browser
+    public func register(for browser: DriverReceiverDelegate) {
+        self.delegate = browser
     }
 }
