@@ -30,7 +30,7 @@ import Foundation
 
  */
 @objcMembers
-@objc public final class DeviceManager: NSObject, DriverDelegate, HttpProtocol, XMLHelperProtocol {
+@objc public final class DeviceManager: NSObject, DriverDelegate, HttpProtocol, XMLHelperDelegate {
     
     // MARK: - Internal
     public weak var delegate:DeviceManagerDelegate?
@@ -44,8 +44,8 @@ import Foundation
     var successCallback: () -> Void = {  }
     var errorCallback: (_ error: NSError?) -> Void = { _ in }
     // settings
-    var publicSettingsCtrl: DriverPublicSettingsProtocol?
-    var privateSettingsCtrl: DriverPrivateSettingsProtocol?
+    var publicSettingsCtrl: DriverPublicSettings?
+    var privateSettingsCtrl: DriverPrivateSettings?
     // ssl
     var certificateInfo: CertificateInfo?
     // timer
@@ -53,7 +53,7 @@ import Foundation
     let maxReconnectionRetry: Int8 = 5
     var failureTimer = Timer()
     // drivers
-    static var registeredDriver: [String: DriverFactoryProtocol] = [:]
+    static var registeredDriver: [String: DriverFactory] = [:]
     var driver: Driver?
     var device: Device
 
@@ -90,7 +90,7 @@ import Foundation
          - onError: the closure to be called in case of error
      */
 
-    public func getPublicSettingsController(onSuccess: @escaping (_: DriverPublicSettingsProtocol) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+    public func getPublicSettingsController(onSuccess: @escaping (_: DriverPublicSettings) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
 
         guard let driver = driver else {
             let newError = NSError(domain: "DeviceManager", code: 0, userInfo: ["Error": "Driver is not created."])
@@ -98,7 +98,7 @@ import Foundation
             return
         }
 
-        if driver.getState(for: .publicSettings) == .connected, let driver = driver as? DriverPublicSettingsProtocol {
+        if driver.getState(for: .publicSettings) == .connected, let driver = driver as? DriverPublicSettings {
             onSuccess(driver)
             return
         }
@@ -109,7 +109,7 @@ import Foundation
 
         driver.connect(for: .publicSettings, with: currentApplicationData,
                        onSuccess: {
-                            self.publicSettingsCtrl = driver as? DriverPublicSettingsProtocol
+                            self.publicSettingsCtrl = driver as? DriverPublicSettings
                             if let publicSettingsCtrl = self.publicSettingsCtrl {
                                 onSuccess(publicSettingsCtrl)
                             }
@@ -143,7 +143,7 @@ import Foundation
          - onError: the closure to be called in case of error
      */
 
-    public func getPrivateSettingsController(onSuccess: @escaping (_: DriverPrivateSettingsProtocol) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+    public func getPrivateSettingsController(onSuccess: @escaping (_: DriverPrivateSettings) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
 
         guard let driver = driver else {
             let newError = NSError(domain: "DeviceManager", code: 0, userInfo: ["Error": "Driver is not created."])
@@ -159,7 +159,7 @@ import Foundation
 
         driver.register(self, forModule: .privateSettings)
 
-        if driver.getState(for: .privateSettings) == .connected, let driver = driver as? DriverPrivateSettingsProtocol {
+        if driver.getState(for: .privateSettings) == .connected, let driver = driver as? DriverPrivateSettings {
             onSuccess(driver)
             return
         }
@@ -168,7 +168,7 @@ import Foundation
 
         driver.connect(for: .privateSettings, with: currentApplicationData,
                        onSuccess: {
-                           self.privateSettingsCtrl = driver as? DriverPrivateSettingsProtocol
+                           self.privateSettingsCtrl = driver as? DriverPrivateSettings
                             if let privateSettingsCtrl = self.privateSettingsCtrl {
                                 onSuccess(privateSettingsCtrl)
                             }
@@ -232,7 +232,7 @@ import Foundation
      */
 
   
-   public static func registerDriver(forName name: String, factory: DriverFactoryProtocol) -> Bool {
+   public static func registerDriver(forName name: String, factory: DriverFactory) -> Bool {
         registeredDriver[name] = factory
         return true
     }
@@ -272,7 +272,8 @@ import Foundation
             return
         }
 
-        let parserHelper = XMLHelper(fromSender: self, for: currentTarget)
+        let parserHelper = XMLHelper(for: currentTarget)
+        parserHelper.delegate = self
 
         let key1 = XMLHelper.KeyDefinition(name: "ocast:X_OCAST_App2AppURL", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition(name: "ocast:X_OCAST_Version", isMandatory: true)
@@ -305,8 +306,8 @@ import Foundation
     }
 
     // MARK: DriverDelegate methods
-    public func onFailure(error _: NSError?) {
-        OCastLog.debug("DeviceMgr: Received a Driver failure indication.")
+    public func onFailure(error: NSError?) {
+        OCastLog.debug("DeviceMgr: Received a Driver failure indication (\(error.debugDescription)).")
         reconnectAllSessions()
     }
 

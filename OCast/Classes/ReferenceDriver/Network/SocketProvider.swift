@@ -128,7 +128,6 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
         }
 
         if socket.readyState == .OPEN {
-            Logger.debug("Socket: Sending a Ping")
             socket.sendPing(nil)
         }
     }

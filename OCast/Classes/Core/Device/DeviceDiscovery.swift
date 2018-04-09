@@ -48,7 +48,7 @@ import CocoaAsyncSocket
  ```
  */
 @objcMembers
-@objc public class DeviceDiscovery: NSObject, GCDAsyncUdpSocketDelegate, XMLHelperProtocol, HttpProtocol {
+@objc public class DeviceDiscovery: NSObject, GCDAsyncUdpSocketDelegate, XMLHelperDelegate, HttpProtocol {
 
     // MARK: - Initialization
 
@@ -103,7 +103,7 @@ import CocoaAsyncSocket
          - searchTargets: List of device targets to search for
      */
     public convenience init(for sender: DeviceDiscoveryProtocol, forTargets searchTargets: Array<String>) {
-        self.init(for: sender, forTargets: searchTargets, withPolicy: DeviceDiscovery.Reliability.high)
+        self.init(for: sender, forTargets: searchTargets, withPolicy: DeviceDiscovery.Reliability.low)
     }
 
     // MARK: - DeviceDiscovery Interface
@@ -122,7 +122,7 @@ import CocoaAsyncSocket
          - true if the discovery process could start.
          - false if the discovery process could not be started.
      */
-
+    @discardableResult
     @objc public func start() -> Bool {
 
         guard !isRunning else {
@@ -197,8 +197,8 @@ import CocoaAsyncSocket
             return
         }
 
-        OCastLog.debug("\n >> From \(udpSocket.localHost() ?? "") on port \(udpSocket.localPort())\n\(udpData)")
-
+        //OCastLog.debug("Ok From \(udpSocket.localHost() ?? "") on port \(udpSocket.localPort())\n\(udpData)")
+ 
         guard let searchTarget = getStickSearchTarget(fromUDPData: udpData as String) else {
             OCastLog.error("Search Target is missing or corrputed. Aborting.")
             return
@@ -322,7 +322,6 @@ import CocoaAsyncSocket
             }
         }
 
-        OCastLog.debug("Resending MSEARCH")
         sendMSearch()
     }
 
@@ -340,12 +339,14 @@ import CocoaAsyncSocket
 
     func getApplicationURL(from httpResponse: HTTPURLResponse?) -> String? {
 
-        OCastLog.debug("HTTP Response: \(String(describing: httpResponse!))")
+        let applicationDIALURL = httpResponse?.allHeaderFields["Application-DIAL-URL"]
+        let applicationURL = httpResponse?.allHeaderFields["Application-URL"]
+        OCastLog.debug("HTTP Response: DIAL-URL:\(applicationDIALURL ?? ""), URL:\(applicationURL ?? "")")
 
-        if let applicationURL = httpResponse?.allHeaderFields["Application-DIAL-URL"] {
-            return applicationURL as? String
-        } else if let applicationURL = httpResponse?.allHeaderFields["Application-URL"] {
-            return applicationURL as? String
+        if let appURL = applicationDIALURL {
+            return appURL as? String
+        } else if let appURL = applicationURL {
+            return appURL as? String
         }
 
         return nil
@@ -360,7 +361,8 @@ import CocoaAsyncSocket
             return
         }
 
-        let parserHelper = XMLHelper(fromSender: self, for: applicationURL)
+        let parserHelper = XMLHelper(for: applicationURL)
+        parserHelper.delegate = self
 
         let key1 = XMLHelper.KeyDefinition(name: "friendlyName", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition(name: "manufacturer", isMandatory: true)
@@ -413,14 +415,11 @@ import CocoaAsyncSocket
                 for delegate in self.delegates {
                     delegate?.onDeviceAdded(from: self, forDevice: device)
                 }
-
-                OCastLog.debug("Adding a new device (\(device.friendlyName)). Have now \(self.currentDevices.count) cached device(s).")
-
             } else {
 
                 self.currentDevicesIdx[deviceID] = self.mSearchIdx
-                OCastLog.debug("\(friendlyName) is already inserted. Have now \(self.currentDevices.count) cached device(s).")
             }
+            OCastLog.debug("\(self.currentDevices.count) device(s) detected, last \(friendlyName)")
         }
     }
 

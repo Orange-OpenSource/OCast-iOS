@@ -91,3 +91,19 @@ public extension DataStreamable {
 @objc public protocol DataSender {
     func send(message: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void)
 }
+
+// MARK: Default DataSender  class
+final class DefaultDataSender: DataSender {
+    
+    let browser: Browser
+    let serviceId: String
+    
+    init(browser: Browser, serviceId: String) {
+        self.browser = browser
+        self.serviceId = serviceId
+    }
+    
+    func send(message: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
+        browser.sendData(data: message, for: serviceId, onSuccess: onSuccess, onError: onError)
+    }
+}

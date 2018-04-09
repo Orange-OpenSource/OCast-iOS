@@ -16,14 +16,17 @@
 //
 import Foundation
 
-protocol XMLHelperProtocol {
+protocol XMLHelperDelegate {
     func didEndParsing(for application: String, result: [String: String], attributes: [String: [String: String]])
     func didParseWithError(for application: String, with error: Error, diagnostic: [String])
 }
 
 final class XMLHelper: NSObject, XMLParserDelegate {
 
-    var delegate: XMLHelperProtocol?
+    var completionHandler:((_ error: (error: Error?, diagnostic: [String]?)?, _ result: [String: String]?, _ attributes:[String: [String: String]]?) -> Void)?
+    
+    // TODO: kick the delegate to use completionHandler
+    var delegate: XMLHelperDelegate?
     var application: String
     var collectedCharacters = ""
 
@@ -37,19 +40,17 @@ final class XMLHelper: NSObject, XMLParserDelegate {
     var keyResult: [String: String] = [:]
     var keyAttributes: [String: [String: String]] = [:]
 
-    init(fromSender: XMLHelperProtocol, for application: String) {
-        delegate = fromSender
+    init(for application: String) {
         self.application = application
     }
-
-    convenience init(fromSender: XMLHelperProtocol) {
-        self.init(fromSender: fromSender, for: "")
-    }
-
+    
     // MARK: - XML Helper interface
 
     func parseDocument(data: Data, withKeyList keyList: [KeyDefinition]) {
         self.keyList = keyList
+        self.keyResult = [:]
+        self.keyAttributes = [:]
+        collectedCharacters = ""
         let parser = XMLParser(data: data)
         parser.delegate = self
         parser.parse()
@@ -59,6 +60,7 @@ final class XMLHelper: NSObject, XMLParserDelegate {
 
     func parser(_: XMLParser, parseErrorOccurred parseError: Error) {
         delegate?.didParseWithError(for: application, with: parseError, diagnostic: [])
+        completionHandler?((parseError, []), nil, nil)
     }
 
     func parser(_: XMLParser, didEndElement elementName: String, namespaceURI _: String?, qualifiedName _: String?) {
@@ -96,11 +98,11 @@ final class XMLHelper: NSObject, XMLParserDelegate {
 
         if result.isOK {
             delegate?.didEndParsing(for: application, result: keyResult, attributes: keyAttributes)
+            completionHandler?(nil, keyResult, keyAttributes)
 
-        } else {
-
-            let error = NSError(domain: "OCastXMLErrorDomain", code: 1, userInfo: ["Fatal error": "Missing required parameter(s)"])
+        } else {            let error = NSError(domain: "OCastXMLErrorDomain", code: 1, userInfo: ["Fatal error": "Missing required parameter(s)"])
             delegate?.didParseWithError(for: application, with: error, diagnostic: result.missingKeys)
+            completionHandler?((error, result.missingKeys), nil, nil)
         }
     }
 

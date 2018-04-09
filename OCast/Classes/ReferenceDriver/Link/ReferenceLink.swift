@@ -18,14 +18,14 @@
 import Foundation
 
 @objcMembers
-final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
+final class ReferenceLink: LinkFactory, SocketProviderProtocol {
 
     // MARK: - Interface
 
-    let linkDelegate: LinkProtocol?
+    let linkDelegate: LinkDelegate?
     let profile: LinkProfile
 
-    init(from sender: LinkProtocol?, profile: LinkProfile) {
+    init(from sender: LinkDelegate?, profile: LinkProfile) {
         linkDelegate = sender
         self.profile = profile
     }
@@ -65,7 +65,7 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
         commandSocket.disconnect()
     }
 
-    func sendPayload(forDomain domain: DomainName, withPaylaod paylaod: CommandStructure, onSuccess: @escaping (CommandStructure) -> Void, onError: @escaping (NSError?) -> Void) {
+    func sendPayload(forDomain domain: DomainName, withPayload payload: Command, onSuccess: @escaping (Command) -> Void, onError: @escaping (NSError?) -> Void) {
 
         guard let commandSocket = commandSocket else {
             let error = NSError(domain: ErrorDomain, code: DriverError.commandWSNil.rawValue, userInfo: [ErrorDomain: "Payload could not be sent."])
@@ -73,7 +73,7 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
             return
         }
 
-        let result = encapsulateMessage(forDomain: domain, with: paylaod)
+        let result = encapsulateMessage(forDomain: domain, with: payload)
 
         guard let message = result.message else {
             let error = NSError(domain: ErrorDomain, code: DriverError.wrongPayload.rawValue, userInfo: [ErrorDomain: "Payload could not be formatted properly."])
@@ -138,7 +138,7 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
 
     var isDisconnecting: Bool = false
     var sequenceID: Int = 0
-    var successCallbacks: [Int: (CommandStructure) -> Void] = [:]
+    var successCallbacks: [Int: (Command) -> Void] = [:]
     var errorCallbacks: [Int: (NSError?) -> Void] = [:]
 
     // MARK: - SocketProvider protocol
@@ -221,7 +221,7 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
             Logger.debug("WS: Ignoring the Command frame. This message Type is not implemented.")
 
         case .event:
-            linkDelegate?.onEvent(payload: EventStructure(domain: dataLink.source, message: message))
+            linkDelegate?.onEvent(payload: Event(domain: dataLink.source, message: message))
 
         case .reply:
 
@@ -230,7 +230,7 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
             if status == "OK" {
 
                 if let successCallback = successCallbacks[dataLink.identifier] {
-                    let response = CommandStructure(command: "", params: message)
+                    let response = Command(command: "", params: message)
                     successCallback(response)
                 }
 
@@ -248,7 +248,7 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
 
     // MARK: - Payload format
 
-    func encapsulateMessage(forDomain domain: DomainName, with payload: CommandStructure) -> (message: String?, sequenceId: Int) {
+    func encapsulateMessage(forDomain domain: DomainName, with payload: Command) -> (message: String?, sequenceId: Int) {
 
         let didFail: (String?, Int) = (nil, 0)
         let sequenceId = getSequenceId()
@@ -279,8 +279,8 @@ final class ReferenceLink: LinkBuildProtocol, SocketProviderProtocol {
 
     // MARK: - LinkBuild protocol implementation
 
-    static func make(from sender: Any, linkProfile: LinkProfile) -> LinkBuildProtocol {
-        return ReferenceLink(from: sender as? LinkProtocol, profile: linkProfile)
+    static func make(from sender: LinkDelegate, linkProfile: LinkProfile) -> LinkFactory {
+        return ReferenceLink(from: sender, profile: linkProfile)
     }
 
     // MARK: - Miscellaneous

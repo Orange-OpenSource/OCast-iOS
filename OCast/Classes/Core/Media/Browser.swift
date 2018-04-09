@@ -21,7 +21,6 @@ import Foundation
 @objc public protocol BrowserDelegate {
     func send(data: [String: Any], onSuccess: @escaping ([String: Any]) -> Void, onError: @escaping (NSError?) -> Void)
     func register(for delegate: DriverReceiverDelegate)
-    
 }
 
 final class Browser: NSObject, DriverReceiverDelegate {
@@ -48,7 +47,6 @@ final class Browser: NSObject, DriverReceiverDelegate {
 
         delegate.send(data: streamData,
                                onSuccess: { params in
-
                                    OCastLog.debug("Browser: Received response from driver: \(String(describing: params))")
                                    onSuccess(params)
                                },

@@ -43,14 +43,15 @@ import Foundation
  ```
  */
 @objcMembers
-public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelperProtocol {
+public class ApplicationController: NSObject, DataStream, HttpProtocol {
 
     var device: Device
     var driver: Driver?
     var target: String
-    var successCallback: () -> Void = {}
-    var errorCallback: (_ error: NSError?) -> Void = { _ in }
-    var currentAction: Action = .start
+    //var successCallback: () -> Void = {}
+    //var errorCallback: (_ error: NSError?) -> Void = { _ in }
+    //var currentAction: Action = .start
+    var currentState: State = .stopped
     var applicationData: ApplicationDescription
     
     var browser: Browser?
@@ -62,12 +63,27 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
         case stop
     }
     
+    enum State: String {
+        case running
+        case stopped
+    }
+    
+    // XML Parser
+    private let xmlParser = XMLHelper(for: "")
+    private let keyList =  [XMLHelper.KeyDefinition(name: "state", isMandatory: true), XMLHelper.KeyDefinition(name: "name", isMandatory: true)]
+    
+    // Timer
+    private var semaphore: DispatchSemaphore?
+    private var isConnectedEvent = false
+    
     // MARK: - Public interface
     init(for device: Device, with applicationData: ApplicationDescription, andDriver driver: Driver?) {
         self.device = device
         self.applicationData = applicationData
         self.driver = driver
-        target = ""
+        target = "\(device.baseURL)/\(applicationData.name)"
+        super.init()
+        semaphore = DispatchSemaphore(value: 0)
     }
 
     /**
@@ -79,17 +95,20 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
      */
 
     public func start(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        currentAction = .start
-        successCallback = onSuccess
-        errorCallback = onError
-        target = "\(device.baseURL)/\(applicationData.name)"
         manageStream(for: self)
-
         if driver?.getState(for: .application) != .connected {
-            driver?.connect(for: .application, with: applicationData, onSuccess: onConnectOK, onError: errorCallback)
-
+            driver?.connect(for: .application, with: applicationData, onSuccess: {
+                self.startApplication(
+                    onSuccess: onSuccess,
+                    onError: { (error) in
+                        self.stopApplication(
+                            onSuccess: { onError(error) },
+                            onError: { (_) in onError(error) }
+                        )
+                })
+            }, onError: onError)
         } else {
-            initiateHttpRequest(from: self, with: .get, to: target, onSuccess: didReceiveHttpResponse(response:with:), onError: errorCallback)
+            startApplication(onSuccess: onSuccess, onError: onError)
         }
     }
 
@@ -101,18 +120,16 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
      */
 
     public func join(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-
-        currentAction = Action.join
-        target = "\(device.baseURL)"
-
-        successCallback = onSuccess
-        errorCallback = onError
-
         if driver?.getState(for: .application) != .connected {
-            driver?.connect(for: .application, with: applicationData, onSuccess: onConnectOK, onError: errorCallback)
+            driver?.connect(for: .application, with: applicationData, onSuccess: {
+                //
+                self.joinApplication(onSuccess: onSuccess, onError: onError)
+            }, onError: onError)
         } else {
-            initiateHttpRequest(from: self, with: .get, to: target, onSuccess: didReceiveHttpResponse(response:with:), onError: onJoinError)
+            self.joinApplication(onSuccess: onSuccess, onError: onError)
         }
+        
+        // TODO : lancer un start si app non lancé
     }
 
     /**
@@ -123,14 +140,10 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
      */
 
     public func stop(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-
-        currentAction = Action.stop
-        target = "\(device.baseURL)/\(applicationData.name)"
-
-        successCallback = onSuccess
-        errorCallback = onError
-
-        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: didReceiveHttpResponse(response:with:), onError: errorCallback)
+        stopApplication(onSuccess: {
+            //
+            self.driver?.disconnect(for: .application, onSuccess: onSuccess, onError: onError)
+        }, onError: onError)
     }
 
     /**
@@ -167,6 +180,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
         if browser == nil && driver != nil {
             browser = Browser(withDelegate: driver!)
         }
+
         stream.dataSender = DefaultDataSender(browser: browser!, serviceId: stream.serviceId)
         browser?.registerStream(for: stream)
     }
@@ -176,26 +190,95 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
         browser = nil
         mediaController = nil
     }
-    
-    
-    func onDeleteResponse(response _: HTTPURLResponse, data _: Data?) {
-        OCastLog.debug("ApplicationMgr: Got a response to the Delete command.")
-        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: didReceiveHttpResponse(response:with:), onError: errorCallback)
-    }
-    
-    func onPostResponse(response _: HTTPURLResponse, data _: Data?) {
-        OCastLog.debug("ApplicationMgr: Got a response to the Post command. Waiting for the 'Connected' webapp message.")
-    }
-    
-    func onJoinError(_ error: NSError?) {
-        
-        if error?.code == 404 {
-            start(onSuccess: successCallback, onError: errorCallback)
+
+    func startApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+        initiateHttpRequest(from: self, with: .post, to: target, onSuccess: { (response, _) in
+            if response.statusCode == 201 {
+                self.applicationStatus(onSuccess: {
+                    self.isConnectedEvent = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+                        self.semaphore?.signal()
+                    }
+                    self.semaphore?.wait()
+                    if self.isConnectedEvent {
+                        onSuccess()
+                    } else {
+                        let error = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "No message received from WS"])
+                        onError(error)
+                    }
+                }, onError: { (error) in
+                    onError(error)
+                })
+            } else {
+                let error = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Application cannot be run."])
+                onError(error)
+            }
+        }) { (error) in
+            onError(error)
         }
     }
     
-    func onConnectOK() {
-        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: didReceiveHttpResponse(response:with:), onError: errorCallback)
+    func joinApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+        self.applicationStatus(
+            onSuccess: {
+                if self.currentState == .running {
+                    onSuccess()
+                } else {
+                    let error = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Application cannot be joined."])
+                    onError(error)
+                }
+            },
+            onError: {
+                (error) in
+                    onError(error)
+            })
+    }
+    
+    
+    func stopApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+        // TODO: recuperer le runLink
+        initiateHttpRequest(from: self, with: .delete, to: "\(target)/run", onSuccess: { (_, _) in
+            self.applicationStatus(onSuccess: {
+                if self.currentState == .stopped {
+                    onSuccess()
+                } else {
+                    let error = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Application is not stopped."])
+                    onError(error)
+                }
+            }, onError: { (error) in
+                onError(error)
+            })
+        }) { (error) in
+            onError(error)
+        }
+    }
+    
+    func applicationStatus(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: { (_, data) in
+            guard let data = data else {
+                OCastLog.error("ApplicationMgr: No content to parse.")
+                let error = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "No content for status dial page"])
+                onError(error)
+                return
+            }
+            self.xmlParser.completionHandler = { (error, result, attributes) -> Void in
+                if error == nil {
+                    guard let state = result?["state"], let _ = result?["name"] else {
+                        let newError = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Missing parameters state/name"])
+                        onError(newError)
+                        return
+                    }
+                    self.currentState = State(rawValue: state)!
+                    onSuccess()
+                } else {
+                    let newError = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Parsing error for \(self.target)\n Error: \(error?.error.debugDescription ?? ""). Diagnostic: \(error?.diagnostic ?? [])"])
+                    onError(newError)
+                }
+            }
+            self.xmlParser.parseDocument(data: data, withKeyList: self.keyList)
+        }) { (error) in
+            onError(error)
+        }
     }
     
     // MARK: - DataStream methods
@@ -206,101 +289,24 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol, XMLHelpe
     public var dataSender: DataSender?
     /// :nodoc:
     public func onMessage(data: [String: Any]) {
-        
         let name = data["name"] as? String
         if name == "connectionStatus" {
             let params = data["params"] as? [String: String]
             if params?["status"] == "connected" {
                 OCastLog.debug("ApplicationMgr: Got the 'Connected' webapp message.")
-                successCallback()
+                isConnectedEvent = true
+                semaphore?.signal()
             }
         }
     }
 
     // MARK: - HTTP Request protocol and related methods
     func didReceiveHttpResponse(response _: HTTPURLResponse, with data: Data?) {
-
         guard let data = data else {
             OCastLog.error("ApplicationMgr: No content to parse.")
             return
         }
-
-        let parserHelper = XMLHelper(fromSender: self, for: target)
-
-        let key1 = XMLHelper.KeyDefinition(name: "state", isMandatory: true)
-        let key2 = XMLHelper.KeyDefinition(name: "name", isMandatory: true)
-
-        parserHelper.parseDocument(data: data, withKeyList: [key1, key2])
+        xmlParser.parseDocument(data: data, withKeyList: keyList)
     }
 
-    // MARK: - XMLHelperProtocol methods
-    func didParseWithError(for _: String, with error: Error, diagnostic: [String]) {
-        OCastLog.error("ApplicationMgr: Parsing failed with error = \(error). Diagnostic: \(diagnostic)")
-    }
-
-    func didEndParsing(for _: String, result: [String: String], attributes _: [String: [String: String]]) {
-
-        guard let state = result["state"], let name = result["name"] else {
-            return
-        }
-
-        switch state {
-        case "running":
-            switch currentAction {
-
-            case .start:
-                initiateHttpRequest(from: self, with: .delete, to: "\(target)/run", onSuccess: onDeleteResponse(response:data:), onError: errorCallback)
-
-            case .stop:
-                initiateHttpRequest(from: self, with: .delete, to: target, onSuccess: onDeleteResponse(response:data:), onError: errorCallback)
-
-            case .join:
-
-                if applicationData.name == name {
-                    successCallback()
-                } else {
-                    let newError = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Stick running another WebApp."])
-                    errorCallback(newError)
-                }
-            }
-
-        case "stopped":
-            switch currentAction {
-
-            case .start:
-                initiateHttpRequest(from: self, with: .post, to: target, onSuccess: onPostResponse(response:data:), onError: errorCallback)
-
-            case .stop:
-                driver?.disconnect(for: .application, onSuccess: successCallback, onError: errorCallback)
-
-            case .join:
-                if applicationData.name == name {
-                    start(onSuccess: successCallback, onError: errorCallback)
-                } else {
-                    let newError = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Stick running another WebApp."])
-                    errorCallback(newError)
-                }
-            }
-
-        default:
-            return
-        }
-    }
-
-    
-    // MARK: DataSender inner class
-    fileprivate final class DefaultDataSender: DataSender {
-
-        let browser: Browser
-        let serviceId: String
-
-        init(browser: Browser, serviceId: String) {
-            self.browser = browser
-            self.serviceId = serviceId
-        }
-
-        func send(message: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
-            browser.sendData(data: message, for: serviceId, onSuccess: onSuccess, onError: onError)
-        }
-    }
 }

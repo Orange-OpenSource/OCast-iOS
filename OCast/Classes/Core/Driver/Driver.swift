@@ -20,18 +20,69 @@ import Foundation
 
 // MARK: - Public Driver protocols
 /// :nodoc:
-@objc public protocol DriverPublicSettingsProtocol {
+public protocol DriverPublicSettings {
     // Not yet implemented on stick side. This getUpdateStatus() is given as an example.
     func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void)
+    func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ())
 }
+
+extension DriverPublicSettings {
+    public func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void) {}
+    public func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ()) {}
+}
+
 /// :nodoc:
-@objc public protocol DriverPrivateSettingsProtocol {
-    // Not yet implemented on stick side
+public protocol DriverPrivateSettings {
+    // Network
+    func scanAPs(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
+    func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
+    func setAP(ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func pbWPS(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func getWifiInfo(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
+    func getNetworkInfo(onSuccess:@escaping (NetworkInfo) -> (), onError:@escaping (NSError?) -> ())
+    // Device
+    func setDevice(name: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func getInfo(onSuccess:@escaping (VersionInfo) -> (), onError:@escaping (NSError?) -> ())
+    func reboot(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func getDeviceInfo(onSuccess:@escaping (DeviceInfo) -> (), onError:@escaping (NSError?) -> ())
+    func reset(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func checkFlash(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    // bluetooth
+    func startDiscovery(profiles: [String], timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func stopDiscovery(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func getDevices(profiles: [String], onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ())
+    func sendCommand(name: String, macAddress: String, onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ())
+    func sendPinCode(code: String, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ())
+}
+
+extension DriverPrivateSettings {
+    // Network
+    public func scanAPs(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func setAP(ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func pbWPS(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func getWifiInfo(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func getNetworkInfo(onSuccess:@escaping (NetworkInfo) -> (), onError:@escaping (NSError?) -> ()) {}
+    // Device
+    public func setDevice(name: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func getInfo(onSuccess:@escaping (VersionInfo) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func reboot(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func getDeviceInfo(onSuccess:@escaping (DeviceInfo) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func reset(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func checkFlash(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    // bluetooth
+    public func startDiscovery(profiles: [String], timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func stopDiscovery(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func getDevices(profiles: [String], onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func sendCommand(name: String, macAddress: String, onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func sendPinCode(code: String, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {}
 }
 
 // MARK: - Internal Driver protocols
 /// :nodoc:
-@objc public protocol DriverFactoryProtocol: class {
+@objc public protocol DriverFactory: class {
     func make(for ipAddress: String, with certificateInfo: CertificateInfo?) -> Driver
 }
 

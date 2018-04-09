@@ -18,7 +18,7 @@
 import Foundation
 
 @objcMembers
-@objc public final class ReferenceDriverFactory: NSObject, DriverFactoryProtocol {
+@objc public final class ReferenceDriverFactory: NSObject, DriverFactory {
 
     public static let sharedInstance = ReferenceDriverFactory()
 
@@ -41,7 +41,7 @@ import Foundation
 
  */
 @objcMembers
-@objc public final class ReferenceDriver: NSObject, Driver, LinkProtocol {
+@objc public final class ReferenceDriver: NSObject, Driver, LinkDelegate {
     
     // MARK: - Public interface
 
@@ -63,7 +63,7 @@ import Foundation
 
     // MARK: - Internal
 
-    var links: [LinkId: LinkBuildProtocol] = [:]
+    var links: [LinkId: LinkFactory] = [:]
     public var delegate: DriverReceiverDelegate?
 
     enum LinkId: Int8 {
@@ -227,7 +227,7 @@ import Foundation
 
     // MARK: - Link Protocol
 
-    func onLinkConnected(from identifier: Int8) {
+    public func onLinkConnected(from identifier: Int8) {
 
         guard let id = LinkId(rawValue: identifier) else {
             return
@@ -242,7 +242,7 @@ import Foundation
         successConnect.removeValue(forKey: .application)
     }
 
-    func onLinkDisconnected(from identifier: Int8) {
+    public func onLinkDisconnected(from identifier: Int8) {
 
         guard let id = LinkId(rawValue: identifier) else {
             return
@@ -257,7 +257,7 @@ import Foundation
         successDisconnect.removeValue(forKey: .application)
     }
 
-    func onLinkFailure(from identifier: Int8) {
+    public func onLinkFailure(from identifier: Int8) {
         Logger.debug(("Reference Driver: Unexpected link disconnection."))
 
         guard let _ = LinkId(rawValue: identifier) else {
@@ -277,9 +277,39 @@ import Foundation
 
     }
 
-    func onEvent(payload: EventStructure) {
+    public func onEvent(payload: Event) {
         if payload.domain == "browser" {
             delegate?.onData(with: payload.message)
         }
+    }
+    
+    // MARK: BrowserDelegate methods
+    public func send(data: [String: Any], onSuccess: @escaping ([String: Any]) -> Void, onError: @escaping (NSError?) -> Void) {
+        
+        guard let link = links[LinkId.genericLink] as? ReferenceLink else {
+            Logger.error("Reference Driver: Could not get the generic link.")
+            return
+        }
+        
+        let payload = Command(params: data)
+        
+        link.sendPayload(forDomain: .browser, withPayload: payload,
+                         
+                         onSuccess: { cmdResponse in
+                            Logger.debug("Reference Driver: Payload sent.")
+                            onSuccess(cmdResponse.params)
+        },
+                         
+                         onError: { error in
+                            
+                            if let error = error {
+                                Logger.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[link.ErrorDomain]))")
+                                onError(error)
+                            }
+        })
+    }
+    
+    public func register(for browser: DriverReceiverDelegate) {
+        self.delegate = browser
     }
 }
