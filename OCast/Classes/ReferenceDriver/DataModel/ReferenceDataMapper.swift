@@ -35,7 +35,7 @@ struct ReferenceDataMapper {
                                               message: dictionary?["message"] as? [String: Any])
 
             } catch {
-                Logger.error("ReferenceDataMapper: Serialization failed: \(error)")
+                OCastLog.error("ReferenceDataMapper: Serialization failed: \(error)")
                 return nil
             }
         }

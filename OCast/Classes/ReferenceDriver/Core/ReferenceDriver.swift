@@ -20,7 +20,7 @@ import Foundation
 @objcMembers
 @objc public final class ReferenceDriverFactory: NSObject, DriverFactory {
 
-    public static let sharedInstance = ReferenceDriverFactory()
+    public static let shared = ReferenceDriverFactory()
 
     private override init() {
         // private initializer to force the use of the singleton instance
@@ -63,7 +63,7 @@ import Foundation
 
     // MARK: - Internal
 
-    var links: [LinkId: LinkFactory] = [:]
+    var links: [LinkId: ReferenceLink] = [:]
     public var delegate: DriverReceiverDelegate?
 
     enum LinkId: Int8 {
@@ -94,11 +94,11 @@ import Foundation
 
             if links.count == 0 {
                 let linkProfile = LinkProfile(identifier: LinkId.genericLink.rawValue, ipAddress: ipAddress, needsEvent: false, app2appURL: info.app2appURL, certInfo: nil)
-                links = [LinkId.genericLink: ReferenceLink.make(from: self, linkProfile: linkProfile)]
+                links = [LinkId.genericLink: ReferenceLink(from: self, profile: linkProfile)]
             }
 
-            guard let genericLink = links[LinkId.genericLink] as? ReferenceLink else {
-                Logger.error(("Reference Driver: Could not get the link."))
+            guard let genericLink = links[LinkId.genericLink] else {
+                OCastLog.error(("Reference Driver: Could not get the link."))
                 let error = NSError(domain: "Reference driver", code: 0, userInfo: ["Reference driver": "Could not get the link."])
                 onError(error)
                 return
@@ -112,16 +112,16 @@ import Foundation
 
             switch state {
             case .connected:
-                Logger.debug("Reference Driver: Already connected. Ignoring request.")
+                OCastLog.debug("Reference Driver: Already connected. Ignoring request.")
                 onSuccess()
                 return
 
             case .connecting:
-                Logger.debug("Reference Driver: Connection already in progress. Ignoring request.")
+                OCastLog.debug("Reference Driver: Connection already in progress. Ignoring request.")
                 return
 
             case .disconnected, .disconnecting:
-                Logger.debug("Reference Driver: Connecting the link.")
+                OCastLog.debug("Reference Driver: Connecting the link.")
                 successConnect[module] = onSuccess
                 linksState[LinkId.genericLink] = .connecting
 
@@ -129,11 +129,11 @@ import Foundation
             }
 
         case .publicSettings:
-            Logger.error(("Reference Driver: Public Settings are not implemented. Ignoring this request."))
+            OCastLog.error(("Reference Driver: Public Settings are not implemented. Ignoring this request."))
             let error = NSError(domain: "Reference driver", code: 1, userInfo: ["Reference driver": "Public Settings are not implemented. Ignoring this request."])
             onError(error)
         case .privateSettings:
-            Logger.error(("Reference Driver: Private Settings are not implemented. Ignoring this request."))
+            OCastLog.error(("Reference Driver: Private Settings are not implemented. Ignoring this request."))
             let error = NSError(domain: "Reference driver", code: 1, userInfo: ["Reference driver": "Private Settings are not implemented. Ignoring this request."])
             onError(error)
         }
@@ -144,14 +144,14 @@ import Foundation
         switch module {
         case .application:
 
-            guard let genericLink = links[LinkId.genericLink] as? ReferenceLink else {
-                Logger.error(("Reference Driver: Could not get the link."))
+            guard let genericLink = links[LinkId.genericLink] else {
+                OCastLog.error(("Reference Driver: Could not get the link."))
                 let error = NSError(domain: "Reference driver", code: 0, userInfo: ["Reference driver": "Could not get the link."])
                 onError(error)
                 return
             }
 
-            Logger.debug("Reference Driver: Connecting the link.")
+            OCastLog.debug("Reference Driver: Connecting the link.")
             successDisconnect[module] = onSuccess
 
             requestedModules[module] = false
@@ -183,16 +183,16 @@ import Foundation
                 genericLink.disconnect()
 
             } else {
-                Logger.debug("Reference driver generic link is already disconnected.")
+                OCastLog.debug("Reference driver generic link is already disconnected.")
                 onSuccess()
             }
 
         case .publicSettings:
-            Logger.error(("Reference Driver: Public Settings are not implemented. Ignoring this request."))
+            OCastLog.error(("Reference Driver: Public Settings are not implemented. Ignoring this request."))
             let error = NSError(domain: "Reference driver", code: 1, userInfo: ["Reference driver": "Public Settings are not implemented. Ignoring this request."])
             onError(error)
         case .privateSettings:
-            Logger.error(("Reference Driver: Private Settings are not implemented. Ignoring this request."))
+            OCastLog.error(("Reference Driver: Private Settings are not implemented. Ignoring this request."))
             let error = NSError(domain: "Reference driver", code: 1, userInfo: ["Reference driver": "Private Settings are not implemented. Ignoring this request."])
             onError(error)
         }
@@ -226,7 +226,6 @@ import Foundation
     }
 
     // MARK: - Link Protocol
-
     public func onLinkConnected(from identifier: Int8) {
 
         guard let id = LinkId(rawValue: identifier) else {
@@ -234,7 +233,7 @@ import Foundation
         }
 
         linksState[id] = .connected
-        Logger.debug("Reference Driver: Link is connected.")
+        OCastLog.debug("Reference Driver: Link is connected.")
 
         successConnect[.publicSettings]?()
         successConnect[.application]?()
@@ -248,7 +247,7 @@ import Foundation
             return
         }
 
-        Logger.debug("Reference Driver: Link is disconnected.")
+        OCastLog.debug("Reference Driver: Link is disconnected.")
         linksState[id] = .disconnected
 
         successDisconnect[.publicSettings]?()
@@ -258,7 +257,7 @@ import Foundation
     }
 
     public func onLinkFailure(from identifier: Int8) {
-        Logger.debug(("Reference Driver: Unexpected link disconnection."))
+        OCastLog.debug(("Reference Driver: Unexpected link disconnection."))
 
         guard let _ = LinkId(rawValue: identifier) else {
             return
@@ -286,27 +285,31 @@ import Foundation
     // MARK: BrowserDelegate methods
     public func send(data: [String: Any], onSuccess: @escaping ([String: Any]) -> Void, onError: @escaping (NSError?) -> Void) {
         
-        guard let link = links[LinkId.genericLink] as? ReferenceLink else {
-            Logger.error("Reference Driver: Could not get the generic link.")
+        guard let link = links[LinkId.genericLink] else {
+            OCastLog.error("Reference Driver: Could not get the generic link.")
+            // TODO: create error
+            onError(nil)
             return
         }
         
         let payload = Command(params: data)
         
-        link.sendPayload(forDomain: .browser, withPayload: payload,
-                         
-                         onSuccess: { cmdResponse in
-                            Logger.debug("Reference Driver: Payload sent.")
-                            onSuccess(cmdResponse.params)
-        },
-                         
-                         onError: { error in
-                            
-                            if let error = error {
-                                Logger.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[link.ErrorDomain]))")
-                                onError(error)
-                            }
-        })
+        link.sendPayload(
+            forDomain: ReferenceDomainName.browser.name(),
+            withPayload: payload,
+            onSuccess: {
+                cmdResponse in
+                    OCastLog.debug("Reference Driver: Payload sent.")
+                    // TODO: Fix this
+                    onSuccess(cmdResponse.reply as? [String: Any] ?? [:])
+                },
+            onError: {
+                error in
+                    if let error = error {
+                        OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[link.ErrorDomain]))")
+                        onError(error)
+                    }
+            })
     }
     
     public func register(for browser: DriverReceiverDelegate) {

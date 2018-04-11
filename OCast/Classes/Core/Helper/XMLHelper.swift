@@ -109,7 +109,6 @@ final class XMLHelper: NSObject, XMLParserDelegate {
     /*--------------------------------------------------------------------------------------------------------------------------------------*/
 
     // MARK: - Private functions
-
     private func checkParsing() -> (isOK: Bool, missingKeys: [String]) {
 
         let result = keyList.filter { element -> Bool in

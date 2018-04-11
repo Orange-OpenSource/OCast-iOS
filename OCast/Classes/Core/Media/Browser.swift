@@ -26,12 +26,11 @@ import Foundation
 final class Browser: NSObject, DriverReceiverDelegate {
     
     var streams: [String: DataStream] = [:]
-    let delegate: BrowserDelegate
-
-    init(withDelegate delegate: BrowserDelegate) {
-        self.delegate = delegate
-        super.init()
-        delegate.register(for: self)
+    
+    weak var delegate: BrowserDelegate? {
+        didSet {
+            delegate?.register(for: self)
+        }
     }
 
     func registerStream(for stream: DataStream) {
@@ -45,7 +44,7 @@ final class Browser: NSObject, DriverReceiverDelegate {
             "data": data,
         ]
 
-        delegate.send(data: streamData,
+        delegate?.send(data: streamData,
                                onSuccess: { params in
                                    OCastLog.debug("Browser: Received response from driver: \(String(describing: params))")
                                    onSuccess(params)
@@ -60,9 +59,9 @@ final class Browser: NSObject, DriverReceiverDelegate {
 
     // MARK: - DriverDelegate methods
     func onData(with data: [String: Any]) {
-        guard let browserData = DataMapper().getBrowserData(with: data),
-            let dataForStream = browserData.data,
-            let service = browserData.service else {
+        guard
+            let dataForStream = DataMapper().browserData(with: data).data,
+            let service = DataMapper().browserData(with: data)  .service else {
             OCastLog.error("Browser: Data is not well formatted \n(\(data)).")
             return
         }

@@ -46,15 +46,15 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     func connect(with command: String) {
 
         if socket == nil || (socket?.readyState != .CONNECTING && socket?.readyState != .OPEN) {
-            Logger.debug("Socket: Creating a socket.")
+            OCastLog.debug("Socket: Creating a socket.")
             socket = getSocket(with: command)
 
             if socket == nil {
-                Logger.error("Socket: Could not initialize the socket.")
+                OCastLog.error("Socket: Could not initialize the socket.")
             }
 
         } else {
-            Logger.debug("Socket: Ignoring connect due to socket state = \(String(describing: socket?.readyState.rawValue))")
+            OCastLog.debug("Socket: Ignoring connect due to socket state = \(String(describing: socket?.readyState.rawValue))")
             delegate?.onConnected(from: self)
         }
     }
@@ -62,13 +62,13 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     func disconnect() {
 
         guard let socket = socket else {
-            Logger.debug("Socket: Socket does not exists. Ignoring disconnect request.")
+            OCastLog.debug("Socket: Socket does not exists. Ignoring disconnect request.")
             return
         }
 
         if socket.readyState != .CLOSED {
             resetPingPongTimer()
-            Logger.debug("Socket: Disconnecting.")
+            OCastLog.debug("Socket: Disconnecting.")
             socket.close()
         }
     }
@@ -123,7 +123,7 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     func sendPing() {
 
         guard let socket = socket else {
-            Logger.debug("Socket: Socket does not exists. Ignoring Ping request.")
+            OCastLog.debug("Socket: Socket does not exists. Ignoring Ping request.")
             return
         }
 
@@ -137,7 +137,7 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     @objc func pingPongTimerExpiry(timer _: Timer) {
 
         if pingPongTimerRetry == pingPongTimerMaxRetry {
-            Logger.debug(("Socket: PingPong timer max number of retries reached. Disconnecting."))
+            OCastLog.debug(("Socket: PingPong timer max number of retries reached. Disconnecting."))
 
             resetPingPongTimer()
             state = .disconnected
@@ -167,10 +167,10 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     }
 
     func webSocketDidOpen(_ webSocket: SRWebSocket!) {
-        Logger.debug("Socket: did open")
+        OCastLog.debug("Socket: did open")
 
         if webSocket == socket {
-            Logger.debug("Socket: send onConnected.")
+            OCastLog.debug("Socket: send onConnected.")
             state = .connected
             delegate?.onConnected(from: self)
 
@@ -180,10 +180,10 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     }
 
     func webSocket(_ webSocket: SRWebSocket!, didCloseWithCode code: Int, reason: String!, wasClean _: Bool) {
-        Logger.debug("Socket: did close")
+        OCastLog.debug("Socket: did close")
 
         if webSocket == socket {
-            Logger.debug("Socket: send onDisconnect")
+            OCastLog.debug("Socket: send onDisconnect")
             resetPingPongTimer()
             state = .disconnected
             delegate?.onDisconnected(from: self, code: code, reason: reason)
@@ -191,10 +191,10 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     }
 
     func webSocket(_ webSocket: SRWebSocket!, didFailWithError error: Error!) {
-        Logger.debug("Socket did fail")
+        OCastLog.debug("Socket did fail")
 
         if webSocket == socket {
-            Logger.debug("Socket: send onDisconnect")
+            OCastLog.debug("Socket: send onDisconnect")
             resetPingPongTimer()
             state = .disconnected
             delegate?.onDisconnected(from: self, code: 0, reason: error.localizedDescription)
@@ -204,7 +204,7 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     func webSocket(_ webSocket: SRWebSocket!, didReceivePong _: Data!) {
 
         if webSocket == socket {
-            Logger.debug("Socket: Got a Pong")
+            OCastLog.debug("Socket: Got a Pong")
             pingPongTimerRetry = 0
         }
     }

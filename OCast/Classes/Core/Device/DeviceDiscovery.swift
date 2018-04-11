@@ -74,9 +74,7 @@ import CocoaAsyncSocket
          - policy:  `Reliability` level for discovery process
      */
 
-    @objc public init(for sender: Any, forTargets searchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
-
-        delegates.append(sender as? DeviceDiscoveryProtocol)
+    @objc public init(forTargets searchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
         mSearchIdx = 0
         self.mSearchTargets = searchTargets
         isRunning = false
@@ -102,8 +100,8 @@ import CocoaAsyncSocket
          - sender: module that will receive further notifications
          - searchTargets: List of device targets to search for
      */
-    public convenience init(for sender: DeviceDiscoveryProtocol, forTargets searchTargets: Array<String>) {
-        self.init(for: sender, forTargets: searchTargets, withPolicy: DeviceDiscovery.Reliability.low)
+    public convenience init(forTargets searchTargets: Array<String>) {
+        self.init(forTargets: searchTargets, withPolicy: DeviceDiscovery.Reliability.low)
     }
 
     // MARK: - DeviceDiscovery Interface
@@ -226,7 +224,7 @@ import CocoaAsyncSocket
 
     // MARK: - Internal
 
-    var delegates: [DeviceDiscoveryProtocol?] = []
+    public weak var delegate: DeviceDiscoveryProtocol?
     let ssdpAddres = "239.255.255.250"
     let ssdpPort: UInt16 = 1900
     var ssdpSocket: GCDAsyncUdpSocket?
@@ -315,9 +313,7 @@ import CocoaAsyncSocket
                     currentDevices.removeValue(forKey: deviceId)
                     currentDevicesIdx.removeValue(forKey: deviceId)
 
-                    for delegate in self.delegates {
-                        delegate?.onDeviceRemoved(from: self, forDevice: cachedDevice)
-                    }
+                    delegate?.onDeviceRemoved(from: self, forDevice: cachedDevice)
                 }
             }
         }
@@ -412,9 +408,7 @@ import CocoaAsyncSocket
                 self.currentDevices[device.deviceID] = device
                 self.currentDevicesIdx[device.deviceID] = self.mSearchIdx
 
-                for delegate in self.delegates {
-                    delegate?.onDeviceAdded(from: self, forDevice: device)
-                }
+                self.delegate?.onDeviceAdded(from: self, forDevice: device)
             } else {
 
                 self.currentDevicesIdx[deviceID] = self.mSearchIdx

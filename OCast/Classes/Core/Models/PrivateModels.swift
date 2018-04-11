@@ -21,13 +21,13 @@ import Foundation
 
 
 // Used to transfer data from/to the browser north interface
-struct BrowserStructure {
+struct BrowserData {
     let service: String?
     let data: [String: Any]?
 }
 
 // Used to transfer data from/to the Stream north interface
-struct StreamStructure {
+struct StreamData {
     let name: String
     let params: [String: Any]
     let options: [String: Any]?

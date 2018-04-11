@@ -162,6 +162,15 @@ import Foundation
     case audio
     case image
     case video
+    
+    init(type : String) {
+        switch (type) {
+        case "audio": self = .audio
+        case "video": self = .video
+        case "image": self = .image
+        default: self = .audio
+        }
+    }
 }
 
 /**
@@ -233,6 +242,18 @@ import Foundation
     case paused
     case stopped
     case cancelled
+    
+    init(state: String) {
+        switch state {
+            case "playing": self = .playing
+            case "buffering": self = .buffering
+            case "idle": self = .idle
+            case "paused": self = .paused
+            case "stopped": self = .stopped
+            case "cancelled": self = .cancelled
+            default: self = .idle
+        }
+    }
 }
 
 /// Describes the status of the current media.

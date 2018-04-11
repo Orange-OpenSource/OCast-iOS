@@ -48,9 +48,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     var device: Device
     var driver: Driver?
     var target: String
-    //var successCallback: () -> Void = {}
-    //var errorCallback: (_ error: NSError?) -> Void = { _ in }
-    //var currentAction: Action = .start
     var currentState: State = .stopped
     var applicationData: ApplicationDescription
     
@@ -93,7 +90,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func start(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         manageStream(for: self)
         if driver?.getState(for: .application) != .connected {
@@ -177,12 +173,16 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
 
     public func manageStream(for stream: DataStream) {
         OCastLog.debug("ApplicationMgr: manage Stream for \(stream.serviceId)")
-        if browser == nil && driver != nil {
-            browser = Browser(withDelegate: driver!)
+        if browser == nil {
+            browser = Browser()
+            browser?.delegate = driver
         }
-
-        stream.dataSender = DefaultDataSender(browser: browser!, serviceId: stream.serviceId)
-        browser?.registerStream(for: stream)
+        if let browser = browser {
+            stream.dataSender = DefaultDataSender(browser: browser, serviceId: stream.serviceId)
+            browser.registerStream(for: stream)
+        } else {
+            OCastLog.error("Unable to manage stream (\(stream.serviceId) because browser is nil")
+        }
     }
 
     // MARK: - Internal
@@ -308,5 +308,4 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         }
         xmlParser.parseDocument(data: data, withKeyList: keyList)
     }
-
 }
