@@ -43,6 +43,15 @@ extension MediaType {
         case .video: return"video"
         }
     }
+    
+    init(type : String) {
+        switch (type) {
+        case "audio": self = .audio
+        case "video": self = .video
+        case "image": self = .image
+        default: self = .audio
+        }
+    }
 }
 
 extension TransferMode {
@@ -63,6 +72,18 @@ extension PlayerState {
         case .paused: return "paused"
         case .stopped: return "stopped"
         case .cancelled: return "cancelled"
+        }
+    }
+    
+    init(state: String) {
+        switch state {
+        case "playing": self = .playing
+        case "buffering": self = .buffering
+        case "idle": self = .idle
+        case "paused": self = .paused
+        case "stopped": self = .stopped
+        case "cancelled": self = .cancelled
+        default: self = .idle
         }
     }
 }
@@ -96,7 +117,7 @@ extension TrackType {
 }
 
 @objcMembers
-@objc public final class WifiInfo: NSObject {
+public final class WifiInfo: NSObject {
     public let ssid: String?
     public let essid: String?
     public let bssid: String?
@@ -132,7 +153,7 @@ extension TrackType {
 
 
 @objcMembers
-@objc public final class VersionInfo: NSObject {
+public final class VersionInfo: NSObject {
     public let name: String?
     public let softwareVersion: String?
     public let hardwareVersion: String?
@@ -145,7 +166,7 @@ extension TrackType {
 }
 
 @objcMembers
-@objc public final class DeviceInfo: NSObject {
+public final class DeviceInfo: NSObject {
     public let vendor: String?
     public let model: String?
     public let serialNumber: String?
@@ -162,7 +183,7 @@ extension TrackType {
 }
 
 @objcMembers
-@objc public final class BluetoothDevice: NSObject {
+public final class BluetoothDevice: NSObject {
     public let name: String?
     public let macAddress: String?
     public let cod: String?

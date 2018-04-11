@@ -18,25 +18,12 @@
 
 import Foundation
 
-protocol HttpProtocol {
-    //func didReceiveHttpResponse(response: HTTPURLResponse, with data: Data?)
-}
+protocol HttpProtocol {}
 
-enum HttpCommand {
-    case get
-    case post
-    case delete
-
-    func name() -> String {
-        switch self {
-        case .delete:
-            return "DELETE"
-        case .get:
-            return "GET"
-        case .post:
-            return "POST"
-        }
-    }
+enum HttpCommand: String {
+    case get = "GET"
+    case post = "POST"
+    case delete = "DELETE"
 }
 
 extension HttpProtocol {
@@ -52,7 +39,7 @@ extension HttpProtocol {
         }
 
         var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = command.name()
+        urlRequest.httpMethod = command.rawValue
 
         let session = URLSession(configuration: URLSessionConfiguration.default)
 
@@ -80,7 +67,7 @@ extension HttpProtocol {
                     return
                 }
 
-                OCastLog.debug(("OK (\(httpResponse.statusCode)) for \(command.name())/\(url)"))
+                OCastLog.debug(("OK (\(httpResponse.statusCode)) for \(command.rawValue)/\(url)"))
                 onSuccess(httpResponse, data)
             }
         }

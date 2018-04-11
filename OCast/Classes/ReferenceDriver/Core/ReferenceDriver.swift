@@ -62,12 +62,35 @@ import Foundation
     public static let manufacturer = "Orange SA"
 
     // MARK: - Internal
-
     var links: [LinkId: ReferenceLink] = [:]
     public var delegate: DriverReceiverDelegate?
 
     enum LinkId: Int8 {
         case genericLink
+    }
+
+    // MARK: - Private interface
+    private var ipAddress: String
+    private var certificateInfo: CertificateInfo?
+    
+    private var onLinkConnect: () -> Void = {}
+    private var onLinkDisconnect: () -> Void = {}
+    
+    private var delegates: [DriverModule : DriverDelegate] = [:]
+    private var successConnect: [DriverModule: () -> Void] = [:]
+    private var successDisconnect: [DriverModule: () -> Void] = [:]
+    
+    private var internalState: DriverState = .connected
+    private var linksState: [LinkId: DriverState] = [:]
+    
+    private var requestedModules: [DriverModule: Bool] = [:]
+    
+    // MARK: - Initialization
+    
+    init(ipAddress: String, with certificateInfo: CertificateInfo?) {
+        self.ipAddress = ipAddress
+        self.certificateInfo = certificateInfo
+        linksState[LinkId.genericLink] = .disconnected
     }
 
     public func privateSettingsAllowed() -> Bool {
@@ -78,13 +101,9 @@ import Foundation
         delegates[module] = delegate
     }
 
-    public func getState(for _: DriverModule) -> DriverState {
-
-        if linksState[LinkId.genericLink] == .connected {
-            return .connected
-        }
-
-        return .disconnected
+    public func state(for _: DriverModule) -> DriverState {
+        // FIXME: add case for settings
+        return linksState[LinkId.genericLink] ?? .disconnected
     }
 
    public func connect(for module: DriverModule, with info: ApplicationDescription, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
@@ -198,33 +217,6 @@ import Foundation
         }
     }
 
-    /*--------------------------------------------------------------------------------------------------------------------------------------*/
-
-    // MARK: - Private interface
-
-    private var ipAddress: String
-    private var certificateInfo: CertificateInfo?
-
-    private var onLinkConnect: () -> Void = {}
-    private var onLinkDisconnect: () -> Void = {}
-
-    private var delegates: [DriverModule : DriverDelegate] = [:]
-    private var successConnect: [DriverModule: () -> Void] = [:]
-    private var successDisconnect: [DriverModule: () -> Void] = [:]
-
-    private var internalState: DriverState = .connected
-    private var linksState: [LinkId: DriverState] = [:]
-
-    private var requestedModules: [DriverModule: Bool] = [:]
-
-    // MARK: - Initialization
-
-    init(ipAddress: String, with certificateInfo: CertificateInfo?) {
-        self.ipAddress = ipAddress
-        self.certificateInfo = certificateInfo
-        linksState[LinkId.genericLink] = .disconnected
-    }
-
     // MARK: - Link Protocol
     public func onLinkConnected(from identifier: Int8) {
 
@@ -283,7 +275,7 @@ import Foundation
     }
     
     // MARK: BrowserDelegate methods
-    public func send(data: [String: Any], onSuccess: @escaping ([String: Any]) -> Void, onError: @escaping (NSError?) -> Void) {
+    public func send(data: [String: Any], onSuccess: @escaping (Any?) -> Void, onError: @escaping (NSError?) -> Void) {
         
         guard let link = links[LinkId.genericLink] else {
             OCastLog.error("Reference Driver: Could not get the generic link.")
@@ -295,13 +287,12 @@ import Foundation
         let payload = Command(params: data)
         
         link.sendPayload(
-            forDomain: ReferenceDomainName.browser.name(),
+            forDomain: ReferenceDomainName.browser.rawValue,
             withPayload: payload,
             onSuccess: {
                 cmdResponse in
                     OCastLog.debug("Reference Driver: Payload sent.")
-                    // TODO: Fix this
-                    onSuccess(cmdResponse.reply as? [String: Any] ?? [:])
+                    onSuccess(cmdResponse.reply)
                 },
             onError: {
                 error in

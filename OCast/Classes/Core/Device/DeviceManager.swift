@@ -97,7 +97,7 @@ import Foundation
             return
         }
 
-        if driver.getState(for: .publicSettings) == .connected, let driver = driver as? DriverPublicSettings {
+        if driver.state(for: .publicSettings) == .connected, let driver = driver as? DriverPublicSettings {
             onSuccess(driver)
             return
         }
@@ -156,7 +156,7 @@ import Foundation
 
         driver.register(self, forModule: .privateSettings)
 
-        if driver.getState(for: .privateSettings) == .connected, let driver = driver as? DriverPrivateSettings {
+        if driver.state(for: .privateSettings) == .connected, let driver = driver as? DriverPrivateSettings {
             onSuccess(driver)
             return
         }

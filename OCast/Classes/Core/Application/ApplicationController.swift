@@ -54,12 +54,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     var browser: Browser?
     var mediaController: MediaController?
     
-    enum Action: String {
-        case start
-        case join
-        case stop
-    }
-    
     enum State: String {
         case running
         case stopped
@@ -92,7 +86,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
      */
     public func start(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         manageStream(for: self)
-        if driver?.getState(for: .application) != .connected {
+        if driver?.state(for: .application) != .connected {
             driver?.connect(for: .application, with: applicationData, onSuccess: {
                 self.startApplication(
                     onSuccess: onSuccess,
@@ -114,9 +108,8 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func join(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        if driver?.getState(for: .application) != .connected {
+        if driver?.state(for: .application) != .connected {
             driver?.connect(for: .application, with: applicationData, onSuccess: {
                 //
                 self.joinApplication(onSuccess: onSuccess, onError: onError)
@@ -134,7 +127,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func stop(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         stopApplication(onSuccess: {
             //
@@ -147,10 +139,10 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
      - Returns: A pointer to the mediaController class
      */
 
-    public func getMediaController(for sender: MediaControllerDelegate) -> MediaController {
+    public func mediaController(with delegate: MediaControllerDelegate) -> MediaController {
 
         if mediaController == nil {
-            mediaController = MediaController(with: sender)
+            mediaController = MediaController(with: delegate)
             manageStream(for: mediaController!)
         }
 
@@ -196,10 +188,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
             if response.statusCode == 201 {
                 self.applicationStatus(onSuccess: {
                     self.isConnectedEvent = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
-                        self.semaphore?.signal()
-                    }
-                    self.semaphore?.wait()
+                    let _ = self.semaphore?.wait(timeout: .now() + 10)
                     if self.isConnectedEvent {
                         onSuccess()
                     } else {
@@ -228,10 +217,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
                     onError(error)
                 }
             },
-            onError: {
-                (error) in
-                    onError(error)
-            })
+            onError: onError)
     }
     
     

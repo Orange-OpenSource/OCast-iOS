@@ -19,7 +19,7 @@ import Foundation
 
 // Data structure for link layer
 
-struct ReferenceLinkStructure {
+struct ReferenceLinkData {
     let destination: String
     let source: String
     let type: String

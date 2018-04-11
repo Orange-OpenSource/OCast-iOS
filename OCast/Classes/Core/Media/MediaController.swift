@@ -44,9 +44,9 @@ import Foundation
 @objcMembers
 public final class MediaController: NSObject, DataStream {
 
-    let delegate: MediaControllerDelegate
+    let delegate: MediaControllerDelegate?
     
-    init(with delegate: MediaControllerDelegate) {
+    init(with delegate: MediaControllerDelegate?) {
         self.delegate = delegate
     }
 
@@ -78,7 +78,9 @@ public final class MediaController: NSObject, DataStream {
         dataSender?.send(message: dict,
                     onSuccess: { response in
 
-                        guard let errorCode = self.getCode(from: response) else {
+                        guard let errorCode = self.code(from: response) else {
+                            // TODO: create error
+                            onError(nil)
                             return
                         }
 
@@ -110,7 +112,9 @@ public final class MediaController: NSObject, DataStream {
 
                     onSuccess: { response in
 
-                        guard let errorCode = self.getCode(from: response) else {
+                        guard let errorCode = self.code(from: response) else {
+                            // TODO: create error
+                            onError(nil)
                             return
                         }
 
@@ -142,7 +146,9 @@ public final class MediaController: NSObject, DataStream {
 
                     onSuccess: { response in
 
-                        guard let errorCode = self.getCode(from: response) else {
+                        guard let errorCode = self.code(from: response) else {
+                            // TODO: create error
+                            onError(nil)
                             return
                         }
 
@@ -174,7 +180,9 @@ public final class MediaController: NSObject, DataStream {
 
                     onSuccess: { response in
 
-                        guard let errorCode = self.getCode(from: response) else {
+                        guard let errorCode = self.code(from: response) else {
+                            // TODO: create error
+                            onError(nil)
                             return
                         }
 
@@ -208,7 +216,9 @@ public final class MediaController: NSObject, DataStream {
 
                     onSuccess: { response in
 
-                        guard let errorCode = self.getCode(from: response) else {
+                        guard let errorCode = self.code(from: response) else {
+                            // TODO: create error
+                            onError(nil)
                             return
                         }
 
@@ -242,7 +252,9 @@ public final class MediaController: NSObject, DataStream {
             message: dict,
             onSuccess: {
             response in
-                guard let errorCode = self.getCode(from: response) else {
+                guard let errorCode = self.code(from: response) else {
+                    // TODO: create error
+                    onError(nil)
                     return
                 }
 
@@ -275,7 +287,9 @@ public final class MediaController: NSObject, DataStream {
             message: dict,
             onSuccess: {
                 response in
-                    guard let errorCode = self.getCode(from: response) else {
+                    guard let errorCode = self.code(from: response) else {
+                        // TODO: create error
+                        onError(nil)
                         return
                     }
 
@@ -309,7 +323,9 @@ public final class MediaController: NSObject, DataStream {
             message: dict,
             onSuccess: {
                 response in
-                    guard let errorCode = self.getCode(from: response) else {
+                    guard let errorCode = self.code(from: response) else {
+                        // TODO: create error
+                        onError(nil)
                         return
                     }
                     if errorCode == MediaErrorCode.noError {
@@ -340,7 +356,9 @@ public final class MediaController: NSObject, DataStream {
             message: dict,
             onSuccess: {
                 response in
-                    guard let errorCode = self.getCode(from: response) else {
+                    guard let errorCode = self.code(from: response) else {
+                        // TODO: create error
+                        onError(nil)
                         return
                     }
 
@@ -362,7 +380,7 @@ public final class MediaController: NSObject, DataStream {
          - onError: the closure to be called in case of error
      */
 
-    public func getMetadata(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: MetaDataChanged) -> Void, onError: @escaping (NSError?) -> Void) {
+    public func metadata(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: MetaDataChanged) -> Void, onError: @escaping (NSError?) -> Void) {
         
         let dict: [String: Any] = ["name": "getMetadata", "params": [], "options": options]
         
@@ -370,7 +388,9 @@ public final class MediaController: NSObject, DataStream {
             message: dict,
             onSuccess: {
                 response in
-                    guard let errorCode = self.getCode(from: response) else {
+                    guard let errorCode = self.code(from: response) else {
+                        // TODO: create error
+                        onError(nil)
                         return
                     }
 
@@ -379,7 +399,7 @@ public final class MediaController: NSObject, DataStream {
                         onError(newError)
                         return
                     }
-                    guard let metaData = self.getMetaData(from: response) else {
+                    guard let metaData = self.metadata(from: response) else {
                         // TODO: creer error
                         onError(nil)
                         return
@@ -398,7 +418,7 @@ public final class MediaController: NSObject, DataStream {
          - onError: the closure to be called in case of error
      */
 
-    public func getPlaybackStatus(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: PlaybackStatus) -> Void, onError: @escaping (NSError?) -> Void) {
+    public func playbackStatus(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: PlaybackStatus) -> Void, onError: @escaping (NSError?) -> Void) {
         
         let dict: [String: Any] = ["name": "getPlaybackStatus", "params": [], "options": options]
         
@@ -407,7 +427,9 @@ public final class MediaController: NSObject, DataStream {
             onSuccess: {
                 response in
 
-                    guard let errorCode = self.getCode(from: response) else {
+                    guard let errorCode = self.code(from: response) else {
+                        // TODO: create error
+                        onError(nil)
                         return
                     }
 
@@ -417,7 +439,7 @@ public final class MediaController: NSObject, DataStream {
                         return
                     }
 
-                    guard let metaData = self.getPlaybackInfo(from: response) else {
+                    guard let metaData = self.playbackStatus(from: response) else {
                         // TODO: creer erreur
                         onError(nil)
                         return
@@ -430,20 +452,20 @@ public final class MediaController: NSObject, DataStream {
     }
     
     // MARK: - Internal
-    func getCode(from response: [String: Any]?) -> MediaErrorCode? {
+    func code(from response: [String: Any]?) -> MediaErrorCode? {
         guard
             let response = response,
             let data = response["data"] as? [String: Any],
             let mediaData = DataMapper().mediaData(with: data),
             let code = mediaData.params["code"],
-            let codeAsInt = code as? Int,
-            let errorCode = MediaErrorCode(rawValue: codeAsInt) else {
+            let codeInt = code as? Int,
+            let errorCode = MediaErrorCode(rawValue: codeInt) else {
                 return nil
         }
         return errorCode
     }
     
-    func getMetaData(from response: [String: Any]?) -> MetaDataChanged? {
+    func metadata(from response: [String: Any]?) -> MetaDataChanged? {
         guard
             let response = response,
             let data = response["data"] as? [String: Any],
@@ -454,7 +476,7 @@ public final class MediaController: NSObject, DataStream {
         return metaData
     }
     
-    func getPlaybackInfo(from response: [String: Any]?) -> PlaybackStatus? {
+    func playbackStatus(from response: [String: Any]?) -> PlaybackStatus? {
         guard
             let response = response,
             let data = response["data"] as? [String: Any],
@@ -481,12 +503,12 @@ public final class MediaController: NSObject, DataStream {
         switch mediaData.name {
             case "playbackStatus":
                 let playbackStatus = DataMapper().playbackStatus(with: mediaData)
-                delegate.onPlaybackStatus(data: playbackStatus)
+                delegate?.onPlaybackStatus(data: playbackStatus)
             case "metadataChanged":
                 guard let metaData = DataMapper().metadata(with: mediaData) else {
                     return
                 }
-                delegate.onMetaDataChanged(data: metaData)
+                delegate?.onMetaDataChanged(data: metaData)
             default:
                 return
         }

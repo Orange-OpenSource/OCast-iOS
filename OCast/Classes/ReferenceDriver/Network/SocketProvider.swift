@@ -18,7 +18,7 @@
 import Foundation
 import SocketRocket
 
-protocol SocketProviderProtocol {
+protocol SocketProviderDelegate {
     func onDisconnected(from socket: SocketProvider, code: Int, reason: String!)
     func onConnected(from socket: SocketProvider)
     func onMessageReceived(from socket: SocketProvider, message: String)
@@ -28,11 +28,11 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
 
     // MARK: - Interface
 
-    let delegate: SocketProviderProtocol?
+    let delegate: SocketProviderDelegate?
     let certInfo: CertificateInfo?
     var state: State
 
-    init(from sender: SocketProviderProtocol?, certInfo: CertificateInfo?) {
+    init(from sender: SocketProviderDelegate?, certInfo: CertificateInfo?) {
         delegate = sender
         self.certInfo = certInfo
         state = .disconnected

@@ -19,7 +19,7 @@
 import Foundation
 
 @objc public protocol BrowserDelegate {
-    func send(data: [String: Any], onSuccess: @escaping ([String: Any]) -> Void, onError: @escaping (NSError?) -> Void)
+    func send(data: [String: Any], onSuccess: @escaping (Any?) -> Void, onError: @escaping (NSError?) -> Void)
     func register(for delegate: DriverReceiverDelegate)
 }
 
@@ -44,16 +44,18 @@ final class Browser: NSObject, DriverReceiverDelegate {
             "data": data,
         ]
 
-        delegate?.send(data: streamData,
-                               onSuccess: { params in
-                                   OCastLog.debug("Browser: Received response from driver: \(String(describing: params))")
-                                   onSuccess(params)
-                               },
-
-                               onError: { error in
-                                   OCastLog.error("Browser: Got an error from driver: \(String(describing: error)))")
-                                   onError(error)
-                               }
+        delegate?.send(
+            data: streamData,
+            onSuccess: {
+                response in
+                    OCastLog.debug("Browser: Received response from driver: \(String(describing: response))")
+                    onSuccess(response as? [String: Any])
+            },
+            onError: {
+                error in
+                    OCastLog.error("Browser: Got an error from driver: \(String(describing: error)))")
+                    onError(error)
+            }
         )
     }
 

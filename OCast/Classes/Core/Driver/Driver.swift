@@ -116,7 +116,7 @@ extension DriverPrivateSettings {
     func privateSettingsAllowed() -> Bool
     func connect(for module: DriverModule, with info: ApplicationDescription, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
     func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
-    func getState(for module: DriverModule) -> DriverState
+    func state(for module: DriverModule) -> DriverState
     func register(_ delegate: DriverDelegate, forModule module: DriverModule)
 }
 
