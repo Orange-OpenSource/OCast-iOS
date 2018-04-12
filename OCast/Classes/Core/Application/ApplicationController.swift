@@ -140,9 +140,9 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     /**
      Used to get control over a user's specific stream. 
      
-     You need this when dealing with custom streams. See `DataStremable` for details on custom messaging.
+     You need this when dealing with custom streams. See `DataStream` for details on custom messaging.
       ```
-        // Create a CustomStream class implementing the DataStremable protocol
+        // Create a CustomStream class implementing the DataStream protocol
         customStream = CustomStream() 
      
         // Register it so the application manager knows how to handle it.
@@ -165,13 +165,14 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         }
     }
 
-    // MARK: - Internal
-    func reset() {
+    // MARK: internal methods
+    internal func reset() {
         browser = nil
         mediaController = nil
     }
 
-    func startApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+    // MARK: private methods
+    private func startApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         initiateHttpRequest(from: self, with: .post, to: target, onSuccess: { (response, _) in
             if response.statusCode == 201 {
                 self.applicationStatus(onSuccess: {
@@ -195,7 +196,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         }
     }
     
-    func joinApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+    private func joinApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         self.applicationStatus(
             onSuccess: {
                 if self.currentState == .running {
@@ -209,7 +210,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     }
     
     
-    func stopApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+    private func stopApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         // TODO: recuperer le runLink
         initiateHttpRequest(from: self, with: .delete, to: "\(target)/run", onSuccess: { (_, _) in
             self.applicationStatus(onSuccess: {
@@ -227,7 +228,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         }
     }
     
-    func applicationStatus(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+    private func applicationStatus(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         initiateHttpRequest(from: self, with: .get, to: target, onSuccess: { (_, data) in
             guard let data = data else {
                 OCastLog.error("ApplicationMgr: No content to parse.")
@@ -272,14 +273,5 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
                 semaphore?.signal()
             }
         }
-    }
-
-    // MARK: - HTTP Request protocol and related methods
-    func didReceiveHttpResponse(response _: HTTPURLResponse, with data: Data?) {
-        guard let data = data else {
-            OCastLog.error("ApplicationMgr: No content to parse.")
-            return
-        }
-        xmlParser.parseDocument(data: data, withKeyList: keyList)
     }
 }

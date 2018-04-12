@@ -46,7 +46,7 @@ public final class MediaController: NSObject, DataStream {
 
     let delegate: MediaControllerDelegate?
     
-    init(with delegate: MediaControllerDelegate?) {
+    internal init(with delegate: MediaControllerDelegate?) {
         self.delegate = delegate
     }
 
