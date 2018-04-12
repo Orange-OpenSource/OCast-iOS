@@ -19,7 +19,8 @@
 import XCTest
 @testable import OCast
 
-class ReferenceLinkTests: XCTestCase , LinkProtocol {
+
+class ReferenceLinkTests: XCTestCase , LinkDelegate {
     
     var testId = ""
     var linkDownCount = 0
@@ -37,11 +38,6 @@ class ReferenceLinkTests: XCTestCase , LinkProtocol {
     override func tearDown() {
         super.tearDown()
     }
-    
-    
-
-    
-
 
     func testLinkFactory() {
         
@@ -136,7 +132,7 @@ class ReferenceLinkTests: XCTestCase , LinkProtocol {
     }
     
        
-    func onSuccessTestID(data: CommandStructure) {
+    func onSuccessTestID(data: Command) {
 
         switch testId {
 
@@ -172,7 +168,7 @@ class ReferenceLinkTests: XCTestCase , LinkProtocol {
     
     
     // MARK: - Link protocol
-    func onEvent (payload: EventStructure) {
+    func onEvent (payload: Event) {
         
         switch testId {
             case "eventOK":

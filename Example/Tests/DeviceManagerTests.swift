@@ -20,70 +20,51 @@
 import XCTest
 @testable import OCast
 
-
-
 class DeviceManagerTests: XCTestCase {
 
     var testID = 0
     
-    func testDeviceManaegCreation () {
+    func testDeviceManageCreation () {
         
         var device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "theDriver", modelName: "")
-        var deviceMgr = DeviceManager (with: device)
+        var deviceMgr = DeviceManager (with: device, withCertificateInfo: nil)
         
         // Must fail: The manufacturer does not macth any existing driver.
-        
-        if deviceMgr != nil {
-            XCTAssert(false)
-        }
+        XCTAssertNil(deviceMgr)
         
         device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        deviceMgr = DeviceManager (with: device)
+        deviceMgr = DeviceManager(with: device)
 
-        XCTAssert(deviceMgr != nil)
-      
+        XCTAssertNotNil(deviceMgr)
     }
     
        
     func testApplicationController () {
-        
-        let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
+        if !DeviceManager.registerDriver(forName: "Orange SA", factory: ReferenceDriverFactory.shared) {
+            XCTFail()
+        }
+        let device = Device(baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
         let deviceMgr = DeviceManager(with: device)
         
-        XCTAssert(deviceMgr != nil)
-        XCTAssert (deviceMgr?.driver != nil)
+        XCTAssertNotNil(deviceMgr)
+        XCTAssertNotNil(deviceMgr?.driver)
+        XCTAssertNil(deviceMgr?.applicationControllers.first)
         
-        XCTAssertTrue((deviceMgr?.applicationControllers.isEmpty)!)
-        
-        deviceMgr?.getApplicationController(for: "myApp", onSuccess: onApplicationSuccess, onError: onError(error:))
-        
-        XCTAssert (deviceMgr?.currentApplicationName == "myApp")
-    }
-
-    
-    func onPublicSettingsSuccess (reference: DriverPublicSettingsProtocol) {
-        XCTAssertTrue(false)
+        deviceMgr?.applicationController(for: "myApp", onSuccess: onApplicationSuccess, onError: onError(error:))
+        XCTAssert(deviceMgr?.currentApplicationName == "myApp")
     }
     
-    func onPrivateSettingsSuccess (reference: DriverPrivateSettingsProtocol) {
-        XCTAssertTrue(false)
-    }
+    public func onApplicationSuccess(app: ApplicationController) {
     
-    func onApplicationSuccess (reference: ApplicationController) {
-        XCTAssertTrue(false)
-    }
-    
-    func onSucess () {
-        XCTAssertTrue(false)
     }
     
     func onError (error: NSError?) {
         
         switch testID {
         case 1,2,3:
-            XCTAssertTrue(true)
+            break
         default:
-            XCTAssertTrue(false)
+            XCTFail()
         }
     }
     

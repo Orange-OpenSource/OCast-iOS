@@ -20,7 +20,7 @@ import XCTest
 import SocketRocket
 @testable import OCast
 
-class SocketProviderTests: XCTestCase, SocketProviderProtocol {
+class SocketProviderTests: XCTestCase, SocketProviderDelegate {
     
     
     func testMaxPayloadSize () {

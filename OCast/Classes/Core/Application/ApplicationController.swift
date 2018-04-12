@@ -87,38 +87,26 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     public func start(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         manageStream(for: self)
         if driver?.state(for: .application) != .connected {
-            driver?.connect(for: .application, with: applicationData, onSuccess: {
-                self.startApplication(
-                    onSuccess: onSuccess,
-                    onError: { (error) in
-                        self.stopApplication(
-                            onSuccess: { onError(error) },
-                            onError: { (_) in onError(error) }
-                        )
-                })
-            }, onError: onError)
+            driver?.connect(for: .application, with: applicationData,
+                            onSuccess: {
+                                self.applicationStatus(onSuccess: {
+                                    if self.currentState == .running {
+                                        onSuccess()
+                                    } else {
+                                        self.startApplication(onSuccess: onSuccess, onError: onError)
+                                    }
+                                }, onError: onError)
+            }
+                , onError: onError)
         } else {
-            startApplication(onSuccess: onSuccess, onError: onError)
-        }
-    }
-
-    /**
-     Joins the web application on the device. Fails if another web application is already running on the device.
-     - Parameters:
-         - onSuccess: the closure to be called in case of success.
-         - onError: the closure to be called in case of error
-     */
-    public func join(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        if driver?.state(for: .application) != .connected {
-            driver?.connect(for: .application, with: applicationData, onSuccess: {
-                //
-                self.joinApplication(onSuccess: onSuccess, onError: onError)
+            self.applicationStatus(onSuccess: {
+                if self.currentState == .running {
+                    onSuccess()
+                } else {
+                    self.startApplication(onSuccess: onSuccess, onError: onError)
+                }
             }, onError: onError)
-        } else {
-            self.joinApplication(onSuccess: onSuccess, onError: onError)
         }
-        
-        // TODO : lancer un start si app non lancé
     }
 
     /**

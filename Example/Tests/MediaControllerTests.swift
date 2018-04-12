@@ -32,15 +32,13 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
     }
     
     func testGetCode01 () {
-        
-        
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
         let deviceMgr = DeviceManager(with: device)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(for: self)
         
 
         let data: [String:Any] = ["service":"org.ocast.media","data":["name":"prepare","params":["code":0]]]
@@ -58,12 +56,12 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         //Unknown code
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (with: device)
+        let deviceMgr = DeviceManager(with: device)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(for: self)
 
         let data: [String:Any] = ["service":"org.ocast.media","data":["name":"prepare","params":["code":1]]]
         
@@ -79,12 +77,12 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (with: device)
+        let deviceMgr = DeviceManager(with: device)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(for: self)
 
         
         // Code is missing
@@ -122,12 +120,12 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
     
     func testGetMetadata01 () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (with: device)
+        let deviceMgr = DeviceManager(with: device, withCertificateInfo: nil)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(for: self)
 
         
         let data : [String:Any] = ["service":"org.ocast.media","data":["name":"metadataChanged","params":["title":"Planète interdite","subtitle":"Brought to you by Orange OCast","logo":"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/","mediaType":"video","transferMode":"streamed","audioTracks":[["language":"fre","label":"#1 Fre","enabled":true,"id":"0"],["language":"eng","label":"#2 Eng","enabled":false,"id":"1"]],"videoTracks":[],"textTracks":[],"code":0],"options":[]]]
@@ -145,9 +143,9 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let deviceMgr = DeviceManager(with: device)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(for: self)
 
         
         if mediaController.getMetaData(from: nil) != nil {
@@ -183,9 +181,9 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let deviceMgr = DeviceManager(with: device)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(for: self)
 
     
         let data : [String:Any] = ["service":"org.ocast.media","data":["name":"playbackStatus","params":["state":"playing","volume":1,"mute":false,"position":1.486712077,"duration":5910.209,"code":0],"options":[]]]
@@ -201,11 +199,11 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
     
     func testGetPlaybackInfo02 () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (with: device)
+        let deviceMgr = DeviceManager(with: device, withCertificateInfo: nil)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(for: self)
 
         
         if mediaController.getPlaybackInfo(from: nil) != nil {

@@ -26,7 +26,7 @@ import Foundation
  See `ApplicationController` for custom stream management.
 
  ```
-final class CustomStream : DataStreamable {
+final class CustomStream : DataStream {
     
     //MARK: - DataStreamable: variable definition
     

@@ -238,7 +238,7 @@ extension MainVC {
 
     
     @IBAction func onPlayerStatus(_ sender: Any) {
-        mediaController?.getPlaybackStatus(
+        mediaController?.playbackStatus(
             onSuccess: { playbackStatus in
                         OCastLog.debug("->PlayBack Status is OK.")
                         self.playbackPosition.text = String (playbackStatus.position.format(f: ".1"))
@@ -253,7 +253,7 @@ extension MainVC {
     }
     
     @IBAction func onGetMetaData(_ sender: Any) {
-        mediaController?.getMetadata(
+        mediaController?.metadata(
             onSuccess: { metadata in
                 OCastLog.debug("->MetaData is OK.")
                  self.onMetaDataChanged(data: metadata)

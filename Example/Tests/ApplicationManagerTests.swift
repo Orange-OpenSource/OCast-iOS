@@ -21,9 +21,12 @@ import XCTest
 @testable import OCast
 
 internal final class DefaultDataStream: DataStream {
-    var dataSender: DataSender?
+
     let serviceId: String
+    
     var browser: Browser?
+    
+    var dataSender: DataSender?
     
     init(forService serviceId: String) {
         self.serviceId = serviceId
@@ -40,11 +43,11 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
     
     func testMutliStream () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager(with: device)
+        let deviceMgr = DeviceManager(with: device, withCertificateInfo: nil)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let stream = DefaultDataStream(forService: "serviceExample")
+        let stream = DefaultDataStream (forService: "serviceExample")
         appliMgr.manageStream(for: stream)
         
         let stream2 = DefaultDataStream (forService: "serviceExample-2")
@@ -53,75 +56,67 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         // Multiple streams can be created.
         XCTAssert(stream !== stream2)
         XCTAssert(stream.serviceId != stream2.serviceId)
-        
     }
     
     func testMediaControllerCreation () {
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (with: device)
+        let deviceMgr = DeviceManager(with: device)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.getMediaController(for: self)
-        
+        let mediaController = appliMgr.mediaController(for: self)
+
         XCTAssert(mediaController.serviceId == "org.ocast.media")
         
         // 1 Stream must be created at browser level
         XCTAssert(appliMgr.browser?.streams.count == 1)
         XCTAssert(appliMgr.browser?.streams["org.ocast.media"] != nil)
-        
     }
     
     func testMultiMediaController () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
         let deviceMgr = DeviceManager (with: device)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(for: self)
         
-        let mediaController2 = appliMgr.getMediaController(for: self)
+        let mediaController2 = appliMgr.mediaController(for: self)
         
         // Only 1  mediacontroller instance can be created.
         XCTAssert(mediaController === mediaController2)
-        
     }
     
     func testOnMessageConnectedOK () {
         testID = 1
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (with: device)
+        let deviceMgr = DeviceManager(with: device)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
         appliMgr.start(onSuccess: onSuccess, onError: onError(error:))
         
         let data : [String:Any] = ["name" : "connectionStatus", "params" : ["status":"connected"]]
         appliMgr.onMessage(data: data)
-        
-        
     }
     
     func testOnMessageConnectedKO () {
         testID = 2
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (with: device)
+        let deviceMgr = DeviceManager(with: device)
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.makeDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
         appliMgr.start(onSuccess: onSuccess, onError: onError(error:))
         
         let data : [String:Any] = ["name" : "connectionStatus", "params" : ["status":"internal error"]]
         appliMgr.onMessage(data: data)
-        
-        
     }
     
     func onSuccess () {
-        
         if testID == 1 {
             XCTAssert(true)
         } else {
@@ -129,20 +124,12 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         }
     }
     
-
     func onError (error: NSError?) {
         XCTAssertTrue(false)
     }
     
-    
     //MARK: - Unused protocols
-    
-    
     // MediaController protocol
-    func onPlaybackStatus(data: PlaybackStatus) {
-        
-    }
-    func onMetaDataChanged (data : MetaDataChanged) {
-    }
-    
+    func onPlaybackStatus(data: PlaybackStatus) {}
+    func onMetaDataChanged (data : MetaDataChanged) {}
 }

@@ -124,7 +124,7 @@ extension MainVC {
     func setupWebAppCtx(onSuccess:@escaping () -> (), onError:@escaping (_ error: NSError?) -> ()) {
         
         if appliMgr == nil {
-            deviceMgr?.getApplicationController(for: applicationName,
+            deviceMgr?.applicationController(for: applicationName,
                                                 onSuccess: {response in
                                                     self.appliMgr = response
                                                     
@@ -134,7 +134,7 @@ extension MainVC {
                                                     }
                                                     
                                                     if self.mediaController == nil {
-                                                        self.mediaController = self.appliMgr?.getMediaController(for: self)
+                                                        self.mediaController = self.appliMgr?.mediaController(with: self)
                                                     }
                                                     
                                                     onSuccess()

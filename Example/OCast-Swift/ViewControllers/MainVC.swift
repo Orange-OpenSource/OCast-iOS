@@ -19,7 +19,7 @@
 import UIKit
 import OCast
 
-class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerDelegate, DeviceManagerDelegate, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate, DeviceManagerDelegate, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
     @IBOutlet var webAppLabel: UITextField!
     @IBOutlet var webAppStatusLabel: UILabel!
@@ -78,11 +78,11 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerDelegate
         
         setupUI ()
 
-        if !DeviceManager.registerDriver(forName: ReferenceDriver.manufacturer, factory: ReferenceDriverFactory.sharedInstance) {
+        if !DeviceManager.registerDriver(forName: ReferenceDriver.manufacturer, factory: ReferenceDriverFactory.shared) {
             return
         }
         
-        deviceDiscovery = DeviceDiscovery.init(for: self, forTargets: [referenceST])
+        deviceDiscovery = DeviceDiscovery(forTargets: [referenceST])
 
         guard deviceDiscovery.start() else {
             return

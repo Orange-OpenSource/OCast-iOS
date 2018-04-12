@@ -19,7 +19,7 @@
 import XCTest
 @testable import OCast
 
-class XMLParsingTests: XCTestCase, XMLHelperProtocol {
+class XMLParsingTests: XCTestCase, XMLHelperDelegate {
     
     override func setUp() {
         super.setUp()
@@ -42,7 +42,7 @@ class XMLParsingTests: XCTestCase, XMLHelperProtocol {
         
         let xmlData = "<?xml version=\"1.0\" encoding=\"utf-8\"?><root xmlns=\"urn:schemas-upnp-org:device-1-0\" xmlns:r=\"urn:restful-tv-org:schemas:upnp-dd\"><specVersion><major>1</major><minor>0</minor></specVersion><URLBase>http://192.168.1.33:56789</URLBase><device><deviceType>urn:schemas-upnp-org:device:dail:1</deviceType><friendlyName>friendly name 01</friendlyName><manufacturer>Manufacurer 01</manufacturer><modelName>Model Name 01</modelName><UDN>device ID 01</UDN><serviceList><service><serviceType>urn:schemas-upnp-org:service:dail:1</serviceType><serviceId>urn:upnp-org:serviceId:dail</serviceId><controlURL>/ssdp/notfound</controlURL><eventSubURL>/ssdp/notfound</eventSubURL><SCPDURL>/ssdp/notfound</SCPDURL></service></serviceList></device></root>"
         
-        let parserHelper = XMLHelper (fromSender: self, for: "http://192.168.1.40:8088")
+        let parserHelper = XMLHelper(for: "http://192.168.1.40:8088")
         let key1 = XMLHelper.KeyDefinition (name: "friendlyName", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition (name: "manufacturer", isMandatory: true)
         let key3 = XMLHelper.KeyDefinition (name: "UDN", isMandatory: true)
@@ -59,7 +59,7 @@ class XMLParsingTests: XCTestCase, XMLHelperProtocol {
         
         let xmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root  xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:r=\"urn:restful-tv-org:schemas:upnp-dd\">  <specVersion>    <major>1</major>    <minor>0</minor>  </specVersion>  <device>    <deviceType>urn:schemas-upnp-org:device:tvdevice:1</deviceType>    <friendlyName>friendly name 02</friendlyName>    <manufacturer>Manufacturer 02</manufacturer>    <modelName>Model Name 02</modelName>    <UDN>device ID 02</UDN>  </device></root>"
         
-        let parserHelper = XMLHelper (fromSender: self, for: "http://192.168.1.40:8088")
+        let parserHelper = XMLHelper(for: "http://192.168.1.40:8088")
         
         let key1 = XMLHelper.KeyDefinition (name: "friendlyName", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition (name: "manufacturer", isMandatory: true)
@@ -77,7 +77,7 @@ class XMLParsingTests: XCTestCase, XMLHelperProtocol {
         
         let xmlData = "<?xml verson=\"1.0\" encoding=\"UTF-8\"?><root  xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:r=\"urn:restful-tv-org:schemas:upnp-dd\">  <specVersion>    <major>1</major>    <minor>0</minor>  </specVersion>  <device>    <deviceType>urn:schemas-upnp-org:device:tvdevice:1</deviceType>    <friendlyName> friendly name 02</friendlyName>    <manufacturer>Manufacturer 02</manufacturer>    <modelName>Model Name 02</modelName>    <UDN>device ID 02</UDN>  </device></root>"
         
-        let parserHelper = XMLHelper (fromSender: self, for: "http://192.168.1.40:8088")
+        let parserHelper = XMLHelper(for: "http://192.168.1.40:8088")
         let key1 = XMLHelper.KeyDefinition (name: "friendlyName", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition (name: "manufacturer", isMandatory: true)
         let key3 = XMLHelper.KeyDefinition (name: "UDN", isMandatory: true)
@@ -95,7 +95,7 @@ class XMLParsingTests: XCTestCase, XMLHelperProtocol {
         
         let xmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root  xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:r=\"urn:restful-tv-org:schemas:upnp-dd\">  <specVersion>    <major>1</major>    <minor>0</minor>  </specVersion>  <device>    <deviceType>urn:schemas-upnp-org:device:tvdevice:1</deviceType>      <manufacturer>Manufacturer 02</manufacturer>    <modelName>Model Name 02</modelName>    <UDN>device ID 02</UDN>  </device></root>"
         
-        let parserHelper = XMLHelper (fromSender: self, for: "http://192.168.1.40:8088")
+        let parserHelper = XMLHelper(for: "http://192.168.1.40:8088")
         let key1 = XMLHelper.KeyDefinition (name: "friendlyName", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition (name: "manufacturer", isMandatory: true)
         let key3 = XMLHelper.KeyDefinition (name: "UDN", isMandatory: true)
@@ -113,7 +113,7 @@ class XMLParsingTests: XCTestCase, XMLHelperProtocol {
         
         let xmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root  xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:r=\"urn:restful-tv-org:schemas:upnp-dd\">  <specVersion>    <major>1</major>    <minor>0</minor>  </specVersion>  <device>    <deviceType>urn:schemas-upnp-org:device:tvdevice:1</deviceType>      <manufacturer>Manufacturer 02</manufacturer>    <modelName>Model Name 02</modelName>      </device></root>"
         
-        let parserHelper = XMLHelper (fromSender: self, for: "http://192.168.1.40:8088")
+        let parserHelper = XMLHelper(for: "http://192.168.1.40:8088")
         let key1 = XMLHelper.KeyDefinition (name: "friendlyName", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition (name: "manufacturer", isMandatory: true)
         let key3 = XMLHelper.KeyDefinition (name: "UDN", isMandatory: true)
@@ -132,14 +132,13 @@ class XMLParsingTests: XCTestCase, XMLHelperProtocol {
         let xmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root  xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:r=\"urn:restful-tv-org:schemas:upnp-dd\">  <specVersion>    <major>1</major>    <minor>0</minor>  </specVersion>  <device>    <deviceType>urn:schemas-upnp-org:device:tvdevice:1</deviceType>    <friendlyName>friendly name 02</friendlyName>  <manufacturer>Manufacturer 02</manufacturer>     <UDN>device ID 02</UDN>  </device></root>"
 
         
-        let parserHelper = XMLHelper (fromSender: self, for: "http://192.168.1.40:8088")
+        let parserHelper = XMLHelper(for: "http://192.168.1.40:8088")
         let key1 = XMLHelper.KeyDefinition (name: "friendlyName", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition (name: "manufacturer", isMandatory: true)
         let key3 = XMLHelper.KeyDefinition (name: "UDN", isMandatory: true)
         let key4 = XMLHelper.KeyDefinition (name: "modelName", isMandatory: false)
         
         parserHelper.parseDocument(data: xmlData.data(using: .utf8)!, withKeyList: [key1, key2, key3, key4])
-
     }
     
     func test07_XMLData_MultipleResponses () {
@@ -149,7 +148,7 @@ class XMLParsingTests: XCTestCase, XMLHelperProtocol {
         // Got 2 answers to a MSEARCH: First Manufacturer 01, then Manufacturer 02
         
         let xmlData = "<?xml version=\"1.0\" encoding=\"utf-8\"?><root xmlns=\"urn:schemas-upnp-org:device-1-0\" xmlns:r=\"urn:restful-tv-org:schemas:upnp-dd\"><specVersion><major>1</major><minor>0</minor></specVersion><URLBase>http://192.168.1.33:56789</URLBase><device><deviceType>urn:schemas-upnp-org:device:dail:1</deviceType><friendlyName>friendly name 01</friendlyName><manufacturer>Manufacurer 01</manufacturer><modelName>Model Name 01</modelName><UDN>device ID 01</UDN><serviceList><service><serviceType>urn:schemas-upnp-org:service:dail:1</serviceType><serviceId>urn:upnp-org:serviceId:dail</serviceId><controlURL>/ssdp/notfound</controlURL><eventSubURL>/ssdp/notfound</eventSubURL><SCPDURL>/ssdp/notfound</SCPDURL></service></serviceList></device></root>"
-        var parserHelper = XMLHelper (fromSender: self, for: "http://192.168.1.40:8088")
+        var parserHelper = XMLHelper (for: "http://192.168.1.40:8088")
         var key1 = XMLHelper.KeyDefinition (name: "friendlyName", isMandatory: true)
         var key2 = XMLHelper.KeyDefinition (name: "manufacturer", isMandatory: true)
         var key3 = XMLHelper.KeyDefinition (name: "UDN", isMandatory: true)
@@ -159,7 +158,7 @@ class XMLParsingTests: XCTestCase, XMLHelperProtocol {
         
         let xmlData2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root  xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:r=\"urn:restful-tv-org:schemas:upnp-dd\">  <specVersion>    <major>1</major>    <minor>0</minor>  </specVersion>  <device>    <deviceType>urn:schemas-upnp-org:device:tvdevice:1</deviceType>    <friendlyName>friendly name 02</friendlyName>    <manufacturer>Manufacturer 02</manufacturer>    <modelName>Model Name 02</modelName>    <UDN>device ID 02</UDN>  </device></root>"
         
-        parserHelper = XMLHelper (fromSender: self, for: "http://192.168.1.41:8088")
+        parserHelper = XMLHelper(for: "http://192.168.1.41:8088")
         key1 = XMLHelper.KeyDefinition (name: "friendlyName", isMandatory: true)
         key2 = XMLHelper.KeyDefinition (name: "manufacturer", isMandatory: true)
         key3 = XMLHelper.KeyDefinition (name: "UDN", isMandatory: true)
@@ -175,7 +174,7 @@ class XMLParsingTests: XCTestCase, XMLHelperProtocol {
         
         let xmlData = "<service xmlns=\"urn:dial-multiscreen-org:schemas:dial\" xmlns:ocast=\"urn:cast-ocast-org:service:cast:1\" dialVer=\"2.1\"> <name>APPID</name> <options allowStop=\"false\"/> <state>running</state> <additionalData><ocast:X_OCAST_App2AppURL>ws://192.168.1.40:4434/ocast</ocast:X_OCAST_App2AppURL> <ocast:X_OCAST_Version>1.0</ocast:X_OCAST_Version ></additionalData><link rel=\"run\" href=\"http://192.168.1.1\"/></service>"
         
-        let parserHelper = XMLHelper (fromSender: self, for: "http://192.168.1.40:8088")
+        let parserHelper = XMLHelper (for: "http://192.168.1.40:8088")
 
         let key1 = XMLHelper.KeyDefinition (name: "ocast:X_OCAST_App2AppURL", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition (name: "ocast:X_OCAST_Version", isMandatory: true)
