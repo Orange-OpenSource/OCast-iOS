@@ -32,8 +32,6 @@ Here are the main functionalities of the Example project:
 - Media tracks management
 - Custom messages handling
 
-You don't need to have a stick to run the Exmaple project or to start developping your own application: use our simulator to get started.
-
 DESC
 
 s.homepage         = 'https://github.com/Orange-OpenSource/OCast-iOS'
