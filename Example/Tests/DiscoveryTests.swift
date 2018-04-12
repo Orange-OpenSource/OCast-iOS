@@ -72,7 +72,7 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
         
         let applicationURL = deviceDiscovery.getApplicationURL(from: httpResponse)
         
-        XCTAssert(applicationURL == appDialURL?.absoluteString)
+        XCTAssertEqual(applicationURL, appDialURL?.absoluteString)
     }
     
     func test03ApplicationURLShouldBeEmpty  () {
@@ -151,43 +151,21 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
         
         // deviceDiscovey has already been initialized, but not yet started.
         
-        if deviceDiscovery.ssdpSocket != nil {
-            XCTAssert(false)
-        } else {
-            XCTAssert(true)
-        }
-        
         XCTAssert(!deviceDiscovery.isRunning)
         XCTAssert(!deviceDiscovery.isStarted())
         
         // Start
         XCTAssert (deviceDiscovery.start())
       
-
-        if deviceDiscovery.ssdpSocket != nil {
-            XCTAssert(true)
-        } else {
-            XCTAssert(false)
-        }
-        
-        XCTAssert(!(deviceDiscovery.ssdpSocket?.isClosed())!)
         XCTAssert(deviceDiscovery.isRunning)
         
         deviceDiscovery.stop()
         XCTAssert(!deviceDiscovery.isRunning)
-        XCTAssert((deviceDiscovery.ssdpSocket?.isClosed())!)
-        
         XCTAssert (deviceDiscovery.start())
         
-        guard let socket = deviceDiscovery.ssdpSocket else {
-            XCTAssert(false)
-            return
-        }
         
         // A start() without a previuos stop() should be ignored => The ssdp socket must be unchanged
         XCTAssert (!deviceDiscovery.start())
-        XCTAssert(socket == deviceDiscovery.ssdpSocket)
-        
     }
     
     func test11IPV6Format () {
@@ -211,19 +189,6 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
 
     }
     
-    func test13mSearchIdx () {
-        XCTAssert (deviceDiscovery.start())
-        XCTAssert(deviceDiscovery.mSearchIdx == 1)
-        deviceDiscovery.stop()
-    }
-    
-    func test14mSearchIdx_MaxValue () {
-        XCTAssert (deviceDiscovery.start())
-        deviceDiscovery.mSearchIdx = type(of: deviceDiscovery.mSearchIdx).max
-        deviceDiscovery.sendMSearch()
-        XCTAssert(deviceDiscovery.mSearchIdx == 1)
-    }
-    
     func test15MultipleDiscoveryInstances () {
         
         testIdx = 15
@@ -236,25 +201,6 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
         
         deviceDiscovery.createDevice(with: xmlData.data(using: String.Encoding.utf8)!, for: "http://192.168.1.33:56789")
         deviceDiscovery02.createDevice(with: xmlData.data(using: String.Encoding.utf8)!, for: "http://192.168.1.33:56789")
-    }
-    
-
-    func testReliability () {
-        deviceDiscovery = DeviceDiscovery(forTargets: [searchTarget01, searchTarget02])
-        XCTAssertEqual(deviceDiscovery.mSearchRetry, 5)
-        XCTAssertEqual(deviceDiscovery.mSearchTimeout, 10)
-        
-        deviceDiscovery = DeviceDiscovery(forTargets: [searchTarget01], withPolicy: .high)
-        XCTAssertEqual(deviceDiscovery.mSearchRetry, 2)
-        XCTAssertEqual(deviceDiscovery.mSearchTimeout, 3)
-        
-        deviceDiscovery = DeviceDiscovery(forTargets: [searchTarget01], withPolicy: .medium)
-        XCTAssertEqual(deviceDiscovery.mSearchRetry, 3)
-        XCTAssertEqual(deviceDiscovery.mSearchTimeout, 5)
-        
-        deviceDiscovery = DeviceDiscovery(forTargets: [searchTarget01], withPolicy: .low)
-        XCTAssertEqual(deviceDiscovery.mSearchRetry, 5)
-        XCTAssertEqual(deviceDiscovery.mSearchTimeout, 10)
     }
 
     func testDevices () {

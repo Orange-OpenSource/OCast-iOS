@@ -65,7 +65,7 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.mediaController(for: self)
+        let mediaController = appliMgr.mediaController(with: self)
 
         XCTAssert(mediaController.serviceId == "org.ocast.media")
         
@@ -80,9 +80,9 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
-        let mediaController = appliMgr.mediaController(for: self)
+        let mediaController = appliMgr.mediaController(with: self)
         
-        let mediaController2 = appliMgr.mediaController(for: self)
+        let mediaController2 = appliMgr.mediaController(with: self)
         
         // Only 1  mediacontroller instance can be created.
         XCTAssert(mediaController === mediaController2)

@@ -192,48 +192,7 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
 
 
     @IBAction func onJoin(_ sender: Any) {
-        webAppStatusLabel.text = "Join-Pending"
-        errorMessageLabel.text = ""
-        
-        setupWebAppCtx (
-            onSuccess: joinApplication,
-            onError: { error in
-                            DispatchQueue.main.async {
-                                self.webAppStatusLabel.text = "Join-NOK"
-                                self.setUIWebAppConnected ()
-                                OCastLog.error("-> Web app failed to join.")
-                            }
-                    }
-        )
-
-    }
-    
-    func joinApplication () {
-        
-        appliMgr!.join (
-            onSuccess: { 
-            
-                DispatchQueue.main.async {
-                    self.webAppStatusLabel.text = "Join-OK"
-                    self.deviceDiscovery.stop()
-                    OCastLog.debug("-> Web App JOIN is OK")}
-                },
-                       
-                onError: { error in
-                        
-                    DispatchQueue.main.async {
-                        self.webAppStatusLabel.text = "Join-NOK"
-                            
-                        if let error = error {
-                            let key = error.userInfo.keys.first!
-                            let info = error.userInfo[key] ?? ""
-                            self.errorMessageLabel.text = info as? String
-                        }
-                            
-                        OCastLog.error("-> Web app failed to join")
-                    }
-                }
-        )
+        webAppStatusLabel.text = "Join-Deprecated"
     }
     
     @IBAction func onStop(_ sender: Any) {
