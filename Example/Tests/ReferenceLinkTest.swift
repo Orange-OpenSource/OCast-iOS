@@ -18,10 +18,9 @@
 
 import XCTest
 @testable import OCast
-@testable import OCastReferenceDriver
 
 
-class ReferenceLinkTests: XCTestCase , LinkProtocol {
+class ReferenceLinkTests: XCTestCase , LinkDelegate {
     
     var testId = ""
     var linkDownCount = 0
@@ -39,23 +38,17 @@ class ReferenceLinkTests: XCTestCase , LinkProtocol {
     override func tearDown() {
         super.tearDown()
     }
-    
-    
-
-    
-
 
     func testLinkFactory() {
-        
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink.make(from: self,
-                                                                                    linkProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
+
+        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
         XCTAssert(referenceLink.count == 1)
         
         if referenceLink[ReferenceDriver.LinkId.genericLink] == nil {
             XCTAssert(false)
         }
         
-        browserLink = referenceLink[ReferenceDriver.LinkId.genericLink] as? ReferenceLink
+        browserLink = referenceLink[ReferenceDriver.LinkId.genericLink]
         
         guard let link = browserLink else {
             XCTAssert(false)
@@ -63,82 +56,9 @@ class ReferenceLinkTests: XCTestCase , LinkProtocol {
         }
         
         XCTAssert (link.profile.ipAddress == "192.168.1.40")
-        
-        referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink.make(from: self,
-                                                                                linkProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.42",  needsEvent: true, app2appURL: "", certInfo: nil))]
     }
     
-    
-    func testPingPong () {
-        
-        testId = "pingPong"
-        
-        let referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink.make(from: self,
-                                                                                    linkProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
-        
-        if referenceLink[ReferenceDriver.LinkId.genericLink] == nil {
-            XCTAssert(false)
-        }
-        
-        browserLink = referenceLink[ReferenceDriver.LinkId.genericLink] as? ReferenceLink
-        
-        guard let link = browserLink else {
-            XCTAssert(false)
-            return
-        }
-        
-        linkDownCount = 0
-        link.connect()
-    }
-    
-    func testStatus () {
-        
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink.make(from: self,
-                                                                                    linkProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
-
-        browserLink = referenceLink[ReferenceDriver.LinkId.genericLink] as? ReferenceLink
-        browserLink?.connect()
-          testId = "-1"
-        var message = "{\"dst\":null,\"src\":null,\"type\":\"reply\",\"id\":-1,\"status\":\"internal_error\", \"message\": {}}"
-
-        browserLink?.onCommandWSReceivedData(text: message)
-
-        testId = "replyOK"
-        message = "{\"dst\":\"*\",\"src\":\"browser\",\"type\":\"reply\",\"id\":1,\"status\":\"OK\", \"message\":{\"service\":\"org.ocast.media\",\"data\":{\"name\":\"prepare\",\"params\":{\"code\":0}}}}"
-        browserLink?.onCommandWSReceivedData(text: message)
-        
-        testId = "replyNOK"
-
-        message = "{\"dst\":\"*\",\"src\":\"browser\",\"type\":\"reply\",\"id\":2,\"status\":\"missing_mandatory_field\", \"message\":{}}"
-        browserLink?.onCommandWSReceivedData(text: message)
-        
-        testId = "eventOK"
-        message = "{\"dst\":\"*\",\"src\":\"browser\",\"type\":\"event\",\"id\":1,\"message\":{\"service\":\"org.ocast.webapp\",\"data\":{\"name\":\"connectionStatus\",\"params\":{\"status\":\"connected\"}}}}"
-        browserLink?.onCommandWSReceivedData(text: message)
- 
-    }
-    
-
-    
-       func testDisconnect () {
-        
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink.make(from: self,
-                                                                                    linkProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
-        
-        browserLink = referenceLink[ReferenceDriver.LinkId.genericLink] as? ReferenceLink
-
-        testId = "disconnectKO"
-        browserLink?.disconnect()
-        XCTAssert(browserLink?.isDisconnecting == false)
-        
-        testId  = "disconnectOK"
-        browserLink?.connect()
-        browserLink?.disconnect()
-        XCTAssert(browserLink?.isDisconnecting == true)
-    }
-    
-       
-    func onSuccessTestID(data: CommandStructure) {
+    func onSuccessTestID(data: Command) {
 
         switch testId {
 
@@ -160,10 +80,9 @@ class ReferenceLinkTests: XCTestCase , LinkProtocol {
     }
     
     func testSequenceID() {
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink.make(from: self,
-                                                                                    linkProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
+        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
    
-        browserLink = referenceLink[ReferenceDriver.LinkId.genericLink] as? ReferenceLink
+        browserLink = referenceLink[ReferenceDriver.LinkId.genericLink]
         
         XCTAssert (browserLink?.getSequenceId() == 1)
         
@@ -174,19 +93,16 @@ class ReferenceLinkTests: XCTestCase , LinkProtocol {
     
     
     // MARK: - Link protocol
-    func onEvent (payload: EventStructure) {
-        
+    func didReceive(event: Event) {
         switch testId {
-            case "eventOK":
+        case "eventOK":
             XCTAssert(true)
         default :
             XCTAssert (false)
         }
-        
     }
     
-    func onLinkConnected (from identifier: Int8) {
-        
+    func didConnect(linkWithIdentifier identifier: Int8) {
         guard let link = browserLink else {
             XCTAssert(false)
             return
@@ -202,7 +118,7 @@ class ReferenceLinkTests: XCTestCase , LinkProtocol {
         }
     }
     
-    func onLinkDisconnected(from identifier: Int8) {
+    func didDisconnect(linkWithIdentifier identifier: Int8) {
         guard let link = browserLink else {
             XCTAssert(false)
             return
@@ -224,8 +140,9 @@ class ReferenceLinkTests: XCTestCase , LinkProtocol {
             XCTAssert(false)
         }
     }
-    
-    func onLinkFailure(from identifier: Int8) {
+
+    func didFail(linkWithIdentifier identifier: Int8) {
+        
     }
     
 }

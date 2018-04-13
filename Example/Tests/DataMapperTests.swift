@@ -38,10 +38,7 @@ class DataMapperTests: XCTestCase {
                                  "data"    : ["name"    :"connectionStatus",
                                               "params"  :["status":"connected"]]]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
-            XCTAssert(false)
-            return
-        }
+        let browserData = DataMapper().browserData(with: msg)
         
         XCTAssert(browserData.data != nil)
         
@@ -62,10 +59,7 @@ class DataMapperTests: XCTestCase {
             "data"    : ["name"    :"connectionStatus",
                          "params"  :["status":"connected"]]]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
-            XCTAssert(false)
-            return
-        }
+        let browserData = DataMapper().browserData(with: msg)
         
         XCTAssert(browserData.data != nil)
         XCTAssert(browserData.service == nil)
@@ -76,10 +70,8 @@ class DataMapperTests: XCTestCase {
         // "data" is missing
         let msg: [String:Any] = ["service" : "org.ocast.webapp"]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
-            XCTAssert(false)
-            return
-        }
+        let browserData = DataMapper().browserData(with: msg)
+
         XCTAssert(browserData.data == nil)
         XCTAssert(browserData.service != nil)
     }
@@ -89,10 +81,8 @@ class DataMapperTests: XCTestCase {
         // "service" and "data" are missing
         let msg: [String:Any] = [:]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
-            XCTAssert(false)
-            return
-        }
+        let browserData = DataMapper().browserData(with: msg)
+
         XCTAssert(browserData.data == nil)
         XCTAssert(browserData.service == nil)
     }
@@ -105,10 +95,7 @@ class DataMapperTests: XCTestCase {
                                  "data"    : ["name"    :"connectionStatus",
                                               "params"  :["status":"connected"]]]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
-            XCTAssert(false)
-            return
-        }
+        let browserData = DataMapper().browserData(with: msg)
         
         XCTAssert(browserData.data != nil)
         
@@ -122,34 +109,17 @@ class DataMapperTests: XCTestCase {
         let msg: [String:Any] = ["service" : "org.ocast.webapp",
                                  "data"    : 5]
         
-        guard let browserData = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
-            XCTAssert(false)
-            return
-        }
+        let browserData = DataMapper().browserData(with: msg)
         
         XCTAssert(browserData.data == nil)
         
         XCTAssert(browserData.service != nil)
     }
-    
-    func testBrowser07 () {
-        
-        // Message is not a dictionnary.
-        
-        let msg = "a message"
-        
-        guard let _ = DataMapper().getBrowserData(with: DriverDataStructure(message: msg))  else {
-            XCTAssert(true)
-            return
-        }
-        
-        XCTAssert(false)
-    }
 
     func testPlayBackStatus01 () {
         
-        let message = StreamStructure(name: "playbackStatus", params: ["state":"playing","volume":0.1,"mute":false,"position":0.99,"duration":596.4733333333334], options: nil)
-        let data = DataMapper().getPlaybackStatus(with: message)
+        let message = StreamData(name: "playbackStatus", params: ["state":2,"volume":0.1,"mute":false,"position":0.99,"duration":596.4733333333334], options: nil)
+        let data = DataMapper().playbackStatus(with: message)
         XCTAssert(data.state == PlayerState.playing)
         XCTAssert(data.volume == 0.1)
         XCTAssert(data.mute == false)
@@ -160,9 +130,9 @@ class DataMapperTests: XCTestCase {
     func testPlayBackStatus02() {
         // Missing parameter "state"
         
-        let message = StreamStructure(name: "playbackStatus", params: ["volume":0.1,"position":0.99,"duration":596.4733333333334], options: nil)
-        let data = DataMapper().getPlaybackStatus(with: message)
-        XCTAssert(data.state == PlayerState.idle)
+        let message = StreamData(name: "playbackStatus", params: ["volume":0.1,"position":0.99,"duration":596.4733333333334], options: nil)
+        let data = DataMapper().playbackStatus(with: message)
+        XCTAssert(data.state == PlayerState.unknown)
         XCTAssert(data.volume == 0.1)
         XCTAssert(data.mute == true)
         XCTAssert(data.position == 0.99)
@@ -172,9 +142,9 @@ class DataMapperTests: XCTestCase {
     func testPlayBackStatus03() {
         // Wrong types
         
-        let message = StreamStructure(name: "playbackStatus", params: ["state":true, "volume":true,"position":true,"duration":true,"mute": "OK"], options: nil)
-        let data = DataMapper().getPlaybackStatus(with: message)
-        XCTAssert(data.state == PlayerState.idle)
+        let message = StreamData(name: "playbackStatus", params: ["state":true, "volume":true,"position":true,"duration":true,"mute": "OK"], options: nil)
+        let data = DataMapper().playbackStatus(with: message)
+        XCTAssert(data.state == PlayerState.unknown)
         XCTAssert(data.volume == 0)
         XCTAssert(data.mute == true)
         XCTAssert(data.position == 0)
@@ -184,8 +154,8 @@ class DataMapperTests: XCTestCase {
     
     func testMetaData01 () {
         
-        let message = StreamStructure(name: "MetaDataChanged", params: ["title":"my film","subtitle":"my subtitle", "logo":"http://www.here.com","mediaType":"audio"], options: nil)
-        guard let data = DataMapper().getMetaData(from: message) else {
+        let message = StreamData(name: "MetaDataChanged", params: ["title":"my film","subtitle":"my subtitle", "logo":"http://www.here.com","mediaType":"audio"], options: nil)
+        guard let data = DataMapper().metadata(with: message) else {
             XCTAssert(false)
             return
         }
@@ -198,9 +168,9 @@ class DataMapperTests: XCTestCase {
 
     func testMetaData02 () {
         // Missing URL parameter
-        let message = StreamStructure(name: "MetaDataChanged", params: ["title":"my film","subtitle":"my subtitle", "mediaType":"audio"], options: nil)
+        let message = StreamData(name: "MetaDataChanged", params: ["title":"my film","subtitle":"my subtitle", "mediaType":"audio"], options: nil)
         
-        guard let _ = DataMapper().getMetaData(from: message) else {
+        guard let _ = DataMapper().metadata(with: message) else {
             XCTAssert(true)
             return
         }
@@ -212,8 +182,8 @@ class DataMapperTests: XCTestCase {
         
         // Media type is not a String
         
-        let message = StreamStructure(name: "MetaDataChanged", params: ["title":"my film","subtitle":"my subtitle", "logo":"http://www.here.com","mediaType":5], options: nil)
-        guard let _ = DataMapper().getMetaData(from: message) else {
+        let message = StreamData(name: "MetaDataChanged", params: ["title":"my film","subtitle":"my subtitle", "logo":"http://www.here.com","mediaType":5], options: nil)
+        guard let _ = DataMapper().metadata(with: message) else {
             XCTAssert(true)
             return
         }
@@ -222,9 +192,9 @@ class DataMapperTests: XCTestCase {
     
     func testMetaData04 () {
         // Title is not a String
-        let message = StreamStructure(name: "MetaDataChanged", params: ["title": true,"subtitle":"my subtitle", "logo":"http://www.here.com","mediaType":"audio"], options: nil)
+        let message = StreamData(name: "MetaDataChanged", params: ["title": true,"subtitle":"my subtitle", "logo":"http://www.here.com","mediaType":"audio"], options: nil)
         
-        guard let data = DataMapper().getMetaData(from: message) else {
+        guard let data = DataMapper().metadata(with: message) else {
             XCTAssert(false)
             return
         }
@@ -235,9 +205,9 @@ class DataMapperTests: XCTestCase {
     
     func testMetaData05 () {
         
-        let message = StreamStructure(name: "MetaDataChanged", params: ["title":"Planète interdite","subtitle":"Brought to you by Orange OCast","logo":"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/","mediaType":"video","transferMode":"streamed","audioTracks":[["language":"fre","label":"#1 Fre","enabled":true,"id":"0"],["language":"eng","label":"#2 Eng","enabled":false,"id":"1"]],"videoTracks":[],"textTracks":[],"code":0], options: nil)
+        let message = StreamData(name: "MetaDataChanged", params: ["title":"Planète interdite","subtitle":"Brought to you by Orange OCast","logo":"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/","mediaType":"video","transferMode":"streamed","audioTracks":[["language":"fre","label":"#1 Fre","enabled":true,"id":"0"],["language":"eng","label":"#2 Eng","enabled":false,"id":"1"]],"videoTracks":[],"textTracks":[],"code":0], options: nil)
         
-        guard let data = DataMapper().getMetaData(from: message) else {
+        guard let data = DataMapper().metadata(with: message) else {
             XCTAssert(false)
             return
         }
@@ -254,18 +224,18 @@ class DataMapperTests: XCTestCase {
 
     func testMediaController () {
         var data: [String:Any] = ["name":"playbackStatus","params":["state":"buffering","volume":1,"mute":false,"position":1 ,"duration":10]]
-        var result = DataMapper().getMediaControllerData(data: data)
+        var result = DataMapper().mediaData(with: data)
         XCTAssert(result?.name == "playbackStatus")
         XCTAssert(result?.options == nil)
         XCTAssert(result?.params != nil)
         
         data = ["params":["state":"buffering","volume":1,"mute":false,"position":1 ,"duration":10]]
-        result = DataMapper().getMediaControllerData(data: data)
+        result = DataMapper().mediaData(with: data)
         XCTAssert(result == nil)
         
         
         data = ["name":"playbackStatus"]
-        result = DataMapper().getMediaControllerData(data: data)
+        result = DataMapper().mediaData(with: data)
         XCTAssert(result == nil)
         
     }
@@ -274,7 +244,7 @@ class DataMapperTests: XCTestCase {
         
         let tracks = [["language":"fre","label":"#1 Fre","enabled":true,"trackId":"0"],["language":"eng","label":"#2 Eng","enabled":false,"trackId":"1"]]
         
-        guard let result = DataMapper().getTracks(with: tracks) else {
+        guard let result = DataMapper().tracks(with: tracks) else {
             XCTAssert(false)
             return
         }
@@ -299,7 +269,7 @@ class DataMapperTests: XCTestCase {
         // Wrong types
         let tracks = [["language":1,"label":2,"enabled":"true","id":1]]
         
-        guard let result = DataMapper().getTracks(with: tracks) else {
+        guard let result = DataMapper().tracks(with: tracks) else {
             XCTAssert(false)
             return
         }
@@ -307,33 +277,20 @@ class DataMapperTests: XCTestCase {
         XCTAssert(result.count == 1)
         
         let track = result.first!
-        XCTAssert(track.language  == "")
-        XCTAssert(track.enabled  == false)
-        XCTAssert(track.id  == "")
-        XCTAssert(track.label == "")
-
+        XCTAssertTrue(track.language  == "")
+        XCTAssertTrue(track.enabled  == false)
+        XCTAssertTrue(track.id  == "")
+        XCTAssertTrue(track.label == "")
     }
     
     func testGetTrack03 () {
-        
         // Wrong format
          let tracks = ["language":1,"label":2,"enabled":"true","id":1] as [String : Any]
         
-        var result = DataMapper().getTracks(with: nil)
+        var result = DataMapper().tracks(with: nil)
+        XCTAssertNil(result)
         
-        if result == nil {
-            XCTAssert(true)
-        } else {
-            XCTAssert(false)
-        }
-        
-        result = DataMapper().getTracks(with: tracks)
-        
-        if result == nil {
-            XCTAssert(true)
-        } else {
-            XCTAssert(false)
-        }
-
+        result = DataMapper().tracks(with: tracks)
+        XCTAssertNil(result)
     }
 }

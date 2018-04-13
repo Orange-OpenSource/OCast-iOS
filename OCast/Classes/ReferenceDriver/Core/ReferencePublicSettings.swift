@@ -17,7 +17,7 @@
 
 import Foundation
 
-extension ReferenceDriver: DriverPublicSettingsProtocol {
+extension ReferenceDriver: DriverPublicSettings {
 
     // MARK: - Public settings
 

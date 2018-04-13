@@ -19,7 +19,7 @@
 import XCTest
 @testable import OCast
 
-class MediaControllerTests: XCTestCase, MediaControllerProtocol {
+class MediaControllerTests: XCTestCase, MediaControllerDelegate {
     
     override func setUp() {
         super.setUp()
@@ -32,20 +32,16 @@ class MediaControllerTests: XCTestCase, MediaControllerProtocol {
     }
     
     func testGetCode01 () {
-        
-        
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver:nil)
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(with: self)
         
-
         let data: [String:Any] = ["service":"org.ocast.media","data":["name":"prepare","params":["code":0]]]
         
-        guard let code = mediaController.getCode(from: data) else {
+        guard let code = mediaController.code(from: data) else {
             XCTAssert(false)
             return
         }
@@ -58,16 +54,15 @@ class MediaControllerTests: XCTestCase, MediaControllerProtocol {
         //Unknown code
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: nil)
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(with: self)
 
         let data: [String:Any] = ["service":"org.ocast.media","data":["name":"prepare","params":["code":1]]]
         
-        guard mediaController.getCode(from: data) != nil else {
+        guard mediaController.code(from: data) != nil else {
             XCTAssert(true)
             return
         }
@@ -79,41 +74,40 @@ class MediaControllerTests: XCTestCase, MediaControllerProtocol {
         
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: nil)
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(with: self)
 
         
         // Code is missing
         
         var data: [String:Any] = ["service":"org.ocast.media","data":["name":"prepare","params":[]]]
         
-        if mediaController.getCode(from: data) != nil  {
+        if mediaController.code(from: data) != nil  {
             XCTAssert(false)
         }
         
         data = ["service":"org.ocast.media","data":["name":"prepare","params":["options":"some options"]]]
         
-        if mediaController.getCode(from: data) != nil  {
+        if mediaController.code(from: data) != nil  {
             XCTAssert(false)
         }
         data = ["service":"org.ocast.media","data":"the data"]
         
-        if mediaController.getCode(from: data) != nil  {
+        if mediaController.code(from: data) != nil  {
             XCTAssert(false)
         }
         
         data = ["service":"org.ocast.media"]
         
-        if mediaController.getCode(from: data) != nil  {
+        if mediaController.code(from: data) != nil  {
             XCTAssert(false)
         }
         
         
-        if mediaController.getCode(from: nil) != nil  {
+        if mediaController.code(from: nil) != nil  {
             XCTAssert(false)
         }
         
@@ -122,17 +116,16 @@ class MediaControllerTests: XCTestCase, MediaControllerProtocol {
     
     func testGetMetadata01 () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: nil)
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(with: self)
 
         
         let data : [String:Any] = ["service":"org.ocast.media","data":["name":"metadataChanged","params":["title":"Planète interdite","subtitle":"Brought to you by Orange OCast","logo":"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/","mediaType":"video","transferMode":"streamed","audioTracks":[["language":"fre","label":"#1 Fre","enabled":true,"id":"0"],["language":"eng","label":"#2 Eng","enabled":false,"id":"1"]],"videoTracks":[],"textTracks":[],"code":0],"options":[]]]
         
-        guard let info =  mediaController.getMetaData(from: data) else {
+        guard let info =  mediaController.metadata(from: data) else {
             XCTAssert(false)
             return
         }
@@ -142,36 +135,35 @@ class MediaControllerTests: XCTestCase, MediaControllerProtocol {
     
     func testGetMetadata02 () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: nil)
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(with: self)
 
         
-        if mediaController.getMetaData(from: nil) != nil {
+        if mediaController.metadata(from: nil) != nil {
             XCTAssert(false)
         }
         
         // "data" format is wrong
         var data : [String:Any] = ["service":"org.ocast.media","data":"the data"]
         
-        if mediaController.getMetaData(from: data) != nil {
+        if mediaController.metadata(from: data) != nil {
             XCTAssert(false)
         }
         
         // "params" is missing
         data = ["service":"org.ocast.media","data":["options": "some options"]]
         
-        if mediaController.getMetaData(from: data) != nil {
+        if mediaController.metadata(from: data) != nil {
             XCTAssert(false)
         }
         
         // mediaType is missing
         data = ["service":"org.ocast.media","data":["name":"metadataChanged","params":["title":"Planète interdite","subtitle":"Brought to you by Orange Cast","logo":"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/","transferMode":"streamed","audioTracks":[["language":"fre","label":"#1 Fre","enabled":true,"id":"0"],["language":"eng","label":"#2 Eng","enabled":false,"id":"1"]],"videoTracks":[],"textTracks":[],"code":0],"options":[]]]
         
-        if mediaController.getMetaData(from: data) != nil {
+        if mediaController.metadata(from: data) != nil {
             XCTAssert(false)
         }
         
@@ -180,17 +172,16 @@ class MediaControllerTests: XCTestCase, MediaControllerProtocol {
     
     func testGetPlaybackInfo01 () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
         
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: nil)
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(with: self)
 
     
         let data : [String:Any] = ["service":"org.ocast.media","data":["name":"playbackStatus","params":["state":"playing","volume":1,"mute":false,"position":1.486712077,"duration":5910.209,"code":0],"options":[]]]
         
-        guard let info = mediaController.getPlaybackInfo(from: data) else  {
+        guard let info = mediaController.playbackStatus(from: data) else  {
             XCTAssert(false)
             return
         }
@@ -201,27 +192,27 @@ class MediaControllerTests: XCTestCase, MediaControllerProtocol {
     
     func testGetPlaybackInfo02 () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.getDriver(for: device))
+        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: nil)
         
-        let mediaController = appliMgr.getMediaController(for: self)
+        let mediaController = appliMgr.mediaController(with: self)
 
         
-        if mediaController.getPlaybackInfo(from: nil) != nil {
+        if mediaController.playbackStatus(from: nil) != nil {
             XCTAssert(false)
         }
         
         // Params is missing
         var data : [String:Any] = ["service":"org.ocast.media","data":["name":"playbackStatus"]]
         
-        if mediaController.getPlaybackInfo(from: data) != nil {
+        if mediaController.playbackStatus(from: data) != nil {
             XCTAssert(false)
         }
         
         data = ["service":"org.ocast.media","data":"the data"]
         
-        if mediaController.getPlaybackInfo(from: data) != nil {
+        if mediaController.playbackStatus(from: data) != nil {
             XCTAssert(false)
         }
     }

@@ -18,7 +18,6 @@
 
 import XCTest
 @testable import OCast
-@testable import OCastReferenceDriver
 
 class ReferecnceDataMapperTests: XCTestCase {
     
@@ -38,7 +37,7 @@ class ReferecnceDataMapperTests: XCTestCase {
         
          let message = "{\"dst\":\"*\",\"src\":\"browser\",\"type\":\"event\",\"id\":2,\"message\":{\"service\":\"org.ocast.webapp\",\"data\":{\"name\":\"connectionStatus\",\"params\":{\"status\":\"connected\"}}}}"
         
-        guard let referenceLink = ReferenceDataMapper().referenceTransformForLink(for: message) else {
+        guard let referenceLink = ReferenceDataMapper().referenceLink(for: message) else {
             XCTAssert(false)
             return
         }
@@ -57,7 +56,7 @@ class ReferecnceDataMapperTests: XCTestCase {
         // Mandatory "dst" parameter is missing
         var message = "{\"src\":\"browser\",\"type\":\"event\",\"id\":2,\"message\":{\"service\":\"org.ocast.webapp\",\"data\":{\"name\":\"connectionStatus\",\"params\":{\"status\":\"connected\"}}}}"
         
-        guard let referenceLink = ReferenceDataMapper().referenceTransformForLink(for: message) else {
+        guard let referenceLink = ReferenceDataMapper().referenceLink(for: message) else {
             XCTAssert(false)
             return
         }

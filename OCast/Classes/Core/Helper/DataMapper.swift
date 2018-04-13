@@ -23,52 +23,38 @@ struct DataMapper {
 
     // MARK: - Generic, ie, not hardware/manufacturer dependant
 
-    func getBrowserData(with data: DriverDataStructure) -> BrowserStructure? {
-
-        guard let browserData = data.message as? [String: Any]? else {
-
-            OCastLog.error("DataMapper: Received data is not of the expected format.")
-            return nil
-        }
-
-        let service = browserData?["service"] as? String
-        let data = browserData?["data"] as? [String: Any]
-        return BrowserStructure(service: service, data: data)
+    func browserData(with data: [String: Any]) -> BrowserData {
+        let service = data["service"] as? String
+        let data = data["data"] as? [String: Any]
+        return BrowserData(service: service, data: data)
     }
 
-    func getMediaControllerData(data: [String: Any]) -> StreamStructure? {
+    func mediaData(with data: [String: Any]) -> StreamData? {
 
-        guard let name = data["name"] as? String else {
+        guard let name = data["name"] as? String,
+            let params = data["params"] as? [String: Any] else {
             return nil
         }
-
-        guard let params = data["params"] as? [String: Any] else {
-            return nil
-        }
-
         let options = data["options"] as? [String: Any]
 
-        return StreamStructure(name: name, params: params, options: options)
+        return StreamData(name: name, params: params, options: options)
     }
 
-    func getMetaData(from data: StreamStructure) -> MetaDataChanged? {
-
-        let logo = data.params["logo"] as? String ?? ""
-
-        guard let logoURL = URL(string: logo) else {
+    func metadata(with data: StreamData) -> MetaDataChanged? {
+        
+        guard let logoURL = URL(string: data.params["logo"] as? String ?? "") else {
             return nil
         }
 
-        let audioTracks = getTracks(with: data.params["audioTracks"])
-        let videoTracks = getTracks(with: data.params["videoTracks"])
-        let textTracks = getTracks(with: data.params["textTracks"])
+        let audioTracks = tracks(with: data.params["audioTracks"])
+        let videoTracks = tracks(with: data.params["videoTracks"])
+        let textTracks = tracks(with: data.params["textTracks"])
 
         if let mediaType = data.params["mediaType"] as? String {
-
             return MetaDataChanged(title: data.params["title"] as? String ?? "",
                                    subtitle: data.params["subtitle"] as? String ?? "",
                                    logo: logoURL,
-                                   mediaType: mediaTypeToInt(for: mediaType),
+                                   mediaType: MediaType(type: mediaType),
                                    audioTracks: audioTracks,
                                    videoTracks: videoTracks,
                                    textTracks: textTracks)
@@ -77,52 +63,23 @@ struct DataMapper {
         return nil
     }
 
-    func playerStateToInt(for state: String) -> PlayerState {
-        switch state {
-        case "playing": return PlayerState.playing
-        case "buffering": return PlayerState.buffering
-        case "idle": return PlayerState.idle
-        case "paused": return PlayerState.paused
-        case "stopped": return PlayerState.stopped
-        case "cancelled": return PlayerState.cancelled
-        default: return PlayerState.idle
-        }
-    }
-
-    func mediaTypeToInt(for media: String) -> MediaType {
-        switch media {
-        case "audio": return MediaType.audio
-        case "video": return MediaType.video
-        case "image": return MediaType.image
-        default: return MediaType.audio
-        }
-    }
-
-    func getPlaybackStatus(with data: StreamStructure) -> PlaybackStatus {
+    func playbackStatus(with data: StreamData) -> PlaybackStatus {
 
         let duration = data.params["duration"] as? Double ?? 0.0
         let mute = data.params["mute"] as? Bool ?? true
         let position = data.params["position"] as? Double ?? 0.0
-        let state = data.params["state"] as? String ?? "idle"
+        let state = data.params["state"] as? Int ?? 0
         let volume = data.params["volume"] as? Double ?? 0
 
-        let stateEnum = DataMapper().playerStateToInt(for: state)
-
-        return PlaybackStatus(duration: duration, mute: mute, position: position, state: stateEnum, volume: volume)
+        return PlaybackStatus(duration: duration, mute: mute, position: position, state: PlayerState(rawValue: state)!, volume: volume)
     }
 
-    func getTracks(with data: Any?) -> [TrackDescription]? {
-
-        if data == nil {
-            return nil
-        }
-
-        guard let message = data as? Array<[String: Any]> else {
+    func tracks(with data: Any?) -> [TrackDescription]? {
+        guard let message = data as? [[String: Any]] else {
             return nil
         }
 
         return message.map { element -> TrackDescription in
-
             TrackDescription(id: element["trackId"] as? String ?? "",
                              enabled: element["enabled"] as? Bool ?? false,
                              language: element["language"] as? String ?? "",

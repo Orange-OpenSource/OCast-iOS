@@ -19,7 +19,7 @@
 @import OCast;
 
 
-@interface OBJCMainVC ()<DeviceDiscoveryProtocol, DataStreamable, MediaControllerProtocol, DeviceManagerProtocol, UIPickerViewDelegate, UIPickerViewDataSource>
+@interface OBJCMainVC ()<DeviceDiscoveryDelegate, DataStream, MediaControllerDelegate, DeviceManagerDelegate, UIPickerViewDelegate, UIPickerViewDataSource>
 
 @property (strong, nonatomic) IBOutlet UIPickerView *stickPickerView;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *stickIcon;
@@ -33,7 +33,7 @@
 
 @implementation OBJCMainVC
 
-@synthesize messageSender; // For DataStreamable protocol
+@synthesize dataSender; // For DataStream protocol
 
 typedef void(^ErrorBlockType)(NSError*);
 
@@ -53,12 +53,13 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 
     [_stickIcon setEnabled:NO];
     
-    if ([DeviceManager registerDriverForName:ReferenceDriver.manufacturer factory:ReferenceDriverFactory.sharedInstance] == NO) {
+    if ([DeviceManager registerDriverForName:ReferenceDriver.manufacturer factory:ReferenceDriverFactory.shared] == NO) {
         NSLog(@"-> Driver could not be registered.");
         return;
     }
     
-    deviceDiscovery = [[DeviceDiscovery alloc] initFor:self forTargets: @[ReferenceDriver.searchTarget]];
+    deviceDiscovery = [[DeviceDiscovery alloc] initForTargets:@[ReferenceDriver.searchTarget]];
+    deviceDiscovery.delegate = self;
 
     if ([deviceDiscovery start] == NO) {
         NSLog(@"-> Discovery process could not be started.");
@@ -148,15 +149,18 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     
 }
 
-#pragma mark - Device Discovery protocol
-
-- (void)onDeviceAddedFrom:(DeviceDiscovery * _Nonnull)deviceDiscovery forDevice:(Device * _Nonnull)device {
+#pragma mark - DeviceDiscoveryDelegate methods
+- (void)deviceDiscovery:(DeviceDiscovery *)deviceDiscovery didAddDevice:(Device *)device {
     NSLog(@"->New device found: %@", device.friendlyName);
     devices = deviceDiscovery.devices;
     [_stickPickerView reloadAllComponents];
+    
+    if (devices.count == 1) {
+        selectedDevice = devices[0];
+    }
 }
 
-- (void)onDeviceRemovedFrom:(DeviceDiscovery * _Nonnull)deviceDiscovery forDevice:(Device * _Nonnull)device {
+- (void)deviceDiscovery:(DeviceDiscovery *)deviceDiscovery didRemoveDevice:(Device *)device {
     NSLog(@"->Lost device %@", device.friendlyName);
     devices = deviceDiscovery.devices;
     [_stickPickerView reloadAllComponents];
@@ -175,8 +179,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     }
     
     // Create a device manager, then get an application controller to start the Web application.
-    
-    DeviceManager *deviceMgr = [[DeviceManager alloc] initFrom:self with:selectedDevice withCertificateInfo:nil];
+    DeviceManager * deviceMgr = [[DeviceManager alloc] initWith:selectedDevice withCertificateInfo:nil];
     
     if (deviceMgr == nil) {
         NSLog(@"->Could not instanciate a device manager");
@@ -189,8 +192,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         [deviceDiscovery stop];
         [self startWebApp];
         
-        [appliCtrl manageStreamFor:self];
-        mediaCtrl = [appliCtrl getMediaControllerFor:self];
+        [appliCtrl manageWithStream:self];
+        mediaCtrl = [appliCtrl mediaControllerWith:self];
     };
     
     ErrorBlockType errorBlock = ^(NSError *error){
@@ -198,7 +201,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         [deviceDiscovery stop];
     };
     
-    [deviceMgr getApplicationControllerFor:applicationName onSuccess:successBlock onError:errorBlock];
+    [deviceMgr applicationControllerFor:applicationName onSuccess:successBlock onError:errorBlock];
 
 }
 
@@ -259,7 +262,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the Custom response");
     };
     
-    [self.messageSender sendWithMessage:dict onSuccess:successBlock onError:errorBlock];
+    [self.dataSender sendWithMessage:dict onSuccess:successBlock onError:errorBlock];
 }
 
 
@@ -267,7 +270,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     // http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8
     // https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8
     
-    NSURL *mediaUrl= [[NSURL alloc]initWithString:@"http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8"];
+    NSURL *mediaUrl= [[NSURL alloc]initWithString:@"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"];
     NSURL *logoUrl = [[NSURL alloc]initWithString:@"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"];
     
     MediaPrepare *mediaPrepare = [[MediaPrepare alloc]initWithUrl:mediaUrl
@@ -341,14 +344,11 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
             case PlayerStatePlaying:
                 _playerState.text = @"playing";
                 break;
-            case PlayerStateStopped:
-                _playerState.text = @"stopped";
-                break;
             case PlayerStateBuffering:
                 _playerState.text = @"buffering";
                 break;
-            case PlayerStateCancelled:
-                _playerState.text = @"cancelled";
+            case PlayerStateUnknown:
+                _playerState.text = @"unknown";
                 break;
             default:
                 break;
@@ -418,7 +418,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the Playback status Info");
     };
     
-    [mediaCtrl getPlaybackStatusWithOptions:@{} onSuccess:successBlock onError:errorBlock];
+    [mediaCtrl playbackStatusWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 -(void)getMetaData {
@@ -465,7 +465,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the MetaDataChanged Info");
     };
     
-    [mediaCtrl getMetadataWithOptions:@{} onSuccess:successBlock onError:errorBlock];
+    [mediaCtrl metadataWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 @end

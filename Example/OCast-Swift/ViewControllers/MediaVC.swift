@@ -42,15 +42,12 @@ extension MainVC {
         durationLabel.text = String (data.duration.format(f: ".1"))
         positionLabel.text = String (data.position.format(f: ".1"))
         
-        let state = data.state
-        
-        switch state {
-        case .buffering:  playerStateLabel.text = "buffering"
-        case .cancelled:  playerStateLabel.text = "cancelled"
-        case .idle:       playerStateLabel.text = "idle"
-        case .paused:     playerStateLabel.text = "paused"
-        case .playing:    playerStateLabel.text = "playing"
-        case .stopped:    playerStateLabel.text = "stopped"
+        switch data.state {
+        case .buffering:    playerStateLabel.text = "buffering"
+        case .idle: playerStateLabel.text = "idle"
+        case .paused:   playerStateLabel.text = "paused"
+        case .playing:  playerStateLabel.text = "playing"
+        case .unknown:  playerStateLabel.text = "unknown"
         }
         
         volumeLabel.text = String (data.volume.format(f: ".1"))
@@ -238,7 +235,7 @@ extension MainVC {
 
     
     @IBAction func onPlayerStatus(_ sender: Any) {
-        mediaController?.getPlaybackStatus(
+        mediaController?.playbackStatus(
             onSuccess: { playbackStatus in
                         OCastLog.debug("->PlayBack Status is OK.")
                         self.playbackPosition.text = String (playbackStatus.position.format(f: ".1"))
@@ -253,7 +250,7 @@ extension MainVC {
     }
     
     @IBAction func onGetMetaData(_ sender: Any) {
-        mediaController?.getMetadata(
+        mediaController?.metadata(
             onSuccess: { metadata in
                 OCastLog.debug("->MetaData is OK.")
                  self.onMetaDataChanged(data: metadata)

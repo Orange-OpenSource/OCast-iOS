@@ -24,25 +24,22 @@ import Foundation
 @objcMembers
 @objc public final class CertificateInfo: NSObject {
 
-    public var clientCertificate: String
-    public var serverCACertificate: String
-    public var serverRootCACertificate: String
-    public var password: String
-
-    /**
-     Initializes a new certificate information class.
-
-     - Parameters:
-         - clientCert: client certificate
-         - serverCACert: server certificate
-         - serverRootCACert: server root certificate
-         - password: password to decode the certificate
-     */
-
-    public init(clientCert: String, serverCACert: String, serverRootCACert: String, password: String) {
-        clientCertificate = clientCert
-        serverCACertificate = serverCACert
-        serverRootCACertificate = serverRootCACert
+    public var clientCertificate: Data?
+    public var serverCACertificate: Data?
+    public var serverRootCACertificate: Data?
+    public var password: String?
+    
+    /// Initializer
+    ///
+    /// - Parameters:
+    ///   - serverRootCACert: The root server certificate (DER format) used for SSL one-way (can be nil if the serverCACert includes the root certificate)
+    ///   - serverCACert: The server certificate (DER format) used for SSL one-way
+    ///   - clientCert: The client certificate (DER format) used for SSL two-way
+    ///   - password: The password used for SSL two way
+    public init(serverRootCACertificate: Data?, serverCACertificate: Data?, clientCertificate: Data?, password: String?) {
+        self.serverRootCACertificate = serverRootCACertificate
+        self.serverCACertificate = serverCACertificate
+        self.clientCertificate = clientCertificate
         self.password = password
     }
 }
@@ -92,11 +89,11 @@ import Foundation
 @objc public final class ApplicationDescription: NSObject {
     public let app2appURL: String
     public let version: String
-    public let rel: String
-    public let href: String
+    public let rel: String?
+    public let href: String?
     public let name: String
 
-    public init(app2appURL: String, version: String, rel: String, href: String, name: String) {
+    public init(app2appURL: String, version: String, rel: String?, href: String?, name: String) {
         self.app2appURL = app2appURL
         self.version = version
         self.rel = rel
@@ -227,12 +224,11 @@ import Foundation
  */
 
 @objc public enum PlayerState: Int {
-    case playing = 1
-    case buffering
-    case idle
-    case paused
-    case stopped
-    case cancelled
+    case unknown = 0
+    case idle = 1
+    case playing = 2
+    case paused = 3
+    case buffering = 4
 }
 
 /// Describes the status of the current media.

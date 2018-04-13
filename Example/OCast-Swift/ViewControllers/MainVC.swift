@@ -19,7 +19,7 @@
 import UIKit
 import OCast
 
-class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol, DeviceManagerProtocol, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate, DeviceManagerDelegate, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
     @IBOutlet var webAppLabel: UITextField!
     @IBOutlet var webAppStatusLabel: UILabel!
@@ -71,18 +71,19 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
     
     var devices: [Device] = []
    
-    var applicationName =  "Orange-OrangeTVReceiverDev-SDK2018" // Orange-DefaultReceiver-DEV"
+    var applicationName =  "Orange-DefaultReceiver-DEV"
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI ()
 
-        if !DeviceManager.registerDriver(forName: ReferenceDriver.manufacturer, factory: ReferenceDriverFactory.sharedInstance) {
+        if !DeviceManager.registerDriver(forName: ReferenceDriver.manufacturer, factory: ReferenceDriverFactory.shared) {
             return
         }
         
-        deviceDiscovery = DeviceDiscovery.init(for: self, forTargets: [referenceST])
+        deviceDiscovery = DeviceDiscovery(forTargets: [referenceST])
+        deviceDiscovery.delegate = self
 
         guard deviceDiscovery.start() else {
             return
@@ -92,45 +93,41 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
     }
 
     
-    //MARK: DeviceManager protocol
-    
-    func onFailure(error: NSError) {
+    //MARK: DeviceManagerDelegate methods
+    func deviceDidDisconnect(withError error: NSError) {
         OCastLog.debug("-> Connection to the stick is down.")
-
         resetContext ()
-       
         guard deviceDiscovery.start() else {
             return
         }
-        
         devices = deviceDiscovery.devices
         stickPickerView.reloadAllComponents()
     }
     
-    // MARK: - Device Discovery protocol
-    
-    func onDeviceAdded(from deviceDiscovery: DeviceDiscovery, forDevice device: Device) {
-
+    // MARK: - DeviceDiscoveryDelegate methods
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {
         devices = deviceDiscovery.devices
         
         if deviceDiscovery == deviceDiscovery {
             OCastLog.debug("-> Device added = \(device.friendlyName). Now managing \(devices.count) device(s).")
         }
-
+        
         stickPickerView.reloadAllComponents()
+        
+        if devices.count == 1 {
+            onDeviceSelected(device: devices[0])
+        }
     }
     
-    func onDeviceRemoved(from deviceDiscovery: DeviceDiscovery, forDevice device: Device) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device) {
         devices = deviceDiscovery.devices
         stickPickerView.reloadAllComponents()
         
         if devices.count == 0 {
-           setupUI()
+            setupUI()
         }
-
+        
         OCastLog.debug ("-> Device lost = \(device.friendlyName). Now managing \(devices.count) device(s).")
-        
-        
     }
     
     func onDeviceSelected(device: Device) {
@@ -140,8 +137,6 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
         
         createDeviceManager(with: device)
     }
-    
-
     
     //MARK: - WebApp control
     
@@ -192,48 +187,7 @@ class MainVC: UIViewController, DeviceDiscoveryProtocol, MediaControllerProtocol
 
 
     @IBAction func onJoin(_ sender: Any) {
-        webAppStatusLabel.text = "Join-Pending"
-        errorMessageLabel.text = ""
-        
-        setupWebAppCtx (
-            onSuccess: joinApplication,
-            onError: { error in
-                            DispatchQueue.main.async {
-                                self.webAppStatusLabel.text = "Join-NOK"
-                                self.setUIWebAppConnected ()
-                                OCastLog.error("-> Web app failed to join.")
-                            }
-                    }
-        )
-
-    }
-    
-    func joinApplication () {
-        
-        appliMgr!.join (
-            onSuccess: { 
-            
-                DispatchQueue.main.async {
-                    self.webAppStatusLabel.text = "Join-OK"
-                    self.deviceDiscovery.stop()
-                    OCastLog.debug("-> Web App JOIN is OK")}
-                },
-                       
-                onError: { error in
-                        
-                    DispatchQueue.main.async {
-                        self.webAppStatusLabel.text = "Join-NOK"
-                            
-                        if let error = error {
-                            let key = error.userInfo.keys.first!
-                            let info = error.userInfo[key] ?? ""
-                            self.errorMessageLabel.text = info as? String
-                        }
-                            
-                        OCastLog.error("-> Web app failed to join")
-                    }
-                }
-        )
+        webAppStatusLabel.text = "Join-Deprecated"
     }
     
     @IBAction func onStop(_ sender: Any) {

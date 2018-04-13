@@ -19,15 +19,15 @@
 import XCTest
 import SocketRocket
 @testable import OCast
-@testable import OCastReferenceDriver
 
-class SocketProviderTests: XCTestCase, SocketProviderProtocol {
+class SocketProviderTests: XCTestCase, SocketProviderDelegate {
     
     
     func testMaxPayloadSize () {
         
-        let certInfo = CertificateInfo (clientCert: "", serverCACert: "", serverRootCACert: "", password: "")
-        let socket = SocketProvider (from: self,certInfo: certInfo)
+        let certInfo = CertificateInfo(serverRootCACertificate: nil, serverCACertificate: nil, clientCertificate: nil, password: nil)
+        let socket = SocketProvider(certificateInfo: certInfo)
+        socket.delegate = self
         
         var message = String(repeating: "*", count: 4095)
         XCTAssert(socket.sendMessage(message: message))

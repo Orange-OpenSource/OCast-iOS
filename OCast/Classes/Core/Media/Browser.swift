@@ -18,22 +18,22 @@
 
 import Foundation
 
-protocol BrowserProtocol {
-    func onMessage(data: [String: Any])
+@objc public protocol BrowserDelegate {
+    func send(data: [String: Any], onSuccess: @escaping (Any?) -> Void, onError: @escaping (NSError?) -> Void)
+    func register(for delegate: DriverReceiverDelegate)
 }
 
-final class Browser: NSObject, DriverBrowserProtocol {
-    var streams: [String: DataStreamable] = [:]
-    let driver: DriverBrowserProtocol
-
-    init(withDriver driver: DriverBrowserProtocol) {
-        self.driver = driver
-        super.init()
-        self.driver.registerBrowser(for: self)
+final class Browser: NSObject, DriverReceiverDelegate {
+    
+    var streams: [String: DataStream] = [:]
+    
+    weak var delegate: BrowserDelegate? {
+        didSet {
+            delegate?.register(for: self)
+        }
     }
 
-    func registerStream(for stream: DataStreamable) {
-
+    func registerStream(for stream: DataStream) {
         streams[stream.serviceId] = stream
     }
 
@@ -44,49 +44,31 @@ final class Browser: NSObject, DriverBrowserProtocol {
             "data": data,
         ]
 
-        let paramsDictionanary = DriverDataStructure(message: streamData)
-
-        driver.sendBrowserData(data: paramsDictionanary,
-                               onSuccess: { params in
-
-                                   OCastLog.debug("Browser: Received response from driver: \(String(describing: params.message))")
-                                   onSuccess(params.message as? [String: Any])
-                               },
-
-                               onError: { error in
-                                   OCastLog.error("Browser: Got an error from driver: \(String(describing: error)))")
-                                   onError(error)
-                               }
+        delegate?.send(
+            data: streamData,
+            onSuccess: {
+                response in
+                    OCastLog.debug("Browser: Received response from driver: \(String(describing: response))")
+                    onSuccess(response as? [String: Any])
+            },
+            onError: {
+                error in
+                    OCastLog.error("Browser: Got an error from driver: \(String(describing: error)))")
+                    onError(error)
+            }
         )
     }
 
-    // MARK: - Driver Browser protocol
-
-    func onData(with data: DriverDataStructure) {
-
-        guard let browserData = DataMapper().getBrowserData(with: data) else {
-            OCastLog.error("Browser: Could not decode the data.")
-            return
-        }
-
-        guard let dataForStream = browserData.data else {
-            OCastLog.error("Browser: data for Stream was nil.")
-            return
-        }
-
-        guard let service = browserData.service else {
-            OCastLog.error("Browser: Service for Stream was nil.")
-            return
-        }
-
-        // Forward the received message to the Stream matching the received service
-
-        guard let stream = streams[service] else {
-            OCastLog.error("Browser: Could not find any stream to pass the data.")
+    // MARK: - DriverDelegate methods
+    func didReceive( data: [String: Any]) {
+        guard
+            let dataForStream = DataMapper().browserData(with: data).data,
+            let service = DataMapper().browserData(with: data)  .service else {
+            OCastLog.error("Browser: Data is not well formatted \n(\(data)).")
             return
         }
 
         OCastLog.debug("Stream: Got data from Browser for service \(service).")
-        stream.onMessage(data: dataForStream)
+        streams[service]?.onMessage(data: dataForStream)
     }
 }

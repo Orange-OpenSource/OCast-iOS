@@ -19,7 +19,7 @@ import Foundation
 
 // Data structure for link layer
 
-struct ReferenceLinkStructure {
+struct ReferenceLinkData {
     let destination: String
     let source: String
     let type: String
@@ -28,20 +28,3 @@ struct ReferenceLinkStructure {
     let message: [String: Any]?
 }
 
-// Used for Event messages
-struct EventStructure {
-    let domain: String
-    var message: DriverDataStructure
-}
-
-// Used for Command request and response
-struct CommandStructure {
-    
-    let command: String
-    var params: DriverDataStructure
-    
-    init(command: String = "", params: DriverDataStructure) {
-        self.command = command
-        self.params = params
-    }
-}

@@ -20,14 +20,12 @@ import Foundation
 struct ReferenceDataMapper {
 
     // MARK: - Interface
-
-    func referenceTransformForLink(for text: String) -> ReferenceLinkStructure? {
-
+    func referenceLink(for text: String) -> ReferenceLinkData? {
         if let data = text.data(using: .utf8) {
             do {
                 let dictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
 
-                return ReferenceLinkStructure(destination: dictionary?["dst"] as? String ?? "",
+                return ReferenceLinkData(destination: dictionary?["dst"] as? String ?? "",
                                               source: dictionary?["src"] as? String ?? "",
                                               type: dictionary?["type"] as? String ?? "",
                                               identifier: dictionary?["id"] as? Int ?? -1,
@@ -35,7 +33,7 @@ struct ReferenceDataMapper {
                                               message: dictionary?["message"] as? [String: Any])
 
             } catch {
-                Logger.error("ReferenceDataMapper: Serialization failed: \(error)")
+                OCastLog.error("ReferenceDataMapper: Serialization failed: \(error)")
                 return nil
             }
         }
@@ -43,28 +41,4 @@ struct ReferenceDataMapper {
         return nil
     }
 
-    enum CommandType {
-        case statusInfo
-    }
-
-    func referenceTransformForDriver(for command: CommandType, withData data: Any?) -> Any? {
-
-        switch command {
-        case .statusInfo:
-            return getStatusInfo(with: data)
-        }
-    }
-
-    // MARK: - Private functions
-
-    private func getStatusInfo(with data: Any?) -> StatusInfo? {
-
-        guard let message = data as? [String: Any] else {
-            return nil
-        }
-
-        return StatusInfo(version: message["version"] as? String,
-                          state: message["state"] as? String,
-                          progress: message["progress"] as? Int ?? 0)
-    }
 }

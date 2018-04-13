@@ -20,24 +20,14 @@ import Foundation
 // MARK: - Internal Generic model structure
 
 
-/// :nodoc:
-// Used to transfer data from/to the driver north interface
-public struct DriverDataStructure {
-    public let message: Any?
-
-    public init(message: Any = [:]) {
-        self.message = message
-    }
-}
-
 // Used to transfer data from/to the browser north interface
-struct BrowserStructure {
+struct BrowserData {
     let service: String?
     let data: [String: Any]?
 }
 
 // Used to transfer data from/to the Stream north interface
-struct StreamStructure {
+struct StreamData {
     let name: String
     let params: [String: Any]
     let options: [String: Any]?
@@ -53,6 +43,15 @@ extension MediaType {
         case .video: return"video"
         }
     }
+    
+    init(type : String) {
+        switch (type) {
+        case "audio": self = .audio
+        case "video": self = .video
+        case "image": self = .image
+        default: self = .audio
+        }
+    }
 }
 
 extension TransferMode {
@@ -60,19 +59,6 @@ extension TransferMode {
         switch self {
         case .buffered: return "buffered"
         case .streamed: return "streamed"
-        }
-    }
-}
-
-extension PlayerState {
-    func toString() -> String {
-        switch self {
-        case .playing: return "playing"
-        case .buffering: return "buffering"
-        case .idle: return "idle"
-        case .paused: return "paused"
-        case .stopped: return "stopped"
-        case .cancelled: return "cancelled"
         }
     }
 }
@@ -104,3 +90,90 @@ extension TrackType {
         }
     }
 }
+
+@objcMembers
+public final class WifiInfo: NSObject {
+    public let ssid: String?
+    public let essid: String?
+    public let bssid: String?
+    public let signal: Int
+    public let flags: Int
+    
+    public init (ssid: String?, essid: String?,bssid: String?, signal: Int, flags: Int) {
+        self.ssid = ssid
+        self.essid = essid
+        self.bssid = bssid
+        self.signal  = signal
+        self.flags = flags
+    }
+}
+
+/// :nodoc:
+@objcMembers
+@objc public final class NetworkInfo: NSObject {
+    public let mode: String?
+    public let essid: String?
+    public let ipAddress: String?
+    public let signal: Int?
+    public let macAddress: String?
+    
+    public init (mode: String?,essid: String?, ipAddress: String?, signal: Int, macAddress: String?) {
+        self.mode = mode
+        self.essid = essid
+        self.ipAddress = ipAddress
+        self.signal = signal
+        self.macAddress = macAddress
+    }
+}
+
+
+@objcMembers
+public final class VersionInfo: NSObject {
+    public let name: String?
+    public let softwareVersion: String?
+    public let hardwareVersion: String?
+    
+    @objc public init(name: String?, softwareVersion: String?, hardwareVersion: String?) {
+        self.name = name
+        self.softwareVersion = softwareVersion
+        self.hardwareVersion = hardwareVersion
+    }
+}
+
+@objcMembers
+public final class DeviceInfo: NSObject {
+    public let vendor: String?
+    public let model: String?
+    public let serialNumber: String?
+    public let macAddress: String?
+    public let countryCode: String?
+    
+    @objc public init(vendor: String?, model: String?, serialNumber: String?, macAddress: String?, countryCode: String?) {
+        self.vendor = vendor
+        self.model = model
+        self.serialNumber = serialNumber
+        self.macAddress = macAddress
+        self.countryCode = countryCode
+    }
+}
+
+@objcMembers
+public final class BluetoothDevice: NSObject {
+    public let name: String?
+    public let macAddress: String?
+    public let cod: String?
+    public let profiles: [String]?
+    public let state: String?
+    public let battery: Int
+    
+    @objc public init(name: String?, macAddress: String?, cod: String?, profiles: [String]?, state: String?, battery: Int) {
+        self.name = name
+        self.macAddress = macAddress
+        self.cod = cod
+        self.profiles = profiles
+        self.state = state
+        self.battery = battery
+    }
+}
+
+

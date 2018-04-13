@@ -114,8 +114,9 @@ extension MainVC {
     
     // MARK: - Device Manager
     
-    func createDeviceManager (with device:Device) {
-        deviceMgr = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+    func createDeviceManager(with device:Device) {
+        deviceMgr = DeviceManager(with: device, withCertificateInfo: nil)
+        deviceMgr?.delegate = self
     }
 
     // MARK: - Context settings
@@ -123,17 +124,17 @@ extension MainVC {
     func setupWebAppCtx(onSuccess:@escaping () -> (), onError:@escaping (_ error: NSError?) -> ()) {
         
         if appliMgr == nil {
-            deviceMgr?.getApplicationController(for: applicationName,
+            deviceMgr?.applicationController(for: applicationName,
                                                 onSuccess: {response in
                                                     self.appliMgr = response
                                                     
                                                     if self.customStream == nil {
                                                         self.customStream = CustomStream()
-                                                        self.appliMgr?.manageStream(for: self.customStream!)
+                                                        self.appliMgr?.manage(stream: self.customStream!)
                                                     }
                                                     
                                                     if self.mediaController == nil {
-                                                        self.mediaController = self.appliMgr?.getMediaController(for: self)
+                                                        self.mediaController = self.appliMgr?.mediaController(with: self)
                                                     }
                                                     
                                                     onSuccess()

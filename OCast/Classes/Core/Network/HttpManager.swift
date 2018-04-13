@@ -18,25 +18,12 @@
 
 import Foundation
 
-protocol HttpProtocol {
-    func didReceiveHttpResponse(response: HTTPURLResponse, with data: Data?)
-}
+protocol HttpProtocol {}
 
-enum HttpCommand {
-    case get
-    case post
-    case delete
-
-    func name() -> String {
-        switch self {
-        case .delete:
-            return "DELETE"
-        case .get:
-            return "GET"
-        case .post:
-            return "POST"
-        }
-    }
+enum HttpCommand: String {
+    case get = "GET"
+    case post = "POST"
+    case delete = "DELETE"
 }
 
 extension HttpProtocol {
@@ -44,7 +31,7 @@ extension HttpProtocol {
     func initiateHttpRequest(from _: HttpProtocol, with command: HttpCommand, to target: String, onSuccess: @escaping (_ response: HTTPURLResponse, _ data: Data?) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
 
         guard let url = URL(string: target) else {
-            OCastLog.error("Cannot create URL with target \(target)")
+            OCastLog.error("Cannot create URL \(target)")
             let cause = "Target syntax error. Cannot send the Http request."
             let newError = NSError(domain: "HTTPManager", code: 0, userInfo: ["Http error": cause])
             onError(newError)
@@ -52,7 +39,7 @@ extension HttpProtocol {
         }
 
         var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = command.name()
+        urlRequest.httpMethod = command.rawValue
 
         let session = URLSession(configuration: URLSessionConfiguration.default)
 
@@ -73,14 +60,14 @@ extension HttpProtocol {
                 case 200 ..< 300:
                     break
                 default:
-                    OCastLog.error("Request was not successful. httpResponse statusCode = \(httpResponse.statusCode)")
+                    OCastLog.error("Failed(\(httpResponse.statusCode))")
                     let cause = "Request was not successful"
                     let newError = NSError(domain: "HTTPManager", code: httpResponse.statusCode, userInfo: ["Http error": cause])
                     onError(newError)
                     return
                 }
 
-                OCastLog.debug(("HttpManager: Got an OK (\(httpResponse.statusCode))"))
+                OCastLog.debug(("OK (\(httpResponse.statusCode)) for \(command.rawValue)/\(url)"))
                 onSuccess(httpResponse, data)
             }
         }

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
 s.name             = 'OCast'
-s.version          = '0.4.0'
+s.version          = '1.0.0'
 s.summary          = 'OCast SDK provides an application with all necessary functions to cast any contents to an Orange stick.'
 
 # This description is used to generate tags and improve search results.
@@ -31,8 +31,6 @@ Here are the main functionalities of the Example project:
 - Time seek management
 - Media tracks management
 - Custom messages handling
-
-You don't need to have a stick to run the Exmaple project or to start developping your own application: use our simulator to get started.
 
 DESC
 

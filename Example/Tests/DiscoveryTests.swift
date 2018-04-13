@@ -19,13 +19,12 @@
 import XCTest
 @testable import OCast
 
-class DummyDiscovery : DeviceDiscoveryProtocol {
-    func onDeviceAdded  (from deviceDiscovery:DeviceDiscovery, forDevice device:Device) {}
-    func onDeviceRemoved(from deviceDiscovery:DeviceDiscovery, forDevice device:Device) {}
-
+class DummyDiscovery : DeviceDiscoveryDelegate {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device) {}
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {}
 }
 
-class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
+class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
     
     let searchTarget01 = "urn:vucast-manufacturer-01-org:service:vucast:1"
     let searchTarget02 = "urn:vucast-manufacturer-02-org:service:vucast:1"
@@ -37,9 +36,8 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
     override func setUp() {
         super.setUp()
       
-        deviceDiscovery = DeviceDiscovery.init(for: self, forTargets: [searchTarget01, searchTarget02])
-        deviceDiscovery02 = DeviceDiscovery.init(for: self, forTargets: [searchTarget01, searchTarget02])
-
+        deviceDiscovery = DeviceDiscovery(forTargets: [searchTarget01, searchTarget02])
+        deviceDiscovery02 = DeviceDiscovery(forTargets: [searchTarget01, searchTarget02])
     }
     
     override func tearDown() {
@@ -73,23 +71,20 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
         
         let applicationURL = deviceDiscovery.getApplicationURL(from: httpResponse)
         
-        XCTAssert(applicationURL == appDialURL?.absoluteString)
+        XCTAssertEqual(applicationURL, appDialURL?.absoluteString)
     }
     
     func test03ApplicationURLShouldBeEmpty  () {
         
         // Application URL must be ""
-        
         let headerFields = ["Content-Type" : "application/xml", "Content-Length" : "472"]
         let url = URL(string: "http://192.168.1.93/dd.xml")!
         let httpResponse = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: headerFields)!
         
         if let _ = deviceDiscovery.getApplicationURL(from: httpResponse) {
-            XCTAssert(false)
+            XCTFail()
             return
         }
-        
-        XCTAssert(true)
     }
     
     func test04LocationPresent () {
@@ -99,7 +94,7 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
         if let location = deviceDiscovery.getStickLocation(fromUDPData: searchResponse) {
             XCTAssert(location == "http://192.168.1.48/dd.xml")
         } else {
-            XCTAssert(false)
+            XCTFail()
         }
     }
     
@@ -108,11 +103,10 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
         let searchResponse = "HTTP/1.1 200 OK\r\nCACHE-CONTROL: max-age=1800\r\nEXT:\r\nBOOTID.UPNP.ORG: 1\r\nSERVER: Linux/2.6 UPnP/1.0 quick_ssdp/1.0\r\nST: urn:vucast-manufacturer-00-org:service:vucast:1\r\nUSN: uuid:c4323fee-db4b-4227-9039-fa4b71589e26::\r\n\r\n"
         
         guard let _ = deviceDiscovery.getStickLocation(fromUDPData: searchResponse) else {
-            XCTAssert(true)
             return
         }
         
-        XCTAssert(false)
+        XCTFail()
     }
     
     func test06SearchTargetPresent () {
@@ -120,7 +114,7 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
         let searchResponse = "HTTP/1.1 200 OK\r\nLOCATION: http://192.168.1.48/dd.xml\r\nCACHE-CONTROL: max-age=1800\r\nEXT:\r\nBOOTID.UPNP.ORG: 1\r\nSERVER: Linux/2.6 UPnP/1.0 quick_ssdp/1.0\r\nST: urn:vucast-manufacturer-00-org:service:vucast:1\r\nUSN: uuid:c4323fee-db4b-4227-9039-fa4b71589e26::\r\n\r\n"
         let searchTarget = deviceDiscovery.getStickSearchTarget(fromUDPData: searchResponse)
         
-        XCTAssert(searchTarget == "vucast-manufacturer-00-org:service:vucast:1")
+        XCTAssertEqual(searchTarget, "vucast-manufacturer-00-org:service:vucast:1")
     }
     
     func test07SearchTargetMissing () {
@@ -128,84 +122,48 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
         let searchResponse = "HTTP/1.1 200 OK\r\nLOCATION: http://192.168.1.48/dd.xml\r\nCACHE-CONTROL: max-age=1800\r\nEXT:\r\nBOOTID.UPNP.ORG: 1\r\nSERVER: Linux/2.6 UPnP/1.0 quick_ssdp/1.0\r\nUSN: uuid:c4323fee-db4b-4227-9039-fa4b71589e26::\r\n\r\n"
         
         guard let _ = deviceDiscovery.getStickSearchTarget(fromUDPData: searchResponse) else {
-            XCTAssert(true)
             return
         }
         
-        XCTAssert(false)
-        
+        XCTFail()
     }
     
     func test08TargetMatchOK () {
-        
-        XCTAssert (deviceDiscovery.start())
-        
         let searchResponse = "HTTP/1.1 200 OK\r\nLOCATION: http://192.168.1.48/dd.xml\r\nCACHE-CONTROL: max-age=1800\r\nEXT:\r\nBOOTID.UPNP.ORG: 1\r\nSERVER: Linux/2.6 UPnP/1.0 quick_ssdp/1.0\r\nST: urn:vucast-manufacturer-01-org:service:vucast:1\r\nUSN: uuid:c4323fee-db4b-4227-9039-fa4b71589e26::\r\n\r\n"
         
         if let searchTarget = deviceDiscovery.getStickSearchTarget(fromUDPData: searchResponse) {
             XCTAssert(deviceDiscovery.isTargetMatching(for: searchTarget))
         } else {
-            XCTAssert(false)
+            XCTFail()
         }
-        
-        deviceDiscovery.stop()
     }
     
     func test09TargetMatchNOK () {
-        XCTAssert (deviceDiscovery.start())
-        
         let searchResponse = "HTTP/1.1 200 OK\r\nLOCATION: http://192.168.1.48/dd.xml\r\nCACHE-CONTROL: max-age=1800\r\nEXT:\r\nBOOTID.UPNP.ORG: 1\r\nSERVER: Linux/2.6 UPnP/1.0 quick_ssdp/1.0\r\nST: someTarget\r\nUSN: uuid:c4323fee-db4b-4227-9039-fa4b71589e26::\r\n\r\n"
        
         if let searchTarget = deviceDiscovery.getStickSearchTarget(fromUDPData: searchResponse) {
             XCTAssert(!deviceDiscovery.isTargetMatching(for: searchTarget))
-        } else {
-            XCTAssert(true)
         }
-        
-        deviceDiscovery.stop()
     }
     
     func test10StartStop () {
         
         // deviceDiscovey has already been initialized, but not yet started.
         
-        if deviceDiscovery.ssdpSocket != nil {
-            XCTAssert(false)
-        } else {
-            XCTAssert(true)
-        }
-        
         XCTAssert(!deviceDiscovery.isRunning)
-        XCTAssert(!deviceDiscovery.isStarted())
         
         // Start
         XCTAssert (deviceDiscovery.start())
       
-
-        if deviceDiscovery.ssdpSocket != nil {
-            XCTAssert(true)
-        } else {
-            XCTAssert(false)
-        }
-        
-        XCTAssert(!(deviceDiscovery.ssdpSocket?.isClosed())!)
         XCTAssert(deviceDiscovery.isRunning)
         
         deviceDiscovery.stop()
         XCTAssert(!deviceDiscovery.isRunning)
-        XCTAssert((deviceDiscovery.ssdpSocket?.isClosed())!)
-        
         XCTAssert (deviceDiscovery.start())
         
-        guard let socket = deviceDiscovery.ssdpSocket else {
-            XCTAssert(false)
-            return
-        }
         
         // A start() without a previuos stop() should be ignored => The ssdp socket must be unchanged
         XCTAssert (!deviceDiscovery.start())
-        XCTAssert(socket == deviceDiscovery.ssdpSocket)
-        
     }
     
     func test11IPV6Format () {
@@ -229,19 +187,6 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
 
     }
     
-    func test13mSearchIdx () {
-        XCTAssert (deviceDiscovery.start())
-        XCTAssert(deviceDiscovery.mSearchIdx == 1)
-        deviceDiscovery.stop()
-    }
-    
-    func test14mSearchIdx_MaxValue () {
-        XCTAssert (deviceDiscovery.start())
-        deviceDiscovery.mSearchIdx = type(of: deviceDiscovery.mSearchIdx).max
-        deviceDiscovery.sendMSearch()
-        XCTAssert(deviceDiscovery.mSearchIdx == 1)
-    }
-    
     func test15MultipleDiscoveryInstances () {
         
         testIdx = 15
@@ -254,28 +199,6 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
         
         deviceDiscovery.createDevice(with: xmlData.data(using: String.Encoding.utf8)!, for: "http://192.168.1.33:56789")
         deviceDiscovery02.createDevice(with: xmlData.data(using: String.Encoding.utf8)!, for: "http://192.168.1.33:56789")
-    }
-    
-
-    func testReliability () {
-        
-        deviceDiscovery = DeviceDiscovery.init(for: self, forTargets: [searchTarget01, searchTarget02])
-        XCTAssertTrue(deviceDiscovery.mSearchRetry == 2)
-        XCTAssertTrue(deviceDiscovery.mSearchTimeout == 3)
-        
-        deviceDiscovery = DeviceDiscovery (for: self, forTargets: [searchTarget01], withPolicy: .high)
-        XCTAssertTrue(deviceDiscovery.mSearchRetry == 2)
-        XCTAssertTrue(deviceDiscovery.mSearchTimeout == 3)
-        
-        deviceDiscovery = DeviceDiscovery (for: self, forTargets: [searchTarget01], withPolicy: .medium)
-        XCTAssertTrue(deviceDiscovery.mSearchRetry == 3)
-        XCTAssertTrue(deviceDiscovery.mSearchTimeout == 5)
-        
-        deviceDiscovery = DeviceDiscovery (for: self, forTargets: [searchTarget01], withPolicy: .low)
-        XCTAssertTrue(deviceDiscovery.mSearchRetry == 5)
-        XCTAssertTrue(deviceDiscovery.mSearchTimeout == 10)
-        
-        
     }
 
     func testDevices () {
@@ -303,8 +226,7 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
 
     // Protocol functions
     
-    func onDeviceAdded(from deviceDiscovery: DeviceDiscovery, forDevice device: Device) {
-        
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {
         switch testIdx {
         case 12:
             if deviceDiscovery == self.deviceDiscovery {
@@ -323,7 +245,7 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
                 XCTAssert(device.deviceID == "device ID 01")
                 testIdx = 151
             } else {
-                 XCTAssert(false)
+                XCTAssert(false)
             }
             
         case 151:
@@ -334,19 +256,17 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryProtocol, XMLHelperProtocol {
                 XCTAssert(device.modelName == "Model Name 01")
                 XCTAssert(device.deviceID == "device ID 01")
             } else {
-                 XCTAssert(false)
+                XCTAssert(false)
             }
-         
-
+            
+            
         default:
             XCTAssert(false)
         }
     }
     
-    func onDeviceRemoved(from deviceDiscovery: DeviceDiscovery, forDevice device: Device) {
-        XCTAssert(false)
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device) {
+        XCTFail()
     }
-    
-
     
 }

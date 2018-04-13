@@ -22,14 +22,14 @@ import CocoaAsyncSocket
  Provides information on device searching activity.
  */
 
-@objc public protocol DeviceDiscoveryProtocol {
+@objc public protocol DeviceDiscoveryDelegate {
     /**
      Gets called when a new device is found.
      - Parameters:
          - deviceDiscovery: module (delegate) registered for notifications
          - device: added device information . See `Device` for details.
      */
-    func onDeviceAdded(from deviceDiscovery: DeviceDiscovery, forDevice device: Device)
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device)
 
     /**
      Gets called when a device is lost.
@@ -37,7 +37,7 @@ import CocoaAsyncSocket
          - deviceDiscovery: module (delegate) registered for notifications
          - device: lost device information . See `Device` for details.
      */
-    func onDeviceRemoved(from deviceDiscovery: DeviceDiscovery, forDevice device: Device)
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device)
 }
 
 /**
@@ -48,7 +48,7 @@ import CocoaAsyncSocket
  ```
  */
 @objcMembers
-@objc public class DeviceDiscovery: NSObject, GCDAsyncUdpSocketDelegate, XMLHelperProtocol, HttpProtocol {
+@objc public class DeviceDiscovery: NSObject, GCDAsyncUdpSocketDelegate, XMLHelperDelegate, HttpProtocol {
 
     // MARK: - Initialization
 
@@ -65,6 +65,56 @@ import CocoaAsyncSocket
         case medium
         case low
     }
+    
+    enum ReliabilityParams {
+        case high
+        case medium
+        case low
+        
+        var mSearchRetry: Int {
+            switch self {
+            case .high:
+                return 2
+            case .medium:
+                return 3
+            case .low:
+                return 5
+            }
+        }
+        
+        var mSearchTimeout: TimeInterval {
+            switch self {
+            case .high:
+                return 3
+            case .medium:
+                return 5
+            case .low:
+                return 10
+            }
+        }
+    }
+
+    public weak var delegate: DeviceDiscoveryDelegate?
+    private let ssdpAddress = "239.255.255.250"
+    private let ssdpPort: UInt16 = 1900
+    private var ssdpSocket: GCDAsyncUdpSocket?
+    private var error: NSError?
+    
+    private var mSearchTargets: [String]
+    private var mSearchTimer = Timer()
+    private var mSearchTimeout: TimeInterval
+    private var mSearchIdx: Int
+    private var mSearchRetry: Int
+    
+    private var currentDevices = [String: Device]()
+    private var currentDevicesIdx = [String: Int]()
+    
+    public private(set) var isRunning: Bool 
+    
+    /// List of current active devices
+    public var devices: [Device] {
+        return Array(currentDevices.values)
+    }
 
     /**
      Initializes a new deviceDiscoevry class.
@@ -74,9 +124,7 @@ import CocoaAsyncSocket
          - policy:  `Reliability` level for discovery process
      */
 
-    @objc public init(for sender: Any, forTargets searchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
-
-        delegates.append(sender as? DeviceDiscoveryProtocol)
+    @objc public init(forTargets searchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
         mSearchIdx = 0
         self.mSearchTargets = searchTargets
         isRunning = false
@@ -93,7 +141,7 @@ import CocoaAsyncSocket
             mSearchRetry = ReliabilityParams.low.mSearchRetry
         }
 
-        print("OCast SDK: Version 0.3.0")
+        OCastLog.debug("OCast SDK: Version 0.4.0")
     }
 
     /**
@@ -102,19 +150,11 @@ import CocoaAsyncSocket
          - sender: module that will receive further notifications
          - searchTargets: List of device targets to search for
      */
-    public convenience init(for sender: DeviceDiscoveryProtocol, forTargets searchTargets: Array<String>) {
-        self.init(for: sender, forTargets: searchTargets, withPolicy: DeviceDiscovery.Reliability.high)
+    public convenience init(forTargets searchTargets: Array<String>) {
+        self.init(forTargets: searchTargets, withPolicy: DeviceDiscovery.Reliability.low)
     }
 
     // MARK: - DeviceDiscovery Interface
-
-    /// List of current active devices
-
-    public var devices: [Device] {
-        return currentDevices.map { (_, device) -> Device in
-            device
-        }
-    }
 
     /**
      Starts a discovery process.
@@ -122,7 +162,7 @@ import CocoaAsyncSocket
          - true if the discovery process could start.
          - false if the discovery process could not be started.
      */
-
+    @discardableResult
     @objc public func start() -> Bool {
 
         guard !isRunning else {
@@ -130,9 +170,7 @@ import CocoaAsyncSocket
             return false
         }
 
-        if let socket = ssdpSocket {
-            socket.close()
-        }
+        ssdpSocket?.close()
 
         ssdpSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.main)
 
@@ -169,25 +207,10 @@ import CocoaAsyncSocket
     /**
      Stops a discovery process.
      */
-
     @objc public func stop() {
-
-        if let ssdpSocket = self.ssdpSocket {
-            ssdpSocket.close()
-        }
-
+        ssdpSocket?.close()
         mSearchTimer.invalidate()
         isRunning = false
-    }
-
-    /**
-     - Returns:
-         - true if the discovery process is started.
-         - false if the discovery process is not started.
-     */
-
-    @objc public func isStarted() -> Bool {
-        return isRunning
     }
 
     // MARK: - UDP management
@@ -199,8 +222,8 @@ import CocoaAsyncSocket
             return
         }
 
-        OCastLog.debug("\n >> From \(udpSocket.localHost() ?? "") on port \(udpSocket.localPort())\n\(udpData)")
-
+        //OCastLog.debug("Ok From \(udpSocket.localHost() ?? "") on port \(udpSocket.localPort())\n\(udpData)")
+ 
         guard let searchTarget = getStickSearchTarget(fromUDPData: udpData as String) else {
             OCastLog.error("Search Target is missing or corrputed. Aborting.")
             return
@@ -224,79 +247,22 @@ import CocoaAsyncSocket
         OCastLog.debug("UDP Socket did close")
     }
 
-    /*--------------------------------------------------------------------------------------------------------------------------------------*/
-
-    // MARK: - Internal
-
-    var delegates: [DeviceDiscoveryProtocol?] = []
-    let ssdpAddres = "239.255.255.250"
-    let ssdpPort: UInt16 = 1900
-    var ssdpSocket: GCDAsyncUdpSocket?
-    var error: NSError?
-
-    var mSearchTargets: [String]
-    var mSearchTimer = Timer()
-    var mSearchTimeout: TimeInterval
-    var mSearchIdx: Int
-    var mSearchRetry: Int
-
-    var currentDevices = [String: Device]()
-    var currentDevicesIdx = [String: Int]()
-
-    var isRunning: Bool
-
-    enum ReliabilityParams {
-        case high
-        case medium
-        case low
-
-        var mSearchRetry: Int {
-            switch self {
-            case .high:
-                return 2
-            case .medium:
-                return 3
-            case .low:
-                return 5
-            }
-        }
-
-        var mSearchTimeout: TimeInterval {
-            switch self {
-            case .high:
-                return 3
-            case .medium:
-                return 5
-            case .low:
-                return 10
-            }
-        }
-    }
-
     func sendMSearch() {
-
-        var tagIndex = 0
-
-        _ = mSearchTargets.map { (searchTarget) -> Void in
-
-            let mSearchString = "M-SEARCH * HTTP/1.1\r\nHOST: \(ssdpAddres):\(ssdpPort)\r\nMan: \"ssdp:discover\"\r\nMX:\(mSearchTimeout) \r\nST: \(searchTarget)\r\n\r\n"
-
-            guard let ssdpSocket = ssdpSocket else {
-                return
+        if let ssdpSocket = ssdpSocket {
+            var tagIndex = 0
+            mSearchTargets.forEach { (target) in
+                let mSearchString = "M-SEARCH * HTTP/1.1\r\nHOST: \(ssdpAddress):\(ssdpPort)\r\nMan: \"ssdp:discover\"\r\nMX:\(mSearchTimeout) \r\nST: \(target)\r\n\r\n"
+            
+                ssdpSocket.send(mSearchString.data(using: String.Encoding.utf8)!, toHost: ssdpAddress, port: ssdpPort, withTimeout: 1, tag: tagIndex)
+                tagIndex += 1
             }
-
-            ssdpSocket.send(mSearchString.data(using: String.Encoding.utf8)!, toHost: ssdpAddres, port: ssdpPort, withTimeout: 1, tag: tagIndex)
-            tagIndex += 1
         }
 
         if mSearchIdx == type(of: mSearchIdx).max {
-
             OCastLog.debug("mSearchIdx reached the maximum allowed value.")
-            
             currentDevicesIdx.keys.forEach({
                 currentDevicesIdx[$0] = 0
             })
-
             mSearchIdx = 0
         }
 
@@ -307,24 +273,19 @@ import CocoaAsyncSocket
 
     @objc func mSearchTimerExpiry(timer _: Timer!) {
 
-        _ = currentDevices.map { (deviceId, cachedDevice) -> Void in
-
+        currentDevices.forEach { (deviceId, cachedDevice) in
             if let deviceIdx = currentDevicesIdx[deviceId] {
-
+                
                 if deviceIdx + self.mSearchRetry <= mSearchIdx {
                     OCastLog.debug("Lost device \(cachedDevice.friendlyName)")
-
+                    
                     currentDevices.removeValue(forKey: deviceId)
                     currentDevicesIdx.removeValue(forKey: deviceId)
-
-                    for delegate in self.delegates {
-                        delegate?.onDeviceRemoved(from: self, forDevice: cachedDevice)
-                    }
+                    
+                    delegate?.deviceDiscovery(self, didRemoveDevice: cachedDevice)
                 }
             }
         }
-
-        OCastLog.debug("Resending MSEARCH")
         sendMSearch()
     }
 
@@ -342,19 +303,20 @@ import CocoaAsyncSocket
 
     func getApplicationURL(from httpResponse: HTTPURLResponse?) -> String? {
 
-        OCastLog.debug("HTTP Response: \(String(describing: httpResponse!))")
+        let applicationDIALURL = httpResponse?.allHeaderFields["Application-DIAL-URL"]
+        let applicationURL = httpResponse?.allHeaderFields["Application-URL"]
+        OCastLog.debug("HTTP Response: DIAL-URL:\(applicationDIALURL ?? ""), URL:\(applicationURL ?? "")")
 
-        if let applicationURL = httpResponse?.allHeaderFields["Application-DIAL-URL"] {
-            return applicationURL as? String
-        } else if let applicationURL = httpResponse?.allHeaderFields["Application-URL"] {
-            return applicationURL as? String
+        if let appURL = applicationDIALURL {
+            return appURL as? String
+        } else if let appURL = applicationURL {
+            return appURL as? String
         }
 
         return nil
     }
 
     // MARK: - Device management
-
     func createDevice(with xmlData: Data, for applicationURL: String?) {
 
         guard let applicationURL = applicationURL else {
@@ -362,7 +324,8 @@ import CocoaAsyncSocket
             return
         }
 
-        let parserHelper = XMLHelper(fromSender: self, for: applicationURL)
+        let parserHelper = XMLHelper(for: applicationURL)
+        parserHelper.delegate = self
 
         let key1 = XMLHelper.KeyDefinition(name: "friendlyName", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition(name: "manufacturer", isMandatory: true)
@@ -389,15 +352,10 @@ import CocoaAsyncSocket
 
             if duplicateDevices.isEmpty {
 
-                let baseURL = URL(string: application)!
-
-                guard let ipAddress = baseURL.host else {
-                    OCastLog.error("IP address for Application-(DIAL)URL is empty.)")
-                    return
-                }
-
-                guard let ipPort = baseURL.port else {
-                    OCastLog.error("Port for Application-(DIAL)URL is empty.)")
+                guard let baseURL = URL(string: application),
+                    let ipAddress = baseURL.host,
+                    let ipPort = baseURL.port else {
+                    OCastLog.error("URL for Application-(DIAL)URL is invalid (\(application)")
                     return
                 }
 
@@ -412,17 +370,11 @@ import CocoaAsyncSocket
                 self.currentDevices[device.deviceID] = device
                 self.currentDevicesIdx[device.deviceID] = self.mSearchIdx
 
-                for delegate in self.delegates {
-                    delegate?.onDeviceAdded(from: self, forDevice: device)
-                }
-
-                OCastLog.debug("Adding a new device (\(device.friendlyName)). Have now \(self.currentDevices.count) cached device(s).")
-
+                self.delegate?.deviceDiscovery(self, didAddDevice: device)
             } else {
-
                 self.currentDevicesIdx[deviceID] = self.mSearchIdx
-                OCastLog.debug("\(friendlyName) is already inserted. Have now \(self.currentDevices.count) cached device(s).")
             }
+            OCastLog.debug("\(self.currentDevices.count) device(s) detected, last \(friendlyName)")
         }
     }
 
@@ -431,7 +383,6 @@ import CocoaAsyncSocket
     }
 
     // MARK: - Private Helpers
-
     func resetContext() {
         currentDevices.removeAll()
         currentDevicesIdx.removeAll()
