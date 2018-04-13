@@ -112,7 +112,7 @@ import Foundation
         case .application:
 
             if links.count == 0 {
-                let linkProfile = LinkProfile(identifier: LinkId.genericLink.rawValue, ipAddress: ipAddress, needsEvent: false, app2appURL: info.app2appURL, certInfo: nil)
+                let linkProfile = LinkProfile(identifier: LinkId.genericLink.rawValue, ipAddress: ipAddress, needsEvent: false, app2appURL: info.app2appURL, certInfo: certificateInfo)
                 links = [LinkId.genericLink: ReferenceLink(from: self, profile: linkProfile)]
             }
 

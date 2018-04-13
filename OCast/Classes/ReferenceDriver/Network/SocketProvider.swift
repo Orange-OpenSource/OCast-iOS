@@ -26,33 +26,44 @@ protocol SocketProviderDelegate {
 
 final class SocketProvider: NSObject, SRWebSocketDelegate {
 
-    // MARK: - Interface
-
-    let delegate: SocketProviderDelegate?
-    let certInfo: CertificateInfo?
-    var state: State
-
-    init(from sender: SocketProviderDelegate?, certInfo: CertificateInfo?) {
-        delegate = sender
-        self.certInfo = certInfo
-        state = .disconnected
-    }
-
     enum State {
         case connected
         case disconnected
     }
+    
+    private let certificateInfo: CertificateInfo?
+    
+    private var socket: SRWebSocket?
+    
+    private var pingPongTimerRetry: Int8 = 0
+    
+    private var pingPongTimer = Timer()
+    
+    private let pingPongTimerTimeout: TimeInterval = 5
+    
+    private let pingPongTimerMaxRetry: Int8 = 2
+    
+    private let maxPayloadSize: Int = 4096
+
+    var delegate: SocketProviderDelegate?
+    
+    private(set) var state: State
+    
+    // MARK: Initializer
+    
+    init(certificateInfo: CertificateInfo?) {
+        self.certificateInfo = certificateInfo
+        state = .disconnected
+    }
+    
+    // MARK: Internal methods
 
     func connect(with command: String) {
-
         if socket == nil || (socket?.readyState != .CONNECTING && socket?.readyState != .OPEN) {
-            OCastLog.debug("Socket: Creating a socket.")
-            socket = getSocket(with: command)
-
-            if socket == nil {
-                OCastLog.error("Socket: Could not initialize the socket.")
-            }
-
+            OCastLog.debug("Socket: Connecting...")
+            socket = socket(with: command)
+            socket?.open()
+            socket?.delegate = self
         } else {
             OCastLog.debug("Socket: Ignoring connect due to socket state = \(String(describing: socket?.readyState.rawValue))")
             delegate?.onConnected(from: self)
@@ -60,82 +71,48 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     }
 
     func disconnect() {
-
-        guard let socket = socket else {
-            OCastLog.debug("Socket: Socket does not exists. Ignoring disconnect request.")
-            return
-        }
-
-        if socket.readyState != .CLOSED {
+        if socket?.readyState != .CLOSED {
             resetPingPongTimer()
-            OCastLog.debug("Socket: Disconnecting.")
-            socket.close()
+            OCastLog.debug("Socket: Disconnecting...")
+            socket?.close()
         }
     }
 
     func sendMessage(message: String) -> Bool {
-        let payloadSize = message.count
-
-        if payloadSize > maxPayloadSize {
-            return false
-        }
-
+        guard message.count <= maxPayloadSize else { return false }
+        
         socket?.send(message)
+        
         return true
     }
+    
+    // MARK: Private methods
 
-    /*--------------------------------------------------------------------------------------------------------------------------------------*/
-
-    // MARK: - Internal
-
-    var socket: SRWebSocket?
-    var pingPongTimerRetry: Int8 = 0
-    var pingPongTimer = Timer()
-
-    // MARK: - Private constants
-
-    let pingPongTimerTimeout: TimeInterval = 5
-    let pingPongTimerMaxRetry: Int8 = 2
-    let maxPayloadSize: Int = 4096
-
-    func getSocket(with command: String) -> SRWebSocket? {
-
-        return getUnsecureSocket(with: command)
-    }
-
-    func getSecureSocket(with _: String) -> SRWebSocket? {
-        return nil
-    }
-
-    func getUnsecureSocket(with command: String) -> SRWebSocket? {
-        socket = SRWebSocket(url: URL(string: command))
-
-        guard let socket = socket else {
-            return nil
+    private func socket(with command: String) -> SRWebSocket? {
+        if let certificateInfo = certificateInfo {
+            return secureSocket(with: command, certficate: certificateInfo)
+        } else {
+            return unsecureSocket(with: command)
         }
-
-        socket.open()
-        socket.delegate = self as SRWebSocketDelegate
-
-        return socket
     }
 
-    func sendPing() {
+    private func secureSocket(with command: String, certficate certificateInfo: CertificateInfo) -> SRWebSocket? {
+        return SRWebSocket(url: URL(string: command), protocols: nil, allowsUntrustedSSLCertificates: true)
+    }
+    
+    private func unsecureSocket(with command: String) -> SRWebSocket? {
+        return SRWebSocket(url: URL(string: command))
+    }
 
-        guard let socket = socket else {
-            OCastLog.debug("Socket: Socket does not exists. Ignoring Ping request.")
-            return
-        }
-
-        if socket.readyState == .OPEN {
-            socket.sendPing(nil)
+    private func sendPing() {
+        if socket?.readyState == .OPEN {
+            socket?.sendPing(nil)
         }
     }
 
     // MARK: - Timer management
 
     @objc func pingPongTimerExpiry(timer _: Timer) {
-
         if pingPongTimerRetry == pingPongTimerMaxRetry {
             OCastLog.debug(("Socket: PingPong timer max number of retries reached. Disconnecting."))
 
@@ -152,15 +129,14 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
         }
     }
 
-    func resetPingPongTimer() {
+    private func resetPingPongTimer() {
         pingPongTimerRetry = 0
         pingPongTimer.invalidate()
     }
 
-    // MARK: - SocketRocket delegate management
+    // MARK: - SRWebSocketDelegate methods
 
     func webSocket(_ webSocket: SRWebSocket!, didReceiveMessage message: Any!) {
-
         if webSocket == socket {
             delegate?.onMessageReceived(from: self, message: message as? String ?? "")
         }
@@ -202,7 +178,6 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     }
 
     func webSocket(_ webSocket: SRWebSocket!, didReceivePong _: Data!) {
-
         if webSocket == socket {
             OCastLog.debug("Socket: Got a Pong")
             pingPongTimerRetry = 0

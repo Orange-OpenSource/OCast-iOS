@@ -78,7 +78,8 @@ final class ReferenceLink: Link, SocketProviderDelegate {
 
         if commandSocket == nil {
             OCastLog.debug(("WS: Creating Command socket."))
-            commandSocket = SocketProvider(from: self, certInfo: profile.certInfo)
+            commandSocket = SocketProvider(certificateInfo: profile.certInfo)
+            commandSocket?.delegate = self
         }
 
         if let commandSocket = commandSocket {

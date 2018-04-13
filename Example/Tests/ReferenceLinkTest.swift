@@ -87,7 +87,7 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
     
     func testStatus () {
         
-        let mockSocketProvider = SocketProvider(from: nil, certInfo: nil)
+        let mockSocketProvider = SocketProvider(certificateInfo: nil)
         var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(from: self,
                                                                                     profile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
 
