@@ -89,11 +89,11 @@ import Foundation
 @objc public final class ApplicationDescription: NSObject {
     public let app2appURL: String
     public let version: String
-    public let rel: String
-    public let href: String
+    public let rel: String?
+    public let href: String?
     public let name: String
 
-    public init(app2appURL: String, version: String, rel: String, href: String, name: String) {
+    public init(app2appURL: String, version: String, rel: String?, href: String?, name: String) {
         self.app2appURL = app2appURL
         self.version = version
         self.rel = rel

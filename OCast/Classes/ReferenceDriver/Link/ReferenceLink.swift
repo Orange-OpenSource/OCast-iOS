@@ -84,14 +84,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
 
         if let commandSocket = commandSocket {
             OCastLog.debug(("WS: Connecting the command socket"))
-
-            var command = profile.app2appURL
-
-            if profile.app2appURL == "" {
-                command = "ws://\(profile.ipAddress):4434/ocast"
-            }
-
-            commandSocket.connect(with: command)
+            commandSocket.connect(with: profile.app2appURL)
         }
     }
 

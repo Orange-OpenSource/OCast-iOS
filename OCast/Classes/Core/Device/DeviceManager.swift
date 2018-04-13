@@ -104,7 +104,7 @@ import Foundation
 
         driver.register(self, forModule: .publicSettings)
 
-        currentApplicationData = ApplicationDescription(app2appURL: "", version: "", rel: "", href: "", name: "")
+        currentApplicationData = ApplicationDescription(app2appURL: "", version: "", rel: nil, href: nil, name: "")
 
         driver.connect(for: .publicSettings, with: currentApplicationData,
                        onSuccess: {
@@ -161,7 +161,7 @@ import Foundation
             return
         }
 
-        currentApplicationData = ApplicationDescription(app2appURL: "", version: "", rel: "", href: "", name: "")
+        currentApplicationData = ApplicationDescription(app2appURL: "", version: "", rel: nil, href: nil, name: "")
 
         driver.connect(for: .privateSettings, with: currentApplicationData,
                        onSuccess: {
@@ -268,7 +268,7 @@ import Foundation
 
         let key1 = XMLHelper.KeyDefinition(name: "ocast:X_OCAST_App2AppURL", isMandatory: true)
         let key2 = XMLHelper.KeyDefinition(name: "ocast:X_OCAST_Version", isMandatory: true)
-        let key3 = XMLHelper.KeyDefinition(name: "link", isMandatory: true)
+        let key3 = XMLHelper.KeyDefinition(name: "link", isMandatory: false)
 
         parserHelper.parseDocument(data: data, withKeyList: [key1, key2, key3])
     }
@@ -276,21 +276,19 @@ import Foundation
     // MARK: - XML Protocol
     func didParseWithError(for _: String, with error: Error, diagnostic: [String]) {
         OCastLog.error("DeviceMgr: Parsing failed with error = \(error). Diagnostic: \(diagnostic)")
-
-        currentApplicationData = ApplicationDescription(app2appURL: "", version: "", rel: "", href: "", name: currentApplicationName ?? "")
-        successCallback()
+        currentApplicationData = ApplicationDescription(app2appURL: "", version: "", rel: nil, href: nil, name: "")
+        errorCallback(error as NSError)
     }
 
     func didEndParsing(for _: String, result: [String: String], attributes: [String: [String: String]]) {
-
         let app2URL = result["ocast:X_OCAST_App2AppURL"]!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         let version = result["ocast:X_OCAST_Version"]!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        let linkAttributes = attributes["link"]!
-        let rel = linkAttributes["rel"] ?? "run"
-        let href = linkAttributes["href"] ?? ""
+        let linkAttributes = attributes["link"]
+        let rel = linkAttributes?["rel"]
+        let href = linkAttributes?["href"]
         
-       let newURL = app2URL.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-
+        let newURL = app2URL.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        
         currentApplicationData = ApplicationDescription(app2appURL: newURL, version: version, rel: rel, href: href, name: currentApplicationName)
         successCallback()
     }
