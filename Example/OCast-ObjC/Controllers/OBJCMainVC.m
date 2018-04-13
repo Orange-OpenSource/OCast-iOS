@@ -53,12 +53,13 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 
     [_stickIcon setEnabled:NO];
     
-    if ([DeviceManager registerDriverForName:ReferenceDriver.manufacturer factory:ReferenceDriverFactory.sharedInstance] == NO) {
+    if ([DeviceManager registerDriverForName:ReferenceDriver.manufacturer factory:ReferenceDriverFactory.shared] == NO) {
         NSLog(@"-> Driver could not be registered.");
         return;
     }
     
-    deviceDiscovery = [[DeviceDiscovery alloc] initFor:self forTargets: @[ReferenceDriver.searchTarget]];
+    deviceDiscovery = [[DeviceDiscovery alloc] initForTargets:@[ReferenceDriver.searchTarget]];
+    deviceDiscovery.delegate = self;
 
     if ([deviceDiscovery start] == NO) {
         NSLog(@"-> Discovery process could not be started.");
@@ -154,6 +155,10 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     NSLog(@"->New device found: %@", device.friendlyName);
     devices = deviceDiscovery.devices;
     [_stickPickerView reloadAllComponents];
+    
+    if (devices.count == 1) {
+        selectedDevice = devices[0];
+    }
 }
 
 - (void)onDeviceRemovedFrom:(DeviceDiscovery * _Nonnull)deviceDiscovery forDevice:(Device * _Nonnull)device {
@@ -189,7 +194,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         [self startWebApp];
         
         [appliCtrl manageStreamFor:self];
-        mediaCtrl = [appliCtrl getMediaControllerFor:self];
+        mediaCtrl = [appliCtrl mediaControllerWith:self];
     };
     
     ErrorBlockType errorBlock = ^(NSError *error){
@@ -197,7 +202,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         [deviceDiscovery stop];
     };
     
-    [deviceMgr getApplicationControllerFor:applicationName onSuccess:successBlock onError:errorBlock];
+    [deviceMgr applicationControllerFor:applicationName onSuccess:successBlock onError:errorBlock];
 
 }
 
@@ -266,7 +271,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     // http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8
     // https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8
     
-    NSURL *mediaUrl= [[NSURL alloc]initWithString:@"http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8"];
+    NSURL *mediaUrl= [[NSURL alloc]initWithString:@"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"];
     NSURL *logoUrl = [[NSURL alloc]initWithString:@"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"];
     
     MediaPrepare *mediaPrepare = [[MediaPrepare alloc]initWithUrl:mediaUrl
@@ -417,7 +422,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the Playback status Info");
     };
     
-    [mediaCtrl getPlaybackStatusWithOptions:@{} onSuccess:successBlock onError:errorBlock];
+    [mediaCtrl playbackStatusWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 -(void)getMetaData {
@@ -464,7 +469,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the MetaDataChanged Info");
     };
     
-    [mediaCtrl getMetadataWithOptions:@{} onSuccess:successBlock onError:errorBlock];
+    [mediaCtrl metadataWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 @end

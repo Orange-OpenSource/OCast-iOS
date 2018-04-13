@@ -71,7 +71,7 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
     
     var devices: [Device] = []
    
-    var applicationName =  "Orange-OrangeTVReceiverDev-SDK2018" // Orange-DefaultReceiver-DEV"
+    var applicationName =  "Orange-DefaultReceiver-DEV"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,6 +83,7 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
         }
         
         deviceDiscovery = DeviceDiscovery(forTargets: [referenceST])
+        deviceDiscovery.delegate = self
 
         guard deviceDiscovery.start() else {
             return
@@ -118,6 +119,10 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
         }
 
         stickPickerView.reloadAllComponents()
+        
+        if devices.count == 1 {
+            onDeviceSelected(device: devices[0])
+        }
     }
     
     func onDeviceRemoved(from deviceDiscovery: DeviceDiscovery, forDevice device: Device) {
