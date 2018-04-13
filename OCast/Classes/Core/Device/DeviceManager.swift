@@ -35,27 +35,27 @@ import Foundation
     // MARK: - Internal
     public weak var delegate:DeviceManagerDelegate?
     // app info
-    var currentTarget: String!
-    var currentApplicationData: ApplicationDescription!
-    var currentApplicationName: String!
+    private var currentTarget: String!
+    private var currentApplicationData: ApplicationDescription!
+    private var currentApplicationName: String!
     // application controllers
-    var applicationControllers: [ApplicationController] = []
+    private var applicationControllers: [ApplicationController] = []
     // callback
-    var successCallback: () -> Void = {  }
-    var errorCallback: (_ error: NSError?) -> Void = { _ in }
+    private var successCallback: () -> Void = {  }
+    private var errorCallback: (_ error: NSError?) -> Void = { _ in }
     // settings
-    var publicSettings: DriverPublicSettings?
-    var privateSettings: DriverPrivateSettings?
+    private var publicSettings: DriverPublicSettings?
+    private var privateSettings: DriverPrivateSettings?
     // ssl
-    var certificateInfo: CertificateInfo?
+    private var certificateInfo: CertificateInfo?
     // timer
-    var reconnectionRetry: Int8 = 0
-    let maxReconnectionRetry: Int8 = 5
-    var failureTimer = Timer()
+    private var reconnectionRetry: Int8 = 0
+    private let maxReconnectionRetry: Int8 = 5
+    private var failureTimer = Timer()
     // drivers
-    static var driverFactories: [String: DriverFactory] = [:]
-    var driver: Driver?
-    var device: Device
+    private static var driverFactories: [String: DriverFactory] = [:]
+    private var driver: Driver?
+    private var device: Device
 
     // MARK: - Public interface
 
@@ -232,7 +232,7 @@ import Foundation
     /*--------------------------------------------------------------------------------------------------------------------------------------*/
 
     // MARK: - Private methods
-    func driver(for device: Device) -> Driver? {
+    private func driver(for device: Device) -> Driver? {
         if let factory = DeviceManager.driverFactories[device.manufacturer] {
             return factory.make(for: device.ipAddress, with: certificateInfo)
         } else {
@@ -241,14 +241,14 @@ import Foundation
         }
     }
 
-    func resetAllContexts() {
+    private func resetAllContexts() {
         applicationControllers.forEach { $0.reset() }
         applicationControllers.removeAll()
         publicSettings = nil
         privateSettings = nil
     }
 
-    func applicationData(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+    private func applicationData(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         successCallback = onSuccess
         errorCallback = onError
 

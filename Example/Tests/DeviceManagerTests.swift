@@ -47,11 +47,8 @@ class DeviceManagerTests: XCTestCase {
         let deviceMgr = DeviceManager(with: device)
         
         XCTAssertNotNil(deviceMgr)
-        XCTAssertNotNil(deviceMgr?.driver)
-        XCTAssertNil(deviceMgr?.applicationControllers.first)
         
         deviceMgr?.applicationController(for: "myApp", onSuccess: onApplicationSuccess, onError: onError(error:))
-        XCTAssert(deviceMgr?.currentApplicationName == "myApp")
     }
     
     public func onApplicationSuccess(app: ApplicationController) {
