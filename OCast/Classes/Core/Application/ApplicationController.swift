@@ -265,7 +265,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     /// :nodoc:
     public func onMessage(data: [String: Any]) {
         let name = data["name"] as? String
-        if name == "connectionStatus" {
+        if name == "connectedStatus" {
             let params = data["params"] as? [String: String]
             if params?["status"] == "connected" {
                 OCastLog.debug("ApplicationMgr: Got the 'Connected' webapp message.")
