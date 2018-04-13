@@ -118,7 +118,7 @@ class DataMapperTests: XCTestCase {
 
     func testPlayBackStatus01 () {
         
-        let message = StreamData(name: "playbackStatus", params: ["state":"playing","volume":0.1,"mute":false,"position":0.99,"duration":596.4733333333334], options: nil)
+        let message = StreamData(name: "playbackStatus", params: ["state":2,"volume":0.1,"mute":false,"position":0.99,"duration":596.4733333333334], options: nil)
         let data = DataMapper().playbackStatus(with: message)
         XCTAssert(data.state == PlayerState.playing)
         XCTAssert(data.volume == 0.1)
@@ -132,7 +132,7 @@ class DataMapperTests: XCTestCase {
         
         let message = StreamData(name: "playbackStatus", params: ["volume":0.1,"position":0.99,"duration":596.4733333333334], options: nil)
         let data = DataMapper().playbackStatus(with: message)
-        XCTAssert(data.state == PlayerState.idle)
+        XCTAssert(data.state == PlayerState.unknown)
         XCTAssert(data.volume == 0.1)
         XCTAssert(data.mute == true)
         XCTAssert(data.position == 0.99)
@@ -144,7 +144,7 @@ class DataMapperTests: XCTestCase {
         
         let message = StreamData(name: "playbackStatus", params: ["state":true, "volume":true,"position":true,"duration":true,"mute": "OK"], options: nil)
         let data = DataMapper().playbackStatus(with: message)
-        XCTAssert(data.state == PlayerState.idle)
+        XCTAssert(data.state == PlayerState.unknown)
         XCTAssert(data.volume == 0)
         XCTAssert(data.mute == true)
         XCTAssert(data.position == 0)
