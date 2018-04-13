@@ -20,9 +20,8 @@ import XCTest
 @testable import OCast
 
 class DummyDiscovery : DeviceDiscoveryDelegate {
-    func onDeviceAdded  (from deviceDiscovery:DeviceDiscovery, forDevice device:Device) {}
-    func onDeviceRemoved(from deviceDiscovery:DeviceDiscovery, forDevice device:Device) {}
-
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device) {}
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {}
 }
 
 class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
@@ -152,7 +151,6 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
         // deviceDiscovey has already been initialized, but not yet started.
         
         XCTAssert(!deviceDiscovery.isRunning)
-        XCTAssert(!deviceDiscovery.isStarted())
         
         // Start
         XCTAssert (deviceDiscovery.start())
@@ -228,8 +226,7 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
 
     // Protocol functions
     
-    func onDeviceAdded(from deviceDiscovery: DeviceDiscovery, forDevice device: Device) {
-        
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {
         switch testIdx {
         case 12:
             if deviceDiscovery == self.deviceDiscovery {
@@ -248,7 +245,7 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
                 XCTAssert(device.deviceID == "device ID 01")
                 testIdx = 151
             } else {
-                 XCTAssert(false)
+                XCTAssert(false)
             }
             
         case 151:
@@ -259,19 +256,17 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
                 XCTAssert(device.modelName == "Model Name 01")
                 XCTAssert(device.deviceID == "device ID 01")
             } else {
-                 XCTAssert(false)
+                XCTAssert(false)
             }
-         
-
+            
+            
         default:
             XCTAssert(false)
         }
     }
     
-    func onDeviceRemoved(from deviceDiscovery: DeviceDiscovery, forDevice device: Device) {
-        XCTAssert(false)
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device) {
+        XCTFail()
     }
-    
-
     
 }

@@ -93,31 +93,25 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
     }
 
     
-    //MARK: DeviceManager protocol
-    
-    func onFailure(error: NSError) {
+    //MARK: DeviceManagerDelegate methods
+    func deviceDidDisconnect(withError error: NSError) {
         OCastLog.debug("-> Connection to the stick is down.")
-
         resetContext ()
-       
         guard deviceDiscovery.start() else {
             return
         }
-        
         devices = deviceDiscovery.devices
         stickPickerView.reloadAllComponents()
     }
     
-    // MARK: - Device Discovery protocol
-    
-    func onDeviceAdded(from deviceDiscovery: DeviceDiscovery, forDevice device: Device) {
-
+    // MARK: - DeviceDiscoveryDelegate methods
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {
         devices = deviceDiscovery.devices
         
         if deviceDiscovery == deviceDiscovery {
             OCastLog.debug("-> Device added = \(device.friendlyName). Now managing \(devices.count) device(s).")
         }
-
+        
         stickPickerView.reloadAllComponents()
         
         if devices.count == 1 {
@@ -125,17 +119,15 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
         }
     }
     
-    func onDeviceRemoved(from deviceDiscovery: DeviceDiscovery, forDevice device: Device) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device) {
         devices = deviceDiscovery.devices
         stickPickerView.reloadAllComponents()
         
         if devices.count == 0 {
-           setupUI()
+            setupUI()
         }
-
+        
         OCastLog.debug ("-> Device lost = \(device.friendlyName). Now managing \(devices.count) device(s).")
-        
-        
     }
     
     func onDeviceSelected(device: Device) {
@@ -145,8 +137,6 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
         
         createDeviceManager(with: device)
     }
-    
-
     
     //MARK: - WebApp control
     

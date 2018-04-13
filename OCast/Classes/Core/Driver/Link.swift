@@ -47,14 +47,14 @@ import Foundation
 }
 
 @objc public protocol LinkDelegate {
-    func onEvent(payload: Event)
-    func onLinkConnected(from identifier: Int8)
-    func onLinkDisconnected(from identifier: Int8)
-    func onLinkFailure(from identifier: Int8)
+    func didReceive(event: Event)
+    func didConnect(linkWithIdentifier identifier: Int8)
+    func didDisconnect(linkWithIdentifier identifier: Int8)
+    func didFail(linkWithIdentifier identifier: Int8)
 }
 
 @objc public protocol LinkFactory {
-    static func make(from sender: LinkDelegate, linkProfile: LinkProfile) -> Link
+    static func make(withDelegate delegate: LinkDelegate, andProfile profile: LinkProfile) -> Link
 }
 
 @objc public class LinkProfile: NSObject {
@@ -75,8 +75,8 @@ import Foundation
 @objc public protocol Link {
     var profile: LinkProfile { get }
     var delegate: LinkDelegate? { get }
-    init(from sender: LinkDelegate?, profile: LinkProfile)
+    init(withDelegate delegate: LinkDelegate?, andProfile profile: LinkProfile)
     func connect()
     func disconnect()
-    func sendPayload(forDomain domain: String, withPayload payload: Command, onSuccess: @escaping (CommandReply) -> Void, onError: @escaping (NSError?) -> Void)
+    func send(payload: Command, forDomain domain: String, onSuccess: @escaping (CommandReply) -> Void, onError: @escaping (NSError?) -> Void)
 }

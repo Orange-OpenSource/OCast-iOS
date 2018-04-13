@@ -40,9 +40,8 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
     }
 
     func testLinkFactory() {
-        
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(from: self,
-                                                                                    profile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
+
+        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
         XCTAssert(referenceLink.count == 1)
         
         if referenceLink[ReferenceDriver.LinkId.genericLink] == nil {
@@ -57,9 +56,6 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
         }
         
         XCTAssert (link.profile.ipAddress == "192.168.1.40")
-        
-        referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(from: self,
-                                                                                profile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.42",  needsEvent: true, app2appURL: "", certInfo: nil))]
     }
     
     
@@ -67,8 +63,7 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
         
         testId = "pingPong"
         
-        let referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(from: self,
-                                                                                    profile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
+        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
         
         if referenceLink[ReferenceDriver.LinkId.genericLink] == nil {
             XCTAssert(false)
@@ -88,8 +83,7 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
     func testStatus () {
         
         let mockSocketProvider = SocketProvider(certificateInfo: nil)
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(from: self,
-                                                                                    profile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
+        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
 
         browserLink = referenceLink[ReferenceDriver.LinkId.genericLink]
 
@@ -113,8 +107,7 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
     
     func testDisconnect () {
         
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(from: self,
-                                                                                    profile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
+        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
         
         browserLink = referenceLink[ReferenceDriver.LinkId.genericLink]
 
@@ -151,7 +144,7 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
     }
     
     func testSequenceID() {
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(from: self, profile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
+        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
    
         browserLink = referenceLink[ReferenceDriver.LinkId.genericLink]
         
@@ -164,19 +157,16 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
     
     
     // MARK: - Link protocol
-    func onEvent (payload: Event) {
-        
+    func didReceive(event: Event) {
         switch testId {
-            case "eventOK":
+        case "eventOK":
             XCTAssert(true)
         default :
             XCTAssert (false)
         }
-        
     }
     
-    func onLinkConnected (from identifier: Int8) {
-        
+    func didConnect(linkWithIdentifier identifier: Int8) {
         guard let link = browserLink else {
             XCTAssert(false)
             return
@@ -192,7 +182,7 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
         }
     }
     
-    func onLinkDisconnected(from identifier: Int8) {
+    func didDisconnect(linkWithIdentifier identifier: Int8) {
         guard let link = browserLink else {
             XCTAssert(false)
             return
@@ -214,8 +204,9 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
             XCTAssert(false)
         }
     }
-    
-    func onLinkFailure(from identifier: Int8) {
+
+    func didFail(linkWithIdentifier identifier: Int8) {
+        
     }
     
 }

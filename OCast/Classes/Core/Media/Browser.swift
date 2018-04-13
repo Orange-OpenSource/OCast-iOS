@@ -60,7 +60,7 @@ final class Browser: NSObject, DriverReceiverDelegate {
     }
 
     // MARK: - DriverDelegate methods
-    func onData(with data: [String: Any]) {
+    func didReceive( data: [String: Any]) {
         guard
             let dataForStream = DataMapper().browserData(with: data).data,
             let service = DataMapper().browserData(with: data)  .service else {

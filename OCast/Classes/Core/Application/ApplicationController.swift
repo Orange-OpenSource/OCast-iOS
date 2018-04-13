@@ -85,7 +85,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
          - onError: the closure to be called in case of error
      */
     public func start(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        manageStream(for: self)
+        manage(stream: self)
         if driver?.state(for: .application) != .connected {
             driver?.connect(for: .application, with: applicationData,
                             onSuccess: {
@@ -131,7 +131,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
 
         if mediaController == nil {
             mediaController = MediaController(with: delegate)
-            manageStream(for: mediaController!)
+            manage(stream: mediaController!)
         }
 
         return mediaController!
@@ -151,7 +151,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         - Parameter stream: custom stream to be managed
      */
 
-    public func manageStream(for stream: DataStream) {
+    public func manage(stream: DataStream) {
         OCastLog.debug("ApplicationMgr: manage Stream for \(stream.serviceId)")
         if browser == nil {
             browser = Browser()

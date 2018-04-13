@@ -29,7 +29,7 @@ import CocoaAsyncSocket
          - deviceDiscovery: module (delegate) registered for notifications
          - device: added device information . See `Device` for details.
      */
-    func onDeviceAdded(from deviceDiscovery: DeviceDiscovery, forDevice device: Device)
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device)
 
     /**
      Gets called when a device is lost.
@@ -37,7 +37,7 @@ import CocoaAsyncSocket
          - deviceDiscovery: module (delegate) registered for notifications
          - device: lost device information . See `Device` for details.
      */
-    func onDeviceRemoved(from deviceDiscovery: DeviceDiscovery, forDevice device: Device)
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device)
 }
 
 /**
@@ -109,7 +109,7 @@ import CocoaAsyncSocket
     private var currentDevices = [String: Device]()
     private var currentDevicesIdx = [String: Int]()
     
-    var isRunning: Bool
+    public private(set) var isRunning: Bool 
     
     /// List of current active devices
     public var devices: [Device] {
@@ -213,16 +213,6 @@ import CocoaAsyncSocket
         isRunning = false
     }
 
-    /**
-     - Returns:
-         - true if the discovery process is started.
-         - false if the discovery process is not started.
-     */
-
-    @objc public func isStarted() -> Bool {
-        return isRunning
-    }
-
     // MARK: - UDP management
 
     /// :nodoc:
@@ -292,7 +282,7 @@ import CocoaAsyncSocket
                     currentDevices.removeValue(forKey: deviceId)
                     currentDevicesIdx.removeValue(forKey: deviceId)
                     
-                    delegate?.onDeviceRemoved(from: self, forDevice: cachedDevice)
+                    delegate?.deviceDiscovery(self, didRemoveDevice: cachedDevice)
                 }
             }
         }
@@ -380,7 +370,7 @@ import CocoaAsyncSocket
                 self.currentDevices[device.deviceID] = device
                 self.currentDevicesIdx[device.deviceID] = self.mSearchIdx
 
-                self.delegate?.onDeviceAdded(from: self, forDevice: device)
+                self.delegate?.deviceDiscovery(self, didAddDevice: device)
             } else {
                 self.currentDevicesIdx[deviceID] = self.mSearchIdx
             }

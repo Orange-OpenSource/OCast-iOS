@@ -18,8 +18,8 @@
 import Foundation
 
 class ReferenceLinkFactory : LinkFactory {
-    static func make(from sender: LinkDelegate, linkProfile: LinkProfile) -> Link {
-        return ReferenceLink(from: sender, profile: linkProfile)
+    static func make(withDelegate delegate: LinkDelegate, andProfile profile: LinkProfile) -> Link {
+        return ReferenceLink(withDelegate: delegate, andProfile: profile)
     }
 }
 
@@ -67,8 +67,8 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     var errorCallbacks: [Int: (NSError?) -> Void] = [:]
 
     // MARK: Driver methods
-    init(from sender: LinkDelegate?, profile: LinkProfile) {
-        delegate = sender
+    init(withDelegate delegate: LinkDelegate?, andProfile profile: LinkProfile) {
+        self.delegate = delegate
         self.profile = profile
     }
 
@@ -100,8 +100,8 @@ final class ReferenceLink: Link, SocketProviderDelegate {
 
         commandSocket.disconnect()
     }
-
-    func sendPayload(forDomain domain: String, withPayload payload: Command, onSuccess: @escaping (CommandReply) -> Void, onError: @escaping (NSError?) -> Void) {
+    
+    func send(payload: Command, forDomain domain: String, onSuccess: @escaping (CommandReply) -> Void, onError: @escaping (NSError?) -> Void) {
 
         guard let commandSocket = commandSocket else {
             let error = NSError(domain: ErrorDomain, code: DriverError.commandWSNil.rawValue, userInfo: [ErrorDomain: "Payload could not be sent."])
@@ -130,7 +130,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
 
         if commandSocket == socket {
             OCastLog.debug("WS: Command is disconnected with code (\(code)), \(reason)")
-            isDisconnecting ? delegate?.onLinkDisconnected(from: profile.identifier) : delegate?.onLinkFailure(from: profile.identifier)
+            isDisconnecting ? delegate?.didDisconnect(linkWithIdentifier: profile.identifier) : delegate?.didFail(linkWithIdentifier: profile.identifier)
         } else {
             OCastLog.debug("WS: Unknown socket. Ignoring the disconnection indication.")
         }
@@ -139,7 +139,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     func onConnected(from socket: SocketProvider) {
         if commandSocket == socket {
             OCastLog.debug("WS: Command is connected.")
-            delegate?.onLinkConnected(from: profile.identifier)
+            delegate?.didConnect(linkWithIdentifier: profile.identifier)
         } else {
             OCastLog.debug("WS: Unknown socket. Ignoring the connection indication.")
         }
@@ -180,7 +180,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
                 OCastLog.debug("WS: Ignoring the Command frame. This message Type is not implemented.")
                 
             case .event:
-                delegate?.onEvent(payload: Event(domain: dataLink.source, message: message))
+                delegate?.didReceive(event: Event(domain: dataLink.source, message: message))
                 
             case .reply:
                 let status = dataLink.status ?? ""

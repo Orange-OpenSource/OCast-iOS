@@ -149,9 +149,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     
 }
 
-#pragma mark - Device Discovery protocol
-
-- (void)onDeviceAddedFrom:(DeviceDiscovery * _Nonnull)deviceDiscovery forDevice:(Device * _Nonnull)device {
+#pragma mark - DeviceDiscoveryDelegate methods
+- (void)deviceDiscovery:(DeviceDiscovery *)deviceDiscovery didAddDevice:(Device *)device {
     NSLog(@"->New device found: %@", device.friendlyName);
     devices = deviceDiscovery.devices;
     [_stickPickerView reloadAllComponents];
@@ -161,7 +160,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     }
 }
 
-- (void)onDeviceRemovedFrom:(DeviceDiscovery * _Nonnull)deviceDiscovery forDevice:(Device * _Nonnull)device {
+- (void)deviceDiscovery:(DeviceDiscovery *)deviceDiscovery didRemoveDevice:(Device *)device {
     NSLog(@"->Lost device %@", device.friendlyName);
     devices = deviceDiscovery.devices;
     [_stickPickerView reloadAllComponents];
@@ -193,7 +192,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         [deviceDiscovery stop];
         [self startWebApp];
         
-        [appliCtrl manageStreamFor:self];
+        [appliCtrl manageWithStream:self];
         mediaCtrl = [appliCtrl mediaControllerWith:self];
     };
     

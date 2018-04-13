@@ -130,7 +130,7 @@ extension MainVC {
                                                     
                                                     if self.customStream == nil {
                                                         self.customStream = CustomStream()
-                                                        self.appliMgr?.manageStream(for: self.customStream!)
+                                                        self.appliMgr?.manage(stream: self.customStream!)
                                                     }
                                                     
                                                     if self.mediaController == nil {

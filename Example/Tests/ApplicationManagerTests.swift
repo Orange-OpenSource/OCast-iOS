@@ -48,10 +48,10 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: deviceMgr?.driver(for: device))
         
         let stream = DefaultDataStream (forService: "serviceExample")
-        appliMgr.manageStream(for: stream)
+        appliMgr.manage(stream: stream)
         
         let stream2 = DefaultDataStream (forService: "serviceExample-2")
-        appliMgr.manageStream(for: stream2)
+        appliMgr.manage(stream: stream2)
         
         // Multiple streams can be created.
         XCTAssert(stream !== stream2)

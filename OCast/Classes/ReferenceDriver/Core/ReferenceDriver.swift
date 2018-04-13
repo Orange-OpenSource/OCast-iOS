@@ -113,9 +113,8 @@ import Foundation
 
             if links.count == 0 {
                 let linkProfile = LinkProfile(identifier: LinkId.genericLink.rawValue, ipAddress: ipAddress, needsEvent: false, app2appURL: info.app2appURL, certInfo: certificateInfo)
-                links = [LinkId.genericLink: ReferenceLink(from: self, profile: linkProfile)]
+                links = [LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: linkProfile)]
             }
-
             guard let genericLink = links[LinkId.genericLink] else {
                 OCastLog.error(("Reference Driver: Could not get the link."))
                 let error = NSError(domain: "Reference driver", code: 0, userInfo: ["Reference driver": "Could not get the link."])
@@ -218,7 +217,7 @@ import Foundation
     }
 
     // MARK: - Link Protocol
-    public func onLinkConnected(from identifier: Int8) {
+    public func didConnect(linkWithIdentifier identifier: Int8) {
 
         guard let id = LinkId(rawValue: identifier) else {
             return
@@ -233,7 +232,7 @@ import Foundation
         successConnect.removeValue(forKey: .application)
     }
 
-    public func onLinkDisconnected(from identifier: Int8) {
+    public func didDisconnect(linkWithIdentifier identifier: Int8) {
 
         guard let id = LinkId(rawValue: identifier) else {
             return
@@ -248,7 +247,7 @@ import Foundation
         successDisconnect.removeValue(forKey: .application)
     }
 
-    public func onLinkFailure(from identifier: Int8) {
+    public func didFail(linkWithIdentifier identifier: Int8) {
         OCastLog.debug(("Reference Driver: Unexpected link disconnection."))
 
         guard let _ = LinkId(rawValue: identifier) else {
@@ -262,15 +261,15 @@ import Foundation
 
         if identifier == LinkId.genericLink.rawValue {
             linksState[LinkId.genericLink] = .disconnected
-            delegates[.application]?.onFailure(error: newError)
-            delegates[.publicSettings]?.onFailure(error: newError)
+            delegates[.application]?.didFail(withError: newError)
+            delegates[.publicSettings]?.didFail(withError: newError)
         }
 
     }
 
-    public func onEvent(payload: Event) {
-        if payload.domain == "browser" {
-            delegate?.onData(with: payload.message)
+    public func didReceive(event: Event) {
+        if event.domain == "browser" {
+            delegate?.didReceive(data: event.message)
         }
     }
     
@@ -286,14 +285,14 @@ import Foundation
         
         let payload = Command(params: data)
         
-        link.sendPayload(
+        link.send(
+            payload: payload,
             forDomain: ReferenceDomainName.browser.rawValue,
-            withPayload: payload,
             onSuccess: {
                 cmdResponse in
                     OCastLog.debug("Reference Driver: Payload sent.")
                     onSuccess(cmdResponse.reply)
-                },
+            },
             onError: {
                 error in
                     if let error = error {

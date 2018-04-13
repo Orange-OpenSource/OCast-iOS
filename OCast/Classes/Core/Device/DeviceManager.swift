@@ -19,7 +19,7 @@
 import Foundation
 
 @objc public protocol DeviceManagerDelegate {
-    func onFailure(error: NSError)
+    func deviceDidDisconnect(withError error: NSError)
 }
 
 /**
@@ -294,8 +294,8 @@ import Foundation
     }
 
     // MARK: DriverDelegate methods
-    public func onFailure(error: NSError?) {
-        OCastLog.debug("DeviceMgr: Received a Driver failure indication (\(error.debugDescription)).")
+    public func didFail(withError: NSError?) {
+        OCastLog.debug("DeviceMgr: Received a Driver failure indication (\(withError.debugDescription)).")
         reconnectAllSessions()
     }
 
@@ -312,7 +312,7 @@ import Foundation
             resetAllContexts()
 
             let newError = NSError(domain: "DeviceManager", code: 0, userInfo: ["Error": "Driver is disconnected."])
-            delegate?.onFailure(error: newError)
+            delegate?.deviceDidDisconnect(withError: newError)
 
             return
         }

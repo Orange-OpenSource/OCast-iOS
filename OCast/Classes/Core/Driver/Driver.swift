@@ -102,12 +102,12 @@ extension DriverPrivateSettings {
 }
 
 @objc public protocol DriverDelegate {
-    func onFailure(error: NSError?)
+    func didFail(withError error: NSError?)
 }
 
 /// :nodoc:
 @objc public protocol DriverReceiverDelegate {
-    func onData(with data: [String: Any])
+    func didReceive(data: [String: Any])
 }
 
 /// :nodoc:
