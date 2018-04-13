@@ -41,15 +41,4 @@ struct ReferenceDataMapper {
         return nil
     }
 
-    // MARK: - Private functions
-    private func statusInfo(with data: Any?) -> StatusInfo? {
-
-        guard let message = data as? [String: Any] else {
-            return nil
-        }
-
-        return StatusInfo(version: message["version"] as? String,
-                          state: message["state"] as? String,
-                          progress: message["progress"] as? Int ?? 0)
-    }
 }

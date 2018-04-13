@@ -68,11 +68,10 @@ struct DataMapper {
         let duration = data.params["duration"] as? Double ?? 0.0
         let mute = data.params["mute"] as? Bool ?? true
         let position = data.params["position"] as? Double ?? 0.0
-        let state = data.params["state"] as? String ?? "idle"
+        let state = data.params["state"] as? Int ?? 0
         let volume = data.params["volume"] as? Double ?? 0
-        let stateEnum = PlayerState(state: state)
 
-        return PlaybackStatus(duration: duration, mute: mute, position: position, state: stateEnum, volume: volume)
+        return PlaybackStatus(duration: duration, mute: mute, position: position, state: PlayerState(rawValue: state)!, volume: volume)
     }
 
     func tracks(with data: Any?) -> [TrackDescription]? {

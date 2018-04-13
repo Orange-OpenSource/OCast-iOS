@@ -42,15 +42,12 @@ extension MainVC {
         durationLabel.text = String (data.duration.format(f: ".1"))
         positionLabel.text = String (data.position.format(f: ".1"))
         
-        let state = data.state
-        
-        switch state {
-        case .buffering:  playerStateLabel.text = "buffering"
-        case .cancelled:  playerStateLabel.text = "cancelled"
-        case .idle:       playerStateLabel.text = "idle"
-        case .paused:     playerStateLabel.text = "paused"
-        case .playing:    playerStateLabel.text = "playing"
-        case .stopped:    playerStateLabel.text = "stopped"
+        switch data.state {
+        case .buffering:    playerStateLabel.text = "buffering"
+        case .idle: playerStateLabel.text = "idle"
+        case .paused:   playerStateLabel.text = "paused"
+        case .playing:  playerStateLabel.text = "playing"
+        case .unknown:  playerStateLabel.text = "unknown"
         }
         
         volumeLabel.text = String (data.volume.format(f: ".1"))

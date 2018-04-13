@@ -345,14 +345,11 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
             case PlayerStatePlaying:
                 _playerState.text = @"playing";
                 break;
-            case PlayerStateStopped:
-                _playerState.text = @"stopped";
-                break;
             case PlayerStateBuffering:
                 _playerState.text = @"buffering";
                 break;
-            case PlayerStateCancelled:
-                _playerState.text = @"cancelled";
+            case PlayerStateUnknown:
+                _playerState.text = @"unknown";
                 break;
             default:
                 break;

@@ -63,31 +63,6 @@ extension TransferMode {
     }
 }
 
-extension PlayerState {
-    func toString() -> String {
-        switch self {
-        case .playing: return "playing"
-        case .buffering: return "buffering"
-        case .idle: return "idle"
-        case .paused: return "paused"
-        case .stopped: return "stopped"
-        case .cancelled: return "cancelled"
-        }
-    }
-    
-    init(state: String) {
-        switch state {
-        case "playing": self = .playing
-        case "buffering": self = .buffering
-        case "idle": self = .idle
-        case "paused": self = .paused
-        case "stopped": self = .stopped
-        case "cancelled": self = .cancelled
-        default: self = .idle
-        }
-    }
-}
-
 extension MediaErrorCode {
     func toString() -> String {
         switch self {

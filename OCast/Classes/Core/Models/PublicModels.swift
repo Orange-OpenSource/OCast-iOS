@@ -227,12 +227,11 @@ import Foundation
  */
 
 @objc public enum PlayerState: Int {
-    case playing = 1
-    case buffering
-    case idle
-    case paused
-    case stopped
-    case cancelled
+    case unknown = 0
+    case idle = 1
+    case playing = 2
+    case paused = 3
+    case buffering = 4
 }
 
 /// Describes the status of the current media.
