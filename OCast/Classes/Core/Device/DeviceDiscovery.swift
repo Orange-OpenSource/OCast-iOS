@@ -48,7 +48,7 @@ import CocoaAsyncSocket
  ```
  */
 @objcMembers
-@objc public class DeviceDiscovery: NSObject, GCDAsyncUdpSocketDelegate, XMLHelperDelegate, HttpProtocol {
+@objc public class DeviceDiscovery: NSObject, GCDAsyncUdpSocketDelegate, HttpProtocol {
 
     // MARK: - Initialization
 
@@ -318,68 +318,47 @@ import CocoaAsyncSocket
 
     // MARK: - Device management
     func createDevice(with xmlData: Data, for applicationURL: String?) {
-
-        guard let applicationURL = applicationURL else {
-            OCastLog.error("Application URL is empty.)")
-            return
-        }
-
-        let parserHelper = XMLHelper(for: applicationURL)
-        parserHelper.delegate = self
-
-        let key1 = XMLHelper.KeyDefinition(name: "friendlyName", isMandatory: true)
-        let key2 = XMLHelper.KeyDefinition(name: "manufacturer", isMandatory: true)
-        let key3 = XMLHelper.KeyDefinition(name: "UDN", isMandatory: true)
-        let key4 = XMLHelper.KeyDefinition(name: "modelName", isMandatory: false)
-
-        parserHelper.parseDocument(data: xmlData, withKeyList: [key1, key2, key3, key4])
-    }
-
-    // MARK: - XML management
-
-    func didEndParsing(for application: String, result: [String: String], attributes _: [String: [String: String]]) {
-
-        DispatchQueue.main.async {
-
-            let deviceID = result["UDN"]!
-            let friendlyName = result["friendlyName"]!
-            let manufacturer = result["manufacturer"]!
-            let modelName = result["modelName"]
-
-            let duplicateDevices = self.currentDevices.filter { (deviceIDFromList, _) -> Bool in
-                return deviceID == deviceIDFromList
-            }
-
-            if duplicateDevices.isEmpty {
-
-                guard let baseURL = URL(string: application),
-                    let ipAddress = baseURL.host,
-                    let ipPort = baseURL.port else {
-                    OCastLog.error("URL for Application-(DIAL)URL is invalid (\(application)")
-                    return
+        let parserHelper = XMLHelper()
+        parserHelper.completionHandler = {
+            (error, keys, keysAttributes) in
+            if error == nil {
+                guard
+                    let deviceID = keys?["UDN"],
+                    let friendlyName = keys?["friendlyName"],
+                    let manufacturer = keys?["manufacturer"] else {
+                        OCastLog.error("Missing attribute for device : \(keys ?? [:]).")
+                        return
                 }
-
-                let device = Device(baseURL: baseURL,
-                                    ipAddress: ipAddress,
-                                    servicePort: UInt16(ipPort),
-                                    deviceID: deviceID,
-                                    friendlyName: friendlyName,
-                                    manufacturer: manufacturer,
-                                    modelName: modelName ?? "")
-
-                self.currentDevices[device.deviceID] = device
-                self.currentDevicesIdx[device.deviceID] = self.mSearchIdx
-
-                self.delegate?.deviceDiscovery(self, didAddDevice: device)
-            } else {
+                let modelName = keys?["modelName"] ?? ""
+                
+                if !self.currentDevices.contains(where: { (id, _) -> Bool in
+                    return id == deviceID
+                }) {
+                    guard let url = applicationURL,
+                        let baseURL = URL(string: url),
+                        let ipAddress = baseURL.host,
+                        let ipPort = baseURL.port else {
+                            OCastLog.error("URL for Application-(DIAL)URL is invalid (\(applicationURL ?? "")")
+                            return
+                    }
+                    
+                    let device = Device(baseURL: baseURL,
+                                        ipAddress: ipAddress,
+                                        servicePort: UInt16(ipPort),
+                                        deviceID: deviceID,
+                                        friendlyName: friendlyName,
+                                        manufacturer: manufacturer,
+                                        modelName: modelName)
+                    
+                    self.currentDevices[device.deviceID] = device
+                    self.delegate?.deviceDiscovery(self, didAddDevice: device)
+                }
                 self.currentDevicesIdx[deviceID] = self.mSearchIdx
+            } else {
+                OCastLog.error("Error while parsing XML.")
             }
-            OCastLog.debug("\(self.currentDevices.count) device(s) detected, last \(friendlyName)")
         }
-    }
-
-    func didParseWithError(for _: String, with error: Error, diagnostic: [String]) {
-        OCastLog.error("DeviceDiscovery: Parsing failed with error = \(error). Diagnostic: \(diagnostic)")
+        parserHelper.parseDocument(data: xmlData)
     }
 
     // MARK: - Private Helpers

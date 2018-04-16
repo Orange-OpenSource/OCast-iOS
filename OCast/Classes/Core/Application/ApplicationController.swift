@@ -60,8 +60,8 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     }
     
     // XML Parser
-    private let xmlParser = XMLHelper(for: "")
-    private let keyList =  [XMLHelper.KeyDefinition(name: "state", isMandatory: true), XMLHelper.KeyDefinition(name: "name", isMandatory: true)]
+    private let xmlParser = XMLHelper()
+    //private let keyList =  [XMLHelper.KeyDefinition(name: "state", isMandatory: true), XMLHelper.KeyDefinition(name: "name", isMandatory: true)]
     
     // Timer
     private var semaphore: DispatchSemaphore?
@@ -211,8 +211,23 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     
     
     private func stopApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        // TODO: recuperer le runLink
-        initiateHttpRequest(from: self, with: .delete, to: "\(target)/run", onSuccess: { (_, _) in
+        
+        // Retrieve runLink to stop application
+        var runLink:String!
+        if let link = applicationData.runLink,
+            let url = URL(string: link),
+            UIApplication.shared.canOpenURL(url) {
+                runLink = url.absoluteString
+        }
+        else if let link = applicationData.runLink,
+                let url = URL(string: "\(target)/\(link)"),
+                UIApplication.shared.canOpenURL(url) {
+            runLink = url.absoluteString
+        } else {
+            runLink = "\(target)/run"
+        }
+
+        initiateHttpRequest(from: self, with: .delete, to: runLink, onSuccess: { (_, _) in
             self.applicationStatus(onSuccess: {
                 if self.currentState == .stopped {
                     onSuccess()
@@ -246,11 +261,11 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
                     self.currentState = State(rawValue: state)!
                     onSuccess()
                 } else {
-                    let newError = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Parsing error for \(self.target)\n Error: \(error?.error.debugDescription ?? ""). Diagnostic: \(error?.diagnostic ?? [])"])
+                    let newError = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Parsing error for \(self.target)\n Error: \(error?.localizedDescription ?? "")."])
                     onError(newError)
                 }
             }
-            self.xmlParser.parseDocument(data: data, withKeyList: self.keyList)
+            self.xmlParser.parseDocument(data: data)
         }) { (error) in
             onError(error)
         }

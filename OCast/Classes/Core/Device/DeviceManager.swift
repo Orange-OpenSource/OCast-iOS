@@ -30,14 +30,14 @@ import Foundation
 
  */
 @objcMembers
-@objc public final class DeviceManager: NSObject, DriverDelegate, HttpProtocol, XMLHelperDelegate {
+@objc public final class DeviceManager: NSObject, DriverDelegate, HttpProtocol {
     
     // MARK: - Internal
     public weak var delegate:DeviceManagerDelegate?
     // app info
     private var currentTarget: String!
-    private var currentApplicationData: ApplicationDescription!
-    private var currentApplicationName: String!
+    private var currentApplicationDescription: ApplicationDescription!
+    private var currentApplicationName: String?
     // application controllers
     private var applicationControllers: [ApplicationController] = []
     // callback
@@ -75,6 +75,7 @@ import Foundation
         }
         self.device = device
         self.certificateInfo = certificateInfo
+        self.currentApplicationDescription = ApplicationDescription(app2appURL: "", version: "", rel: nil, href: nil, name: "")
         super.init()
         driver = driver(for: device)
 
@@ -104,9 +105,7 @@ import Foundation
 
         driver.register(self, forModule: .publicSettings)
 
-        currentApplicationData = ApplicationDescription(app2appURL: "", version: "", rel: nil, href: nil, name: "")
-
-        driver.connect(for: .publicSettings, with: currentApplicationData,
+        driver.connect(for: .publicSettings, with: currentApplicationDescription,
                        onSuccess: {
                             self.publicSettings = driver as? DriverPublicSettings
                             if let publicSettingsCtrl = self.publicSettings {
@@ -161,9 +160,7 @@ import Foundation
             return
         }
 
-        currentApplicationData = ApplicationDescription(app2appURL: "", version: "", rel: nil, href: nil, name: "")
-
-        driver.connect(for: .privateSettings, with: currentApplicationData,
+        driver.connect(for: .privateSettings, with: currentApplicationDescription,
                        onSuccess: {
                            self.privateSettings = driver as? DriverPrivateSettings
                             if let privateSettingsCtrl = self.privateSettings {
@@ -209,7 +206,7 @@ import Foundation
         
         applicationData(
             onSuccess: {
-                let newController = ApplicationController(for: self.device, with: self.currentApplicationData, andDriver: self.driver)
+                let newController = ApplicationController(for: self.device, with: self.currentApplicationDescription, andDriver: self.driver)
                 self.driver?.register(self, forModule: .application)
                 self.applicationControllers.append(newController)
                 onSuccess(newController)
@@ -229,7 +226,6 @@ import Foundation
         driverFactories[name] = factory
         return true
     }
-    /*--------------------------------------------------------------------------------------------------------------------------------------*/
 
     // MARK: - Private methods
     private func driver(for device: Device) -> Driver? {
@@ -255,42 +251,31 @@ import Foundation
         initiateHttpRequest(from: self, with: .get, to: currentTarget, onSuccess: didReceiveHttpResponse(response:with:), onError: onError)
     }
 
-    // MARK: - HTTP Request protocol and related methods
-    func didReceiveHttpResponse(response _: HTTPURLResponse, with data: Data?) {
+    private func didReceiveHttpResponse(response _: HTTPURLResponse, with data: Data?) {
 
         guard let data = data else {
             OCastLog.error("ApplicationMgr: No content to parse.")
             return
         }
 
-        let parserHelper = XMLHelper(for: currentTarget)
-        parserHelper.delegate = self
+        let parserHelper = XMLHelper()
+        parserHelper.completionHandler = {
+            (error, keys, keysAttributes) in
+            if error == nil {
+                let app2URL = keys?["ocast:X_OCAST_App2AppURL"]?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+                let newURL = app2URL?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+                let version = keys?["ocast:X_OCAST_Version"]?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+                let linkAttributes = keysAttributes?["link"]
+                let rel = linkAttributes?["rel"]
+                let href = linkAttributes?["href"]
+                self.currentApplicationDescription = ApplicationDescription(app2appURL: newURL ?? "", version: version ?? "", rel: rel, href: href, name: self.currentApplicationName ?? "")
+                self.successCallback()
+            } else {
+                self.errorCallback(error as NSError?)
+            }
+        }
 
-        let key1 = XMLHelper.KeyDefinition(name: "ocast:X_OCAST_App2AppURL", isMandatory: true)
-        let key2 = XMLHelper.KeyDefinition(name: "ocast:X_OCAST_Version", isMandatory: true)
-        let key3 = XMLHelper.KeyDefinition(name: "link", isMandatory: false)
-
-        parserHelper.parseDocument(data: data, withKeyList: [key1, key2, key3])
-    }
-
-    // MARK: - XML Protocol
-    func didParseWithError(for _: String, with error: Error, diagnostic: [String]) {
-        OCastLog.error("DeviceMgr: Parsing failed with error = \(error). Diagnostic: \(diagnostic)")
-        currentApplicationData = ApplicationDescription(app2appURL: "", version: "", rel: nil, href: nil, name: "")
-        errorCallback(error as NSError)
-    }
-
-    func didEndParsing(for _: String, result: [String: String], attributes: [String: [String: String]]) {
-        let app2URL = result["ocast:X_OCAST_App2AppURL"]!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        let version = result["ocast:X_OCAST_Version"]!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        let linkAttributes = attributes["link"]
-        let rel = linkAttributes?["rel"]
-        let href = linkAttributes?["href"]
-        
-        let newURL = app2URL.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        
-        currentApplicationData = ApplicationDescription(app2appURL: newURL, version: version, rel: rel, href: href, name: currentApplicationName)
-        successCallback()
+        parserHelper.parseDocument(data: data)
     }
 
     // MARK: DriverDelegate methods
@@ -301,7 +286,6 @@ import Foundation
 
 
    // MARK: Miscellaneous
-    
     @objc func onFailureTimerExpiry(timer _: Timer) {
         OCastLog.debug("DeviceMgr: onFailureTimerExpiry")
 
@@ -337,15 +321,15 @@ import Foundation
             failureTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(onFailureTimerExpiry), userInfo: nil, repeats: false)
 
             if !applicationControllers.isEmpty {
-                driver?.connect(for: .application, with: currentApplicationData, onSuccess: {  self.resetFailureTimer() }, onError: { _ in })
+                driver?.connect(for: .application, with: currentApplicationDescription, onSuccess: {  self.resetFailureTimer() }, onError: { _ in })
             }
 
             if publicSettings != nil {
-                driver?.connect(for: .publicSettings, with: currentApplicationData, onSuccess: {  self.resetFailureTimer() }, onError: { _ in })
+                driver?.connect(for: .publicSettings, with: currentApplicationDescription, onSuccess: {  self.resetFailureTimer() }, onError: { _ in })
             }
 
             if privateSettings != nil {
-                driver?.connect(for: .privateSettings, with: currentApplicationData, onSuccess: {  self.resetFailureTimer() }, onError: { _ in })
+                driver?.connect(for: .privateSettings, with: currentApplicationDescription, onSuccess: {  self.resetFailureTimer() }, onError: { _ in })
             }
         }
     }

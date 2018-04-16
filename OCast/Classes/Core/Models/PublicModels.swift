@@ -90,14 +90,14 @@ import Foundation
     public let app2appURL: String
     public let version: String
     public let rel: String?
-    public let href: String?
+    public let runLink: String?
     public let name: String
 
     public init(app2appURL: String, version: String, rel: String?, href: String?, name: String) {
         self.app2appURL = app2appURL
         self.version = version
         self.rel = rel
-        self.href = href
+        self.runLink = href
         self.name = name
     }
 }

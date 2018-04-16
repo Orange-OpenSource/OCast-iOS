@@ -16,38 +16,16 @@
 //
 import Foundation
 
-protocol XMLHelperDelegate {
-    func didEndParsing(for application: String, result: [String: String], attributes: [String: [String: String]])
-    func didParseWithError(for application: String, with error: Error, diagnostic: [String])
-}
-
 final class XMLHelper: NSObject, XMLParserDelegate {
 
-    var completionHandler:((_ error: (error: Error?, diagnostic: [String]?)?, _ result: [String: String]?, _ attributes:[String: [String: String]]?) -> Void)?
+    public var completionHandler:((_ error: Error?, _ keys: [String: String]?, _ keysAttributes:[String: [String: String]]?) -> Void)?
+
+    private var collectedCharacters = ""
+    private var keyResult: [String: String] = [:]
+    private var keyAttributes: [String: [String: String]] = [:]
     
-    // TODO: kick the delegate to use completionHandler
-    var delegate: XMLHelperDelegate?
-    var application: String
-    var collectedCharacters = ""
-
-    internal struct KeyDefinition {
-        let name: String
-        let isMandatory: Bool
-    }
-
-    var keyList: [KeyDefinition] = []
-
-    var keyResult: [String: String] = [:]
-    var keyAttributes: [String: [String: String]] = [:]
-
-    init(for application: String) {
-        self.application = application
-    }
-    
-    // MARK: - XML Helper interface
-
-    func parseDocument(data: Data, withKeyList keyList: [KeyDefinition]) {
-        self.keyList = keyList
+    // MARK: - public methods
+    func parseDocument(data: Data) {
         self.keyResult = [:]
         self.keyAttributes = [:]
         collectedCharacters = ""
@@ -56,36 +34,21 @@ final class XMLHelper: NSObject, XMLParserDelegate {
         parser.parse()
     }
 
-    // MARK: - Parser protocol
-
+    // MARK: - XMLParserDelegate methods
     func parser(_: XMLParser, parseErrorOccurred parseError: Error) {
-        delegate?.didParseWithError(for: application, with: parseError, diagnostic: [])
-        completionHandler?((parseError, []), nil, nil)
+        completionHandler?(parseError, nil, nil)
     }
 
     func parser(_: XMLParser, didEndElement elementName: String, namespaceURI _: String?, qualifiedName _: String?) {
 
-        let keyElement = keyList.filter { keyDefinition -> Bool in
-            return keyDefinition.name == elementName
-        }
-
-        if let keyName = keyElement.first?.name {
-            keyResult[keyName] = collectedCharacters
-        }
-
+        keyResult[elementName] = collectedCharacters
         collectedCharacters = ""
     }
 
     func parser(_: XMLParser, didStartElement elementName: String, namespaceURI _: String?, qualifiedName _: String?, attributes attributeDict: [String: String] = [:]) {
 
-        let keyElement = keyList.filter { keyDefinition -> Bool in
-            return keyDefinition.name == elementName
-        }
-
-        if keyElement.first?.name != nil {
-            keyAttributes[elementName] = attributeDict
-            collectedCharacters = ""
-        }
+        keyAttributes[elementName] = attributeDict
+        collectedCharacters = ""
     }
 
     func parser(_: XMLParser, foundCharacters string: String) {
@@ -93,36 +56,7 @@ final class XMLHelper: NSObject, XMLParserDelegate {
     }
 
     func parserDidEndDocument(_: XMLParser) {
-
-        let result = checkParsing()
-
-        if result.isOK {
-            delegate?.didEndParsing(for: application, result: keyResult, attributes: keyAttributes)
-            completionHandler?(nil, keyResult, keyAttributes)
-
-        } else {            let error = NSError(domain: "OCastXMLErrorDomain", code: 1, userInfo: ["Fatal error": "Missing required parameter(s)"])
-            delegate?.didParseWithError(for: application, with: error, diagnostic: result.missingKeys)
-            completionHandler?((error, result.missingKeys), nil, nil)
-        }
+        completionHandler?(nil, keyResult, keyAttributes)
     }
 
-    /*--------------------------------------------------------------------------------------------------------------------------------------*/
-
-    // MARK: - Private functions
-    private func checkParsing() -> (isOK: Bool, missingKeys: [String]) {
-
-        let result = keyList.filter { element -> Bool in
-            return element.isMandatory && (keyResult[element.name] == nil)
-        }
-
-        if result.count == 0 {
-            return (true, [])
-        }
-
-        let missingKeys = result.map { element -> String in
-            return element.name
-        }
-
-        return (false, missingKeys)
-    }
 }

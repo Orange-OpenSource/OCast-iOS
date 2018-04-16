@@ -24,7 +24,7 @@ class DummyDiscovery : DeviceDiscoveryDelegate {
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {}
 }
 
-class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate, XMLHelperDelegate {
+class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate {
     
     let searchTarget01 = "urn:vucast-manufacturer-01-org:service:vucast:1"
     let searchTarget02 = "urn:vucast-manufacturer-02-org:service:vucast:1"
