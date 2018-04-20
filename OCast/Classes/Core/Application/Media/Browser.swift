@@ -20,10 +20,10 @@ import Foundation
 
 @objc public protocol BrowserDelegate {
     func send(data: [String: Any], onSuccess: @escaping (Any?) -> Void, onError: @escaping (NSError?) -> Void)
-    func register(for delegate: DriverReceiverDelegate)
+    func register(for delegate: EventDelegate)
 }
 
-final class Browser: NSObject, DriverReceiverDelegate {
+final class Browser: NSObject, EventDelegate {
     
     var streams: [String: DataStream] = [:]
     
@@ -33,11 +33,11 @@ final class Browser: NSObject, DriverReceiverDelegate {
         }
     }
 
-    func registerStream(for stream: DataStream) {
+    func register(stream: DataStream) {
         streams[stream.serviceId] = stream
     }
 
-    func sendData(data: [String: Any], for service: String, onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
+    func send(data: [String: Any], for service: String, onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
 
         let streamData: [String: Any] = [
             "service": service,
@@ -59,16 +59,16 @@ final class Browser: NSObject, DriverReceiverDelegate {
         )
     }
 
-    // MARK: - DriverDelegate methods
-    func didReceive( data: [String: Any]) {
+    // MARK: - BrowserEventDelegate methods
+    func didReceiveEvent(withMessage message: [String: Any]) {
         guard
-            let dataForStream = DataMapper().browserData(with: data).data,
-            let service = DataMapper().browserData(with: data)  .service else {
-            OCastLog.error("Browser: Data is not well formatted \n(\(data)).")
+            let service = message["service"] as? String,
+            let data = message["data"] as? [String: Any] else {
+                OCastLog.error("Browser: Data is not well formatted:(\(message)).")
             return
         }
 
         OCastLog.debug("Stream: Got data from Browser for service \(service).")
-        streams[service]?.onMessage(data: dataForStream)
+        streams[service]?.onMessage(data: data)
     }
 }

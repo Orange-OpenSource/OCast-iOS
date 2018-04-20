@@ -21,6 +21,10 @@ import OCast
 
 class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate, DeviceManagerDelegate, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
+    func deviceDidDisconnect(module: DriverModule, withError error: NSError?) {
+        
+    }
+    
     @IBOutlet var webAppLabel: UITextField!
     @IBOutlet var webAppStatusLabel: UILabel!
     @IBOutlet var positionLabel: UILabel!

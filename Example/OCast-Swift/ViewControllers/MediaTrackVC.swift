@@ -44,7 +44,7 @@ extension MainVC {
         return (currentTrack, nextTrack)
     }
     
-    func updateTracks (from data: MetaDataChanged) {
+    func updateTracks (from data: Metadata) {
         
         if let newTracks = data.audioTracks {
             

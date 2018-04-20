@@ -20,11 +20,17 @@ import Foundation
 
 // Used for Event messages
 @objc public class Event: NSObject {
-    public let domain: String
+    public let source: String
     public var message: [String: Any]
-    public init(domain: String, message: [String: Any]) {
-        self.domain = domain
+    public init(source: String, message: [String: Any]) {
+        self.source = source
         self.message = message
+    }
+    
+    public override var description: String {
+        get {
+            return "Event with source: \(source) / message: \(message)"
+        }
     }
 }
 
@@ -35,22 +41,34 @@ import Foundation
         self.command = command
         self.params = params
     }
+    
+    public override var description: String {
+        get {
+            return "Command: \(command) / Reply: \(params)"
+        }
+    }
 }
 
 @objc public class CommandReply: NSObject {
-    public let command: String
+    public let command: String?
     public var reply: Any?
-    public init(command: String = "", reply: Any?) {
+    public init(command: String? = "", reply: Any?) {
         self.command = command
         self.reply = reply
+    }
+    
+    public override var description: String {
+        get {
+            return "Reply for Command: \(command ?? "noname") / Reply: \(reply ?? "nil")"
+        }
     }
 }
 
 @objc public protocol LinkDelegate {
     func didReceive(event: Event)
-    func didConnect(linkWithIdentifier identifier: Int8)
-    func didDisconnect(linkWithIdentifier identifier: Int8)
-    func didFail(linkWithIdentifier identifier: Int8)
+    func didConnect(module: DriverModule)
+    func didDisconnect(module: DriverModule)
+    func didFail(module: DriverModule)
 }
 
 @objc public protocol LinkFactory {
@@ -58,15 +76,11 @@ import Foundation
 }
 
 @objc public class LinkProfile: NSObject {
-    public let identifier: Int8
-    public let ipAddress: String
-    public let needsEvent: Bool
+    public let module: DriverModule
     public let app2appURL: String
     public let certInfo: CertificateInfo?
-    public init(identifier: Int8, ipAddress: String, needsEvent: Bool, app2appURL: String, certInfo: CertificateInfo?) {
-        self.identifier = identifier
-        self.ipAddress = ipAddress
-        self.needsEvent = needsEvent
+    public init(module: DriverModule, app2appURL: String, certInfo: CertificateInfo?) {
+        self.module = module
         self.app2appURL = app2appURL
         self.certInfo = certInfo
     }

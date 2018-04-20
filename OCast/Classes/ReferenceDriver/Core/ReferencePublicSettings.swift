@@ -17,15 +17,76 @@
 
 import Foundation
 
-extension ReferenceDriver: DriverPublicSettings {
-
+extension ReferenceDriver: PublicSettings {
+    
     // MARK: - Public settings
-
-    public func getUpdateStatus(onSuccess _: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void) {
-
-        // The public settings are not available in this version.
-
-        let error = NSError(domain: "Reference Driver", code: 0, userInfo: ["Error": "Public Settings are not impelemented in this version."])
-        onError(error)
+    public func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void) {
+        guard let link = links[.publicSettings] else {
+            OCastLog.error("Reference Driver: Could not get the secured link.")
+            // FIXME: create error
+            onError(nil)
+            return
+        }
+        
+        let payload = Command(
+            command: PublicSettingsConstants.COMMAND_STATUS,
+            params: ["service" : PublicSettingsConstants.SERVICE_SETTINGS_DEVICE, "data": ["name": PublicSettingsConstants.COMMAND_STATUS, "params": [:], "options": [:]]])
+        
+        link.send(
+            payload: payload,
+            forDomain: ReferenceDomainName.settings.rawValue,
+            onSuccess: {
+                commandReply in
+                    guard  commandReply.command == PublicSettingsConstants.COMMAND_STATUS,
+                        let statusInfo = DataMapper().statusInfo(for: commandReply.reply) else {
+                            // FIXME: create error
+                            onError(nil)
+                            return
+                    }
+                    onSuccess(statusInfo)
+        }) { (error) in
+            if let error = error {
+                OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[ReferenceDriver.ReferenceDriverErrorDomain]))")
+            }
+            onError (error)
+        }
+    }
+    
+    public func getDeviceID(onSuccess: @escaping (String) -> (), onError: @escaping (NSError?) -> ()) {
+        guard let link = links[.publicSettings] else {
+            OCastLog.error("Reference Driver: Could not get the secured link.")
+            // FIXME: create error
+            onError(nil)
+            return
+        }
+        
+        let payload = Command(
+            command: PublicSettingsConstants.COMMAND_DEVICE_ID,
+            params: ["service" : PublicSettingsConstants.SERVICE_SETTINGS_DEVICE, "data": ["name": PublicSettingsConstants.COMMAND_DEVICE_ID, "params": [:], "options": [:]]])
+        
+        link.send(
+            payload: payload,
+            forDomain: ReferenceDomainName.settings.rawValue,
+            onSuccess: {
+                commandReply in
+                guard
+                    commandReply.command == PublicSettingsConstants.COMMAND_DEVICE_ID,
+                    let response = commandReply.reply as? [String: Any],
+                    let id = response["id"] as? String else {
+                        // FIXME: create error
+                        onError(nil)
+                        return
+                }
+                onSuccess(id)
+        }) { (error) in
+            if let error = error {
+                OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[ReferenceDriver.ReferenceDriverErrorDomain]))")
+            }
+            onError (error)
+        }
+    }
+    
+    public func didReceivePublicSettingsEvent(withMessage message: [String : Any]) {
+        
     }
 }

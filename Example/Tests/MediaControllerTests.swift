@@ -220,5 +220,5 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
     
     // Unused protocol
     func onPlaybackStatus (data: PlaybackStatus) {}
-    func onMetaDataChanged (data: MetaDataChanged) {}
+    func onMetaDataChanged (data: Metadata) {}
 }

@@ -94,34 +94,36 @@ extension TrackType {
 @objcMembers
 public final class WifiInfo: NSObject {
     public let ssid: String?
-    public let essid: String?
     public let bssid: String?
-    public let signal: Int
-    public let flags: Int
+    public let frequency: Float?
+    public let rssi: Int?
+    public let security: Int?
+    public let ip: String?
+    public let macAddress: String?
+    public let mode: String?
     
-    public init (ssid: String?, essid: String?,bssid: String?, signal: Int, flags: Int) {
+    public init (ssid: String?, bssid: String?, frequency: Float?, rssi: Int?, security: Int?, ip: String?, macAddress: String?, mode: String?) {
         self.ssid = ssid
-        self.essid = essid
         self.bssid = bssid
-        self.signal  = signal
-        self.flags = flags
+        self.frequency = frequency
+        self.rssi = rssi
+        self.security = security
+        self.ip = ip
+        self.macAddress = macAddress
+        self.mode = mode
     }
 }
 
 /// :nodoc:
 @objcMembers
 @objc public final class NetworkInfo: NSObject {
-    public let mode: String?
-    public let essid: String?
     public let ipAddress: String?
-    public let signal: Int?
+    public let rate: Int?
     public let macAddress: String?
     
-    public init (mode: String?,essid: String?, ipAddress: String?, signal: Int, macAddress: String?) {
-        self.mode = mode
-        self.essid = essid
+    public init(ipAddress: String?, rate: Int, macAddress: String?) {
         self.ipAddress = ipAddress
-        self.signal = signal
+        self.rate = rate
         self.macAddress = macAddress
     }
 }

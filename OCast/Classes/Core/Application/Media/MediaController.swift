@@ -24,15 +24,15 @@ import Foundation
 @objc public protocol MediaControllerDelegate {
     /**
      Gets called when a media status has been received from the web application
-     - Parameter data: data with the status information. See `PlaybackStatus` for details.
+     - Parameter playbackStatus: status information. See `PlaybackStatus` for details.
      */
-    func onPlaybackStatus(data: PlaybackStatus)
+    func didReceiveEvent(playbackStatus: PlaybackStatus)
 
     /**
      Gets called when the media metadata changed.
-     - Parameter data: data with the metadata information. See `MetaDataChanged` for details.
+     - Parameter metadata: metadata information. See `Metadata` for details.
      */
-    func onMetaDataChanged(data: MetaDataChanged)
+    func didReceiveEvent(metadata: Metadata)
 }
 
 /** Provides basic media control.
@@ -380,7 +380,7 @@ public final class MediaController: NSObject, DataStream {
          - onError: the closure to be called in case of error
      */
 
-    public func metadata(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: MetaDataChanged) -> Void, onError: @escaping (NSError?) -> Void) {
+    public func metadata(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: Metadata) -> Void, onError: @escaping (NSError?) -> Void) {
         
         let dict: [String: Any] = ["name": "getMetadata", "params": [], "options": options]
         
@@ -465,7 +465,7 @@ public final class MediaController: NSObject, DataStream {
         return errorCode
     }
     
-    func metadata(from response: [String: Any]?) -> MetaDataChanged? {
+    func metadata(from response: [String: Any]?) -> Metadata? {
         guard
             let response = response,
             let data = response["data"] as? [String: Any],
@@ -503,12 +503,12 @@ public final class MediaController: NSObject, DataStream {
         switch mediaData.name {
             case "playbackStatus":
                 let playbackStatus = DataMapper().playbackStatus(with: mediaData)
-                delegate?.onPlaybackStatus(data: playbackStatus)
+                delegate?.didReceiveEvent(playbackStatus: playbackStatus)
             case "metadataChanged":
                 guard let metaData = DataMapper().metadata(with: mediaData) else {
                     return
                 }
-                delegate?.onMetaDataChanged(data: metaData)
+                delegate?.didReceiveEvent(metadata: metaData)
             default:
                 return
         }

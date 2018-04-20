@@ -19,12 +19,5 @@ import Foundation
 
 // Data structure for link layer
 
-struct ReferenceLinkData {
-    let destination: String
-    let source: String
-    let type: String
-    let identifier: Int
-    let status: String?
-    let message: [String: Any]?
-}
+
 

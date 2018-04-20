@@ -17,6 +17,115 @@
 
 import Foundation
 
+
+struct OCastData {
+    let destination: String
+    let source: String
+    let type: String
+    let identifier: Int
+    let status: String?
+    let message: [String: Any]?
+}
+
+struct DataMapper {
+    
+    // MARK: - Generic, ie, not hardware/manufacturer dependant
+    func decodeOCastData(for text: String) -> OCastData? {
+        if let data = text.data(using: .utf8) {
+            do {
+                let dictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                
+                return OCastData(destination: dictionary?["dst"] as? String ?? "",
+                                 source: dictionary?["src"] as? String ?? "",
+                                 type: dictionary?["type"] as? String ?? "",
+                                 identifier: dictionary?["id"] as? Int ?? -1,
+                                 status: dictionary?["status"] as? String,
+                                 message: dictionary?["message"] as? [String: Any])
+                
+            } catch {
+                OCastLog.error("DataMapper: Serialization failed: \(error)")
+                return nil
+            }
+        }
+        
+        return nil
+    }
+    
+    func browserData(with data: [String: Any]) -> BrowserData {
+        let service = data["service"] as? String
+        let data = data["data"] as? [String: Any]
+        return BrowserData(service: service, data: data)
+    }
+    
+    func mediaData(with data: [String: Any]) -> StreamData? {
+        
+        guard let name = data["name"] as? String,
+            let params = data["params"] as? [String: Any] else {
+                return nil
+        }
+        let options = data["options"] as? [String: Any]
+        
+        return StreamData(name: name, params: params, options: options)
+    }
+    
+    func metadata(with data: StreamData) -> Metadata? {
+        
+        guard let logoURL = URL(string: data.params["logo"] as? String ?? "") else {
+            return nil
+        }
+        
+        let audioTracks = tracks(with: data.params["audioTracks"])
+        let videoTracks = tracks(with: data.params["videoTracks"])
+        let textTracks = tracks(with: data.params["textTracks"])
+        
+        if let mediaType = data.params["mediaType"] as? String {
+            return Metadata(title: data.params["title"] as? String ?? "",
+                            subtitle: data.params["subtitle"] as? String ?? "",
+                            logo: logoURL,
+                            mediaType: MediaType(type: mediaType),
+                            audioTracks: audioTracks,
+                            videoTracks: videoTracks,
+                            textTracks: textTracks)
+        }
+        
+        return nil
+    }
+    
+    func playbackStatus(with data: StreamData) -> PlaybackStatus {
+        
+        let duration = data.params["duration"] as? Double ?? 0.0
+        let mute = data.params["mute"] as? Bool ?? true
+        let position = data.params["position"] as? Double ?? 0.0
+        let state = data.params["state"] as? Int ?? 0
+        let volume = data.params["volume"] as? Double ?? 0
+        
+        return PlaybackStatus(duration: duration, mute: mute, position: position, state: PlayerState(rawValue: state)!, volume: volume)
+    }
+    
+    func tracks(with data: Any?) -> [TrackDescription]? {
+        guard let message = data as? [[String: Any]] else {
+            return nil
+        }
+        
+        return message.map { element -> TrackDescription in
+            TrackDescription(id: element["trackId"] as? String ?? "",
+                             enabled: element["enabled"] as? Bool ?? false,
+                             language: element["language"] as? String ?? "",
+                             label: element["label"] as? String ?? "")
+        }
+    }
+    
+    func statusInfo(for data: Any?) -> StatusInfo? {
+        guard let message = data as? [String:Any] else {
+            return nil
+        }
+        
+        return StatusInfo(version: message["version"]  as? String,
+                          state:   message["state"]    as? String,
+                          progress:message["progress"] as? Int ?? 0)
+    }
+}
+
 /**
  Used to transfer certificate information from the DeviceManager to the Driver.
  Not implemented in this version.
@@ -293,7 +402,7 @@ import Foundation
 
 /// Describes the metadata of the current media.
 @objcMembers
-@objc public final class MetaDataChanged: NSObject {
+@objc public final class Metadata: NSObject {
     /// media title
     public let title: String
     /// media subtitle

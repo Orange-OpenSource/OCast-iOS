@@ -18,28 +18,52 @@
 
 import Foundation
 
-// MARK: - Public Driver protocols
+// MARK: - PublicSettings protocol
+@objc public protocol PublicSettingsEventDelegate {
+    func didReceiveEvent(updateStatus: StatusInfo)
+}
+
 /// :nodoc:
-public protocol DriverPublicSettings {
-    // Not yet implemented on stick side. This getUpdateStatus() is given as an example.
+public protocol PublicSettings {
+    var publicSettingsEventDelegate:PublicSettingsEventDelegate? { get set }
+    // Receive event settings
+    func didReceivePublicSettingsEvent(withMessage message: [String: Any])
+    // Device settings
     func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void)
     func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ())
 }
 
-extension DriverPublicSettings {
+struct PublicSettingsConstants {
+    static let COMMAND_STATUS = "getUpdateStatus"
+    static let COMMAND_DEVICE_ID = "getDeviceID"
+    static let SERVICE_SETTINGS_DEVICE = "org.ocast.settings.device"
+}
+
+extension PublicSettings {
     public func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void) {}
     public func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ()) {}
 }
 
-/// :nodoc:
-public protocol DriverPrivateSettings {
+// MARK: - PrivateSettings protocol
+@objc public protocol PrivateSettingsEventDelegate {
+    func didReceiveEvent(connectionStatus: String)
+    func didReceiveEvent(bluetoothDeviceInfo: String)
+    func didReceiveEvent(bluetoothKeyPressed: String)
+    func didReceiveEvent(bluetoothMouseMovedToPositionX x: Int, andY y: Int)
+    func didReceiveEvent(blueetoothMouseClicked: String)
+}
+
+public protocol PrivateSettings {
+    var privateSettingsEventDelegate: PrivateSettingsEventDelegate? { get set }
+    // Receive event settings
+    func didReceivePrivateSettingsEvent(withMessage message: [String: Any])
     // Network
     func scanAPs(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
     func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
     func setAP(ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func pbWPS(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
-    func getWifiInfo(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
+    func getWifiInfo(onSuccess:@escaping (WifiInfo) -> (), onError:@escaping (NSError?) -> ())
     func getNetworkInfo(onSuccess:@escaping (NetworkInfo) -> (), onError:@escaping (NSError?) -> ())
     // Device
     func setDevice(name: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
@@ -56,7 +80,7 @@ public protocol DriverPrivateSettings {
     func sendPinCode(code: String, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ())
 }
 
-extension DriverPrivateSettings {
+extension PrivateSettings {
     // Network
     public func scanAPs(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {}
     public func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {}
@@ -102,23 +126,24 @@ extension DriverPrivateSettings {
 }
 
 @objc public protocol DriverDelegate {
-    func didFail(withError error: NSError?)
+    func didFail(module: DriverModule, withError error: NSError?)
 }
 
 /// :nodoc:
-@objc public protocol DriverReceiverDelegate {
-    func didReceive(data: [String: Any])
+@objc public protocol EventDelegate {
+    func didReceiveEvent(withMessage message: [String: Any])
 }
 
 /// :nodoc:
 @objc public protocol Driver: BrowserDelegate {
-    var delegate: DriverReceiverDelegate? { get set }
+    var browserEventDelegate: EventDelegate? { get set }
     func privateSettingsAllowed() -> Bool
-    func connect(for module: DriverModule, with info: ApplicationDescription, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
+    func connect(for module: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
     func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
     func state(for module: DriverModule) -> DriverState
     func register(_ delegate: DriverDelegate, forModule module: DriverModule)
 }
+
 
 
 

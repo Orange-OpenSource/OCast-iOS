@@ -104,6 +104,6 @@ final class DefaultDataSender: DataSender {
     }
     
     func send(message: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
-        browser.sendData(data: message, for: serviceId, onSuccess: onSuccess, onError: onError)
+        browser.send(data: message, for: serviceId, onSuccess: onSuccess, onError: onError)
     }
 }

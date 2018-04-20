@@ -116,9 +116,14 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
          - onError: the closure to be called in case of error
      */
     public func stop(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        stopApplication(onSuccess: {
-            //
-            self.driver?.disconnect(for: .application, onSuccess: onSuccess, onError: onError)
+        applicationStatus(onSuccess: {
+            if self.currentState == .running {
+                self.stopApplication(onSuccess: {
+                    self.driver?.disconnect(for: .application, onSuccess: onSuccess, onError: onError)
+                }, onError: onError)
+            } else {
+                onSuccess()
+            }
         }, onError: onError)
     }
 
@@ -159,7 +164,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         }
         if let browser = browser {
             stream.dataSender = DefaultDataSender(browser: browser, serviceId: stream.serviceId)
-            browser.registerStream(for: stream)
+            browser.register(stream: stream)
         } else {
             OCastLog.error("Unable to manage stream (\(stream.serviceId) because browser is nil")
         }
@@ -195,20 +200,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
             onError(error)
         }
     }
-    
-    private func joinApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        self.applicationStatus(
-            onSuccess: {
-                if self.currentState == .running {
-                    onSuccess()
-                } else {
-                    let error = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Application cannot be joined."])
-                    onError(error)
-                }
-            },
-            onError: onError)
-    }
-    
     
     private func stopApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         

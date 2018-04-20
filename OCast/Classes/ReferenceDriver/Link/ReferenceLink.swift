@@ -23,7 +23,7 @@ class ReferenceLinkFactory : LinkFactory {
     }
 }
 
-enum ReferenceDomainName: String {
+public enum ReferenceDomainName: String {
     case browser = "browser"
     case settings = "settings"
     case all = "*"
@@ -130,18 +130,14 @@ final class ReferenceLink: Link, SocketProviderDelegate {
 
         if commandSocket == socket {
             OCastLog.debug("WS: Command is disconnected with code (\(code)), \(reason)")
-            isDisconnecting ? delegate?.didDisconnect(linkWithIdentifier: profile.identifier) : delegate?.didFail(linkWithIdentifier: profile.identifier)
-        } else {
-            OCastLog.debug("WS: Unknown socket. Ignoring the disconnection indication.")
+            isDisconnecting ? delegate?.didDisconnect(module: profile.module) : delegate?.didFail(module: profile.module)
         }
     }
 
     func onConnected(from socket: SocketProvider) {
         if commandSocket == socket {
             OCastLog.debug("WS: Command is connected.")
-            delegate?.didConnect(linkWithIdentifier: profile.identifier)
-        } else {
-            OCastLog.debug("WS: Unknown socket. Ignoring the connection indication.")
+            delegate?.didConnect(module: profile.module)
         }
     }
 
@@ -150,57 +146,62 @@ final class ReferenceLink: Link, SocketProviderDelegate {
         if commandSocket == socket {
             OCastLog.debug("WS: Received data: \(message)")
             
-            guard let dataLink = ReferenceDataMapper().referenceLink(for: message) else {
+            guard let ocastData = DataMapper().decodeOCastData(for: message) else {
                 return
             }
             
-            if dataLink.identifier == -1 {
-                return manageFatalError(with: dataLink.status)
+            if ocastData.identifier == -1 {
+                return manageFatalError(with: ocastData.status)
             }
             
-            if !(dataLink.destination == linkUUID || dataLink.destination == ReferenceDomainName.all.rawValue) {
-                OCastLog.debug("WS: Ignoring message (destination was: \(dataLink.destination)")
+            if !(ocastData.destination == linkUUID || ocastData.destination == ReferenceDomainName.all.rawValue) {
+                OCastLog.debug("WS: Ignoring message (destination was: \(ocastData.destination)")
                 return
             }
             
-            guard let msgType = MessageType(rawValue: dataLink.type) else {
-                OCastLog.error("WS: Ignoring message. messageType was: \(dataLink.type)")
+            guard let msgType = MessageType(rawValue: ocastData.type) else {
+                OCastLog.error("WS: Ignoring message. messageType was: \(ocastData.type)")
                 return
             }
             
-            guard let message = dataLink.message else {
+            guard let message = ocastData.message else {
                 OCastLog.error("WS: Missing message. Ignoring this frame.")
                 return
             }
             
-            OCastLog.debug("WS: Command frame was OK.")
-            
             switch msgType {
             case .command:
                 OCastLog.debug("WS: Ignoring the Command frame. This message Type is not implemented.")
-                
             case .event:
-                delegate?.didReceive(event: Event(domain: dataLink.source, message: message))
-                
+                delegate?.didReceive(event: Event(source: ocastData.source, message: message))
             case .reply:
-                let status = dataLink.status ?? ""
+                let status = ocastData.status ?? ""
                 
-                if status == "OK" {
-                    
-                    if let successCallback = successCallbacks[dataLink.identifier] {
-                        let response = CommandReply(command: "", reply: message)
+                if status.uppercased() == "OK" {
+                    let data = message["data"] as? [String: Any]
+                    let commandName = data?["name"] as? String
+                    let response = data?["params"] as? [String: Any]
+                    if let statusCode = response?["code"] as? Int,
+                        statusCode != 0 {
+                        // Erreur
+                        if let errorCallback = errorCallbacks[ocastData.identifier] {
+                            let error = NSError(domain: ErrorDomain, code: statusCode, userInfo: [ErrorDomain: "\(status)"])
+                            errorCallback(error)
+                        }
+                    } else if let successCallback = successCallbacks[ocastData.identifier] {
+                        let response = CommandReply(command: commandName, reply: response)
                         successCallback(response)
                     }
                     
                 } else {
                     
-                    if let errorCallback = errorCallbacks[dataLink.identifier] {
+                    if let errorCallback = errorCallbacks[ocastData.identifier] {
                         let error = NSError(domain: ErrorDomain, code: DriverError.remoteError.rawValue, userInfo: [ErrorDomain: "\(status)"])
                         errorCallback(error)
                     }
                 }
                 
-                resetCallbacks(for: dataLink.identifier)
+                resetCallbacks(for: ocastData.identifier)
             }
         }
     }

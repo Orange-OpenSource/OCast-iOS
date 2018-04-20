@@ -22,27 +22,26 @@ import OCast
 extension MainVC {
     
     //MARK: - Media Controller protocol
-    
-    func onMetaDataChanged(data: MetaDataChanged) {
-        OCastLog.debug(("-> MetaData from MediaController: \(data)"))
+
+    func didReceiveEvent(metadata: Metadata) {
+        OCastLog.debug(("-> MetaData from MediaController: \(metadata)"))
         
-        metadataTitleLabel.text = data.title
-        updateTracks(from: data)
+        metadataTitleLabel.text = metadata.title
+        updateTracks(from: metadata)
     }
     
-    func onPlaybackStatus(data: PlaybackStatus) {
+    func didReceiveEvent(playbackStatus: PlaybackStatus) {
+        mediaDuration = playbackStatus.duration
         
-        mediaDuration = data.duration
+        OCastLog.debug("-> MediaStatus position: \(playbackStatus.position.format(f: ".2"))")
+        OCastLog.debug("-> MediaStatus duration: \(playbackStatus.duration.format(f: ".2"))")
+        OCastLog.debug("-> MediaStatus playerState: \(playbackStatus.state.rawValue)")
+        OCastLog.debug("-> MediaStatus Volume: \(playbackStatus.volume)")
         
-        OCastLog.debug("-> MediaStatus position: \(data.position.format(f: ".2"))")
-        OCastLog.debug("-> MediaStatus duration: \(data.duration.format(f: ".2"))")
-        OCastLog.debug("-> MediaStatus playerState: \(data.state.rawValue)")
-        OCastLog.debug("-> MediaStatus Volume: \(data.volume)")
+        durationLabel.text = String (playbackStatus.duration.format(f: ".1"))
+        positionLabel.text = String (playbackStatus.position.format(f: ".1"))
         
-        durationLabel.text = String (data.duration.format(f: ".1"))
-        positionLabel.text = String (data.position.format(f: ".1"))
-        
-        switch data.state {
+        switch playbackStatus.state {
         case .buffering:    playerStateLabel.text = "buffering"
         case .idle: playerStateLabel.text = "idle"
         case .paused:   playerStateLabel.text = "paused"
@@ -50,14 +49,13 @@ extension MainVC {
         case .unknown:  playerStateLabel.text = "unknown"
         }
         
-        volumeLabel.text = String (data.volume.format(f: ".1"))
-        volumeSlider.value = Float(data.volume)
+        volumeLabel.text = String (playbackStatus.volume.format(f: ".1"))
+        volumeSlider.value = Float(playbackStatus.volume)
         
-        seekSlider.value = Float (data.position/mediaDuration)
+        seekSlider.value = Float (playbackStatus.position/mediaDuration)
     }
     
-   
-        //MARK: - Media general control
+    //MARK: - Media general control
     
     @IBAction func onSeekSlider(_ sender: UISlider) {
         
@@ -253,7 +251,7 @@ extension MainVC {
         mediaController?.metadata(
             onSuccess: { metadata in
                 OCastLog.debug("->MetaData is OK.")
-                 self.onMetaDataChanged(data: metadata)
+                 self.didReceiveEvent(metadata: metadata)
                 
         },
             onError: {error in
