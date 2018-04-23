@@ -87,7 +87,7 @@ extension PrivateSettings {
     public func setAP(ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
     public func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
     public func pbWPS(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
-    public func getWifiInfo(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func getWifiInfo(onSuccess:@escaping (WifiInfo) -> (), onError:@escaping (NSError?) -> ()) {}
     public func getNetworkInfo(onSuccess:@escaping (NetworkInfo) -> (), onError:@escaping (NSError?) -> ()) {}
     // Device
     public func setDevice(name: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
