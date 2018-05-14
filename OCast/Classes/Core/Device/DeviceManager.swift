@@ -246,7 +246,7 @@ import Foundation
                     let linkAttributes = keysAttributes?["link"]
                     let rel = linkAttributes?["rel"]
                     let href = linkAttributes?["href"]
-                    let applicationDescription = ApplicationDescription(app2appURL: newURL ?? "", version: version ?? "", rel: rel, href: href, name: applicationName)
+                    let applicationDescription = ApplicationDescription(app2appURL: newURL, version: version ?? "", rel: rel, href: href, name: applicationName)
                     onSuccess(applicationDescription)
                 } else {
                     onError(error as NSError?)

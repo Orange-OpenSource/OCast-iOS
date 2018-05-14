@@ -18,19 +18,23 @@
 import Foundation
 
 
-struct OCastData {
-    let destination: String
-    let source: String
-    let type: String
-    let identifier: Int
-    let status: String?
-    let message: [String: Any]?
+public struct OCastData {
+    public let destination: String
+    public let source: String
+    public let type: String
+    public let identifier: Int
+    public let status: String?
+    public let message: [String: Any]?
 }
 
-struct DataMapper {
+public struct DataMapper {
+    
+    public init() {
+    
+    }
     
     // MARK: - Generic, ie, not hardware/manufacturer dependant
-    func decodeOCastData(for text: String) -> OCastData? {
+    public func decodeOCastData(for text: String) -> OCastData? {
         if let data = text.data(using: .utf8) {
             do {
                 let dictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
@@ -196,13 +200,13 @@ struct DataMapper {
 /// :nodoc:
 @objcMembers
 @objc public final class ApplicationDescription: NSObject {
-    public let app2appURL: String
+    public let app2appURL: String?
     public let version: String
     public let rel: String?
     public let runLink: String?
     public let name: String
 
-    public init(app2appURL: String, version: String, rel: String?, href: String?, name: String) {
+    public init(app2appURL: String?, version: String, rel: String?, href: String?, name: String) {
         self.app2appURL = app2appURL
         self.version = version
         self.rel = rel

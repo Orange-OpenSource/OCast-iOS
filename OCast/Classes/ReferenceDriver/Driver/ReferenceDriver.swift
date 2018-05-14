@@ -51,7 +51,7 @@ import Foundation
      */
 
     /// Read only. Target that matches with this driver.
-    public static let searchTarget = "urn:cast-ocast-org:service:cast:1"
+    open static let searchTarget = "urn:cast-ocast-org:service:cast:1"
 
     /*  
      Caps sensitive.
@@ -59,7 +59,7 @@ import Foundation
      */
 
     /// Read only. Manufacturer'name that matches with this driver.
-    public static let manufacturer = "Orange SA"
+    open static let manufacturer = "Orange SA"
     
     public static let ReferenceDriverErrorDomain = "ReferenceDriverErrorDomain"
 
@@ -100,7 +100,7 @@ import Foundation
         return linksState[module] ?? .disconnected
     }
 
-    public func connect(for module: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+    open func connect(for module: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
 
         if module == .privateSettings && !privateSettingsAllowed() {
             OCastLog.error(("Reference Driver: Private Settings are not implemented in reference driver"))
@@ -123,9 +123,16 @@ import Foundation
             case .disconnected, .disconnecting:
                 var link = links[module]
                 if link == nil {
+                    var app2appURL:String?
+                    // Settings ou Cavium
+                    if info?.app2appURL == nil {
+                        app2appURL = "wss://\(ipAddress):4433/ocast"
+                    } else {
+                        app2appURL = info?.app2appURL
+                    }
                     let linkProfile = LinkProfile(
                         module: module,
-                        app2appURL: info?.app2appURL ?? "wss://\(ipAddress):4433/ocast",
+                        app2appURL: app2appURL ?? "",
                         certInfo: certificateInfo)
                     
                     // Check if the same link is already existing in another module
@@ -169,7 +176,7 @@ import Foundation
         }
     }
 
-    public func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+    open func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
         
         guard let link = links[module] else {
             let error = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: 0, userInfo: ["Error": "Could not get the link."])
@@ -208,14 +215,14 @@ import Foundation
     }
 
     // MARK: - Link Protocol
-    public func didConnect(module: DriverModule) {
+    open func didConnect(module: DriverModule) {
         OCastLog.debug("Reference Driver: Link is connected.")
         linksState[module] = .connected
         successConnect[module]?()
         successConnect.removeValue(forKey: module)
     }
 
-    public func didDisconnect(module: DriverModule) {
+    open func didDisconnect(module: DriverModule) {
         OCastLog.debug("Reference Driver: Link is disconnected.")
         linksState[module] = .disconnected
         links.removeValue(forKey: module)
@@ -223,7 +230,7 @@ import Foundation
         successDisconnect.removeValue(forKey: module)
     }
 
-    public func didFail(module: DriverModule) {
+    open func didFail(module: DriverModule) {
         OCastLog.debug(("Reference Driver: Unexpected link disconnection."))
         successConnect.removeValue(forKey: module)
         successDisconnect.removeValue(forKey: module)
@@ -234,7 +241,7 @@ import Foundation
         delegates[module]?.didFail(module: module, withError: newError)
     }
 
-    public func didReceive(event: Event) {
+    open func didReceive(event: Event) {
         if event.source == ReferenceDomainName.browser.rawValue {
             browserEventDelegate?.didReceiveEvent(withMessage: event.message)
         } else if event.source == ReferenceDomainName.settings.rawValue {
@@ -251,7 +258,7 @@ import Foundation
     }
     
     // MARK: BrowserDelegate methods
-    public func send(data: [String: Any], onSuccess: @escaping (Any?) -> Void, onError: @escaping (NSError?) -> Void) {
+    open func send(data: [String: Any], onSuccess: @escaping (Any?) -> Void, onError: @escaping (NSError?) -> Void) {
         
         guard let link = links[.application] else {
             let error = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: 0, userInfo: ["Error": "Link doesn't exists."])

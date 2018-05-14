@@ -182,7 +182,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
             if response.statusCode == 201 {
                 self.applicationStatus(onSuccess: {
                     self.isConnectedEvent = false
-                    let _ = self.semaphore?.wait(timeout: .now() + 10)
+                    let _ = self.semaphore?.wait(timeout: .now() + 60)
                     if self.isConnectedEvent {
                         onSuccess()
                     } else {

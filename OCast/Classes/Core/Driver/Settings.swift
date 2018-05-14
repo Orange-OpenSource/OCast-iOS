@@ -33,15 +33,19 @@ public protocol PublicSettings {
     func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ())
 }
 
-struct PublicSettingsConstants {
-    static let COMMAND_STATUS = "getUpdateStatus"
-    static let COMMAND_DEVICE_ID = "getDeviceID"
-    static let SERVICE_SETTINGS_DEVICE = "org.ocast.settings.device"
+public struct PublicSettingsConstants {
+    public static let COMMAND_STATUS = "getUpdateStatus"
+    public static let COMMAND_DEVICE_ID = "getDeviceID"
+    public static let SERVICE_SETTINGS_DEVICE = "org.ocast.settings.device"
 }
 
 extension PublicSettings {
-    public func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void) {}
-    public func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
 }
 
 // MARK: - PrivateSettings protocol
@@ -82,24 +86,60 @@ public protocol PrivateSettings {
 
 extension PrivateSettings {
     // Network
-    public func scanAPs(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {}
-    public func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {}
-    public func setAP(ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
-    public func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
-    public func pbWPS(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
-    public func getWifiInfo(onSuccess:@escaping (WifiInfo) -> (), onError:@escaping (NSError?) -> ()) {}
-    public func getNetworkInfo(onSuccess:@escaping (NetworkInfo) -> (), onError:@escaping (NSError?) -> ()) {}
+    public func scanAPs(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func setAP(ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func pbWPS(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func getWifiInfo(onSuccess:@escaping (WifiInfo) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func getNetworkInfo(onSuccess:@escaping (NetworkInfo) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
     // Device
-    public func setDevice(name: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
-    public func getInfo(onSuccess:@escaping (VersionInfo) -> (), onError:@escaping (NSError?) -> ()) {}
-    public func reboot(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
-    public func getDeviceInfo(onSuccess:@escaping (DeviceInfo) -> (), onError:@escaping (NSError?) -> ()) {}
-    public func reset(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
-    public func checkFlash(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func setDevice(name: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func getInfo(onSuccess:@escaping (VersionInfo) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func reboot(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func getDeviceInfo(onSuccess:@escaping (DeviceInfo) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func reset(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func checkFlash(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
     // bluetooth
-    public func startDiscovery(profiles: [String], timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
-    public func stopDiscovery(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {}
-    public func getDevices(profiles: [String], onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ()) {}
-    public func sendCommand(name: String, macAddress: String, onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ()) {}
-    public func sendPinCode(code: String, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {}
+    public func startDiscovery(profiles: [String], timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func stopDiscovery(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func getDevices(profiles: [String], onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func sendCommand(name: String, macAddress: String, onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func sendPinCode(code: String, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
 }

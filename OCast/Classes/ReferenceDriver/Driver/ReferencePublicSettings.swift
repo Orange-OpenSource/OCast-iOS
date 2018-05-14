@@ -20,7 +20,7 @@ import Foundation
 extension ReferenceDriver: PublicSettings {
     
     // MARK: - Public settings
-    public func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void) {
+    open func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void) {
         guard let link = links[.publicSettings] else {
             OCastLog.error("Reference Driver: Could not get the secured link.")
             // FIXME: create error
@@ -52,7 +52,7 @@ extension ReferenceDriver: PublicSettings {
         }
     }
     
-    public func getDeviceID(onSuccess: @escaping (String) -> (), onError: @escaping (NSError?) -> ()) {
+    open func getDeviceID(onSuccess: @escaping (String) -> (), onError: @escaping (NSError?) -> ()) {
         guard let link = links[.publicSettings] else {
             OCastLog.error("Reference Driver: Could not get the secured link.")
             // FIXME: create error
@@ -86,7 +86,7 @@ extension ReferenceDriver: PublicSettings {
         }
     }
     
-    public func didReceivePublicSettingsEvent(withMessage message: [String : Any]) {
+    open func didReceivePublicSettingsEvent(withMessage message: [String : Any]) {
         
     }
 }

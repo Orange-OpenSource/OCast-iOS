@@ -36,7 +36,7 @@ final class XMLHelper: NSObject, XMLParserDelegate {
 
     // MARK: - XMLParserDelegate methods
     func parser(_: XMLParser, parseErrorOccurred parseError: Error) {
-        completionHandler?(parseError, nil, nil)
+        self.completionHandler?(parseError, nil, nil)
     }
 
     func parser(_: XMLParser, didEndElement elementName: String, namespaceURI _: String?, qualifiedName _: String?) {
@@ -56,7 +56,7 @@ final class XMLHelper: NSObject, XMLParserDelegate {
     }
 
     func parserDidEndDocument(_: XMLParser) {
-        completionHandler?(nil, keyResult, keyAttributes)
+        self.completionHandler?(nil, self.keyResult, self.keyAttributes)
     }
 
 }

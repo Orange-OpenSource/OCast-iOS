@@ -454,13 +454,10 @@ public final class MediaController: NSObject, DataStream {
     // MARK: - Internal
     func code(from response: [String: Any]?) -> MediaErrorCode? {
         guard
-            let response = response,
-            let data = response["data"] as? [String: Any],
-            let mediaData = DataMapper().mediaData(with: data),
-            let code = mediaData.params["code"],
-            let codeInt = code as? Int,
-            let errorCode = MediaErrorCode(rawValue: codeInt) else {
-                return nil
+            let message = response,
+            let code = message["code"] as? Int,
+            let errorCode = MediaErrorCode(rawValue: code) else {
+                return MediaErrorCode.noError
         }
         return errorCode
     }

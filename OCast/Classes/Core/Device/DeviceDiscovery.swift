@@ -281,7 +281,7 @@ import CocoaAsyncSocket
                     
                     currentDevices.removeValue(forKey: deviceId)
                     currentDevicesIdx.removeValue(forKey: deviceId)
-                    
+
                     delegate?.deviceDiscovery(self, didRemoveDevice: cachedDevice)
                 }
             }
@@ -351,7 +351,9 @@ import CocoaAsyncSocket
                                         modelName: modelName)
                     
                     self.currentDevices[device.deviceID] = device
-                    self.delegate?.deviceDiscovery(self, didAddDevice: device)
+                    DispatchQueue.main.async {
+                        self.delegate?.deviceDiscovery(self, didAddDevice: device)
+                    }
                 }
                 self.currentDevicesIdx[deviceID] = self.mSearchIdx
             } else {
