@@ -1,4 +1,10 @@
 OCast Release notes
+============================
+Version 1.0.1, April 2018
+============================
+- fix bugs
+- normalize method naming
+- clean code
 
 ============================
 Version 1.0.0, April 2018
