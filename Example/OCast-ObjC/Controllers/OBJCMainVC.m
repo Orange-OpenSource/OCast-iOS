@@ -122,9 +122,9 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     return stickView;
 }
 
-#pragma mark - DeviceManager protocol
+#pragma mark - DeviceManagerDelegate methods
 
--(void)onFailureWithError:(NSError *)error {
+- (void)deviceDidDisconnectWithModule:(enum DriverModule)module_ withError:(NSError * _Nullable)error {
     NSLog(@"-> Driver is disconnected.");
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -150,6 +150,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 }
 
 #pragma mark - DeviceDiscoveryDelegate methods
+
 - (void)deviceDiscovery:(DeviceDiscovery *)deviceDiscovery didAddDevice:(Device *)device {
     NSLog(@"->New device found: %@", device.friendlyName);
     devices = deviceDiscovery.devices;
@@ -322,19 +323,19 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     return @"org.ocast.custom";
 }
 
-#pragma mark -  MediaControlProtocol
+#pragma mark -  MediaControllerDelegate methods
 
-- (void)onPlaybackStatusWithData:(PlaybackStatus* _Nonnull)data {
-    NSLog(@"-> Got onPlaybackStatus: Position = %f", data.position);
-    NSLog(@"-> Got onPlaybackStatus: Volume = %f", data.volume);
-    NSLog(@"-> Got onPlaybackStatus: Duration = %f", data.duration);
-    NSLog(@"-> Got onPlaybackStatus: State = %ld", (long)data.state);
-    NSLog(@"-> Got onPlaybackStatus: Mute = %@", data.mute ? @"yes":@"no");
+- (void)didReceiveEventWithPlaybackStatus:(PlaybackStatus * _Nonnull)playbackStatus {
+    NSLog(@"-> Got onPlaybackStatus: Position = %f", playbackStatus.position);
+    NSLog(@"-> Got onPlaybackStatus: Volume = %f", playbackStatus.volume);
+    NSLog(@"-> Got onPlaybackStatus: Duration = %f", playbackStatus.duration);
+    NSLog(@"-> Got onPlaybackStatus: State = %ld", (long)playbackStatus.state);
+    NSLog(@"-> Got onPlaybackStatus: Mute = %@", playbackStatus.mute ? @"yes":@"no");
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        _positionLabel.text = [NSString stringWithFormat:@"%f", data.position];
-        _durationLabel.text = [NSString stringWithFormat:@"%f", data.duration];
-        switch (data.state) {
+        _positionLabel.text = [NSString stringWithFormat:@"%f", playbackStatus.position];
+        _durationLabel.text = [NSString stringWithFormat:@"%f", playbackStatus.duration];
+        switch (playbackStatus.state) {
             case PlayerStateIdle:
                 _playerState.text = @"idle";
                 break;
@@ -356,13 +357,13 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     });
 };
 
-- (void)onMetaDataChangedWithData:(MetaDataChanged* _Nonnull)metaData {
-    NSLog(@"-> MetaData changed: %@", metaData);
+- (void)didReceiveEventWithMetadata:(Metadata * _Nonnull)metadata {
+    NSLog(@"-> MetaData changed: %@", metadata);
     
     TrackDescription *track;
     
-    if (metaData.audioTracks.count > 0) {
-        for (track in metaData.audioTracks) {
+    if (metadata.audioTracks.count > 0) {
+        for (track in metadata.audioTracks) {
             NSLog(@"-> MetaData Audio ID: %@", track.id);
             NSLog(@"->   MetaData Audio language: %@", track.language);
             NSLog(@"->   MetaData Audio enabled: %@", track.enabled ? @"Yes":@"No");
@@ -370,8 +371,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         }
     }
     
-    if (metaData.videoTracks.count > 0) {
-        for (track in metaData.audioTracks) {
+    if (metadata.videoTracks.count > 0) {
+        for (track in metadata.audioTracks) {
             NSLog(@"-> MetaData Video ID: %@", track.id);
             NSLog(@"->   MetaData Video language: %@", track.language);
             NSLog(@"->   MetaData Video enabled: %@", track.enabled ? @"Yes":@"No");
@@ -379,8 +380,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         }
     }
     
-    if (metaData.textTracks.count > 0) {
-        for (track in metaData.audioTracks) {
+    if (metadata.textTracks.count > 0) {
+        for (track in metadata.audioTracks) {
             NSLog(@"-> MetaData Text ID: %@", track.id);
             NSLog(@"->   MetaData Text language: %@", track.language);
             NSLog(@"->   MetaData Text enabled: %@", track.enabled ? @"Yes":@"No");
@@ -396,7 +397,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Audio could not be set.");
     };
     
-    if (metaData.audioTracks.count > 0) {
+    if (metadata.audioTracks.count > 0) {
         [mediaCtrl trackWithType:TrackTypeAudio id:@"0" enabled:YES withOptions:@{} onSuccess:successBlock onError:errorBlock];
     }
 }
@@ -423,17 +424,17 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 
 -(void)getMetaData {
     
-    void(^successBlock)(MetaDataChanged  *) = ^(MetaDataChanged *metaData){
+    void(^successBlock)(Metadata  *) = ^(Metadata *metadata){
         NSLog(@"->MetaDataChanged:");
-        NSLog(@"->MetaDataChanged title: %@.", metaData.title);
-        NSLog(@"->MetaDataChanged subtitle: %@.", metaData.subtitle);
-        NSLog(@"->MetaDataChanged mediatype: %ld.", (long)metaData.mediaType);
+        NSLog(@"->MetaDataChanged title: %@.", metadata.title);
+        NSLog(@"->MetaDataChanged subtitle: %@.", metadata.subtitle);
+        NSLog(@"->MetaDataChanged mediatype: %ld.", (long)metadata.mediaType);
         
         
         TrackDescription *track;
         
-        if (metaData.audioTracks.count == 0) {
-            for (track in metaData.audioTracks) {
+        if (metadata.audioTracks.count == 0) {
+            for (track in metadata.audioTracks) {
                 NSLog(@"-> MetaData Audio ID: %@", track.id);
                 NSLog(@"->   MetaData Audio language: %@", track.language);
                 NSLog(@"->   MetaData Audio enabled: %@", track.enabled ? @"Yes":@"No");
@@ -441,8 +442,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
             }
         }
         
-        if (metaData.videoTracks.count == 0) {
-            for (track in metaData.audioTracks) {
+        if (metadata.videoTracks.count == 0) {
+            for (track in metadata.audioTracks) {
                 NSLog(@"-> MetaData Video ID: %@", track.id);
                 NSLog(@"->   MetaData Video language: %@", track.language);
                 NSLog(@"->   MetaData Video enabled: %@", track.enabled ? @"Yes":@"No");
@@ -450,8 +451,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
             }
         }
         
-        if (metaData.textTracks.count == 0) {
-            for (track in metaData.audioTracks) {
+        if (metadata.textTracks.count == 0) {
+            for (track in metadata.audioTracks) {
                 NSLog(@"-> MetaData Text ID: %@", track.id);
                 NSLog(@"->   MetaData Text language: %@", track.language);
                 NSLog(@"->   MetaData Text enabled: %@", track.enabled ? @"Yes":@"No");
