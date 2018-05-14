@@ -1,0 +1,32 @@
+PODS:
+  - CocoaAsyncSocket (7.6.3)
+  - OCast (1.0.1):
+    - OCast/Core (= 1.0.1)
+    - OCast/ReferenceDriver (= 1.0.1)
+  - OCast/Core (1.0.1):
+    - CocoaAsyncSocket (= 7.6.3)
+  - OCast/ReferenceDriver (1.0.1):
+    - OCast/Core
+    - SocketRocket (= 0.5.1)
+  - SocketRocket (0.5.1)
+
+DEPENDENCIES:
+  - OCast (from `../`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - CocoaAsyncSocket
+    - SocketRocket
+
+EXTERNAL SOURCES:
+  OCast:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  CocoaAsyncSocket: eafaa68a7e0ec99ead0a7b35015e0bf25d2c8987
+  OCast: fb91637cf30b8e8fce96915df67f3d9b8b0a8a5d
+  SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
+
+PODFILE CHECKSUM: e3a0b447155e598b5d96f0629b0cbe01de0327cb
+
+COCOAPODS: 1.5.2

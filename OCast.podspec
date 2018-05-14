@@ -45,7 +45,7 @@ s.source_files = 'OCast/**/*'
 
 s.subspec 'Core' do |core|
     core.source_files   = 'OCast/Classes/Core/**/*'
-    core.dependency 'CocoaAsyncSocket', '7.6.2'
+    core.dependency 'CocoaAsyncSocket', '7.6.3'
 end
 
 s.subspec 'ReferenceDriver' do |reference|
