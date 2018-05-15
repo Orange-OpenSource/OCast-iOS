@@ -545,7 +545,7 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="gqE-8O-E8g">
-                        <barButtonItem key="rightBarButtonItem" image="playtoNotConnected" style="plain" id="uqd-4S-7xj">
+                        <barButtonItem key="rightBarButtonItem" image="playtoNotConnected" id="uqd-4S-7xj">
                             <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         </barButtonItem>
                     </navigationItem>
