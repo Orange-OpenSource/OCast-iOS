@@ -117,13 +117,11 @@ import CocoaAsyncSocket
     }
 
     /**
-     Initializes a new deviceDiscoevry class.
+     Initializes a new deviceDiscovery class.
      - Parameters:
-         - sender: module that will receive further notifications
          - searchTargets: list of device targets to search for
          - policy:  `Reliability` level for discovery process
      */
-
     @objc public init(forTargets searchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
         mSearchIdx = 0
         self.mSearchTargets = searchTargets
@@ -145,9 +143,8 @@ import CocoaAsyncSocket
     }
 
     /**
-     Initializes a new deviceDiscoevry class. The `Reliability` level is set to `.high` by default (a MSEARCH is sent every 3s. If no anwser after 6s, the device is considered as lost).
+     Initializes a new deviceDiscovery class. The `Reliability` level is set to `.high` by default (a MSEARCH is sent every 3s. If no anwser after 6s, the device is considered as lost).
      - Parameters:
-         - sender: module that will receive further notifications
          - searchTargets: List of device targets to search for
      */
     public convenience init(forTargets searchTargets: Array<String>) {

@@ -49,7 +49,6 @@ import Foundation
      Initializes a new DeviceManager.
 
      - Parameters:
-         - sender: module that will receive further notifications
          - device: the device to be managed
          - certificateInfo: Optional. An array of certificates to establish secured connections to the device.
      */

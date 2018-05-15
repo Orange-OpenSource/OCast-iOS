@@ -145,9 +145,9 @@ public struct DataMapper {
     /// Initializer
     ///
     /// - Parameters:
-    ///   - serverRootCACert: The root server certificate (DER format) used for SSL one-way (can be nil if the serverCACert includes the root certificate)
-    ///   - serverCACert: The server certificate (DER format) used for SSL one-way
-    ///   - clientCert: The client certificate (DER format) used for SSL two-way
+    ///   - serverRootCACertificate: The root server certificate (DER format) used for SSL one-way (can be nil if the serverCACert includes the root certificate)
+    ///   - serverCACertificate: The server certificate (DER format) used for SSL one-way
+    ///   - clientCertificate: The client certificate (DER format) used for SSL two-way
     ///   - password: The password used for SSL two way
     public init(serverRootCACertificate: Data?, serverCACertificate: Data?, clientCertificate: Data?, password: String?) {
         self.serverRootCACertificate = serverRootCACertificate
