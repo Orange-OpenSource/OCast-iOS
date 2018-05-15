@@ -128,12 +128,12 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     NSLog(@"-> Driver is disconnected.");
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        _webAppStatus.text = @"disconnected";
-        [_stickIcon setEnabled:NO];
-        [_stickIcon setTintColor: [UIColor blackColor]];
-        _positionLabel.text = @"";
-        _durationLabel.text = @"";
-        _playerState.text = @"idle";
+        self.webAppStatus.text = @"disconnected";
+        [self.stickIcon setEnabled:NO];
+        [self.stickIcon setTintColor: [UIColor blackColor]];
+        self.positionLabel.text = @"";
+        self.durationLabel.text = @"";
+        self.playerState.text = @"idle";
     });
     
     devices = deviceDiscovery.devices;
@@ -212,8 +212,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"-> WebApp started !");
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            _webAppStatus.text = @"connected";
-            [_stickIcon setTintColor: [UIColor orangeColor]];
+            self.webAppStatus.text = @"connected";
+            [self.stickIcon setTintColor: [UIColor orangeColor]];
         });
     };
     
@@ -230,12 +230,12 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            _webAppStatus.text = @"disconnected";
+            self.webAppStatus.text = @"disconnected";
 
-            [_stickIcon setTintColor: [UIColor blackColor]];
+            [self.stickIcon setTintColor: [UIColor blackColor]];
             
             if ([devices count] == 0) {
-                [_stickIcon setEnabled:NO];
+                [self.stickIcon setEnabled:NO];
             }
             
             if ([deviceDiscovery start] == NO) {
@@ -315,7 +315,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     NSLog(@"-> Got custom response : %@", data);
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        _customResponseLabel.text = data.description;
+        self.customResponseLabel.text = data.description;
     });
 }
 
@@ -333,23 +333,23 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     NSLog(@"-> Got onPlaybackStatus: Mute = %@", playbackStatus.mute ? @"yes":@"no");
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        _positionLabel.text = [NSString stringWithFormat:@"%f", playbackStatus.position];
-        _durationLabel.text = [NSString stringWithFormat:@"%f", playbackStatus.duration];
+        self.positionLabel.text = [NSString stringWithFormat:@"%f", playbackStatus.position];
+        self.durationLabel.text = [NSString stringWithFormat:@"%f", playbackStatus.duration];
         switch (playbackStatus.state) {
             case PlayerStateIdle:
-                _playerState.text = @"idle";
+                self.playerState.text = @"idle";
                 break;
             case PlayerStatePaused:
-                _playerState.text = @"paused";
+                self.playerState.text = @"paused";
                 break;
             case PlayerStatePlaying:
-                _playerState.text = @"playing";
+                self.playerState.text = @"playing";
                 break;
             case PlayerStateBuffering:
-                _playerState.text = @"buffering";
+                self.playerState.text = @"buffering";
                 break;
             case PlayerStateUnknown:
-                _playerState.text = @"unknown";
+                self.playerState.text = @"unknown";
                 break;
             default:
                 break;
