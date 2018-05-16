@@ -89,19 +89,7 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     // MARK: Private methods
 
     private func socket(with command: String) -> SRWebSocket? {
-        if let certificateInfo = certificateInfo {
-            return secureSocket(with: command, certficate: certificateInfo)
-        } else {
-            return unsecureSocket(with: command)
-        }
-    }
-
-    private func secureSocket(with command: String, certficate certificateInfo: CertificateInfo) -> SRWebSocket? {
-        return SRWebSocket(url: URL(string: command), protocols: nil, allowsUntrustedSSLCertificates: true)
-    }
-    
-    private func unsecureSocket(with command: String) -> SRWebSocket? {
-        return SRWebSocket(url: URL(string: command))
+       return SRWebSocket(url: URL(string: command), protocols: nil, allowsUntrustedSSLCertificates: true)
     }
 
     private func sendPing() {
