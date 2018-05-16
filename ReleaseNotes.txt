@@ -1,9 +1,11 @@
 OCast Release notes
 ============================
-Version x.y.z, In progress
+Version 1.0.2, May 2018
 ============================
+- fix websocket bug on Release mode
+- update tests
 ============================
-Version 1.0.1, April 2018
+Version 1.0.1, May 2018
 ============================
 - fix bugs
 - normalize method naming
