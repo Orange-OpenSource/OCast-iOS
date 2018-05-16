@@ -257,7 +257,7 @@ public struct DataMapper {
     case unknownTransferMode = 2006
     case unknownError = 2500
     /// :nodoc:
-    case unvalidErrorCode = 9999
+    case invalidErrorCode = 9999
 }
 
 /**

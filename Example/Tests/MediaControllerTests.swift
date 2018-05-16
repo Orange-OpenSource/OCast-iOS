@@ -39,7 +39,7 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         
         let mediaController = appliMgr.mediaController(with: self)
         
-        let data: [String:Any] = ["service":"org.ocast.media","data":["name":"prepare","params":["code":0]]]
+        let data: [String:Any] = ["code":0]
         
         guard let code = mediaController.code(from: data) else {
             XCTAssert(false)
@@ -60,14 +60,14 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         
         let mediaController = appliMgr.mediaController(with: self)
 
-        let data: [String:Any] = ["service":"org.ocast.media","data":["name":"prepare","params":["code":1]]]
+        let data: [String:Any] = ["code":1]
         
-        guard mediaController.code(from: data) != nil else {
-            XCTAssert(true)
+        if let code = mediaController.code(from: data) {
+            XCTAssertEqual(code, MediaErrorCode.invalidErrorCode)
             return
         }
         
-        XCTAssert(false)
+        XCTFail()
     }
     
     func testGetCode03 () {
@@ -82,36 +82,12 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
 
         
         // Code is missing
-        
-        var data: [String:Any] = ["service":"org.ocast.media","data":["name":"prepare","params":[]]]
-        
-        if mediaController.code(from: data) != nil  {
-            XCTAssert(false)
-        }
-        
-        data = ["service":"org.ocast.media","data":["name":"prepare","params":["options":"some options"]]]
+        let data: [String:Any] = [:]
         
         if mediaController.code(from: data) != nil  {
-            XCTAssert(false)
+            return
         }
-        data = ["service":"org.ocast.media","data":"the data"]
-        
-        if mediaController.code(from: data) != nil  {
-            XCTAssert(false)
-        }
-        
-        data = ["service":"org.ocast.media"]
-        
-        if mediaController.code(from: data) != nil  {
-            XCTAssert(false)
-        }
-        
-        
-        if mediaController.code(from: nil) != nil  {
-            XCTAssert(false)
-        }
-        
-        XCTAssert(true)
+        XCTFail()
     }
     
     func testGetMetadata01 () {
@@ -218,7 +194,9 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
     }
     
     
-    // Unused protocol
-    func onPlaybackStatus (data: PlaybackStatus) {}
-    func onMetaDataChanged (data: Metadata) {}
+    func didReceiveEvent(playbackStatus: PlaybackStatus) {
+    }
+    
+    func didReceiveEvent(metadata: Metadata) {
+    }
 }

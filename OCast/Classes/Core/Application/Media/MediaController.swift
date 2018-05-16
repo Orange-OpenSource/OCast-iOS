@@ -457,7 +457,7 @@ public final class MediaController: NSObject, DataStream {
             let message = response,
             let code = message["code"] as? Int,
             let errorCode = MediaErrorCode(rawValue: code) else {
-                return MediaErrorCode.noError
+                return MediaErrorCode.invalidErrorCode
         }
         return errorCode
     }

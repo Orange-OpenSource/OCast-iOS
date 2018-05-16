@@ -126,7 +126,7 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
     }
     
     //MARK: - Unused protocols
-    // MediaController protocol
-    func onPlaybackStatus(data: PlaybackStatus) {}
-    func onMetaDataChanged (data : Metadata) {}
+    func didReceiveEvent(playbackStatus: PlaybackStatus) {}
+    func didReceiveEvent(metadata: Metadata) {}
 }
+

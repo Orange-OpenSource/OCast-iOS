@@ -57,12 +57,6 @@ class DeviceManagerTests: XCTestCase {
     
     func onError (error: NSError?) {
         
-        switch testID {
-        case 1,2,3:
-            break
-        default:
-            XCTFail()
-        }
     }
     
 }

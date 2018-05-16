@@ -20,7 +20,7 @@ import XCTest
 @testable import OCast
 
 
-class ReferenceLinkTests: XCTestCase , LinkDelegate {
+class ReferenceLinkTests: XCTestCase {
     
     var testId = ""
     var linkDownCount = 0
@@ -39,25 +39,6 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
         super.tearDown()
     }
 
-    func testLinkFactory() {
-
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
-        XCTAssert(referenceLink.count == 1)
-        
-        if referenceLink[ReferenceDriver.LinkId.genericLink] == nil {
-            XCTAssert(false)
-        }
-        
-        browserLink = referenceLink[ReferenceDriver.LinkId.genericLink]
-        
-        guard let link = browserLink else {
-            XCTAssert(false)
-            return
-        }
-        
-        XCTAssert (link.profile.ipAddress == "192.168.1.40")
-    }
-    
     func onSuccessTestID(data: Command) {
 
         switch testId {
@@ -80,17 +61,11 @@ class ReferenceLinkTests: XCTestCase , LinkDelegate {
     }
     
     func testSequenceID() {
-        var referenceLink = [ReferenceDriver.LinkId.genericLink: ReferenceLink(withDelegate: self, andProfile: LinkProfile(identifier: ReferenceDriver.LinkId.genericLink.rawValue, ipAddress: "192.168.1.40", needsEvent: true, app2appURL: "", certInfo: nil))]
-   
-        browserLink = referenceLink[ReferenceDriver.LinkId.genericLink]
-        
+        browserLink = ReferenceLink(withDelegate: nil, andProfile: LinkProfile(module: .application, app2appURL: "192.168.1.40", certInfo: nil))
         XCTAssert (browserLink?.getSequenceId() == 1)
-        
         browserLink?.sequenceID = Int.max
         XCTAssert(browserLink?.getSequenceId() == 1)
     }
-        
-    
     
     // MARK: - Link protocol
     func didReceive(event: Event) {
