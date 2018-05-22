@@ -139,7 +139,6 @@ import CocoaAsyncSocket
             mSearchRetry = ReliabilityParams.low.mSearchRetry
         }
 
-        OCastLog.debug("OCast SDK: Version 0.4.0")
     }
 
     /**
