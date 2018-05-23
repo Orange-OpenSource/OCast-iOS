@@ -115,7 +115,7 @@ extension MainVC {
     // MARK: - Device Manager
     
     func createDeviceManager(with device:Device) {
-        deviceMgr = DeviceManager(with: device, withCertificateInfo: nil)
+        deviceMgr = DeviceManager(with: device, sslConfiguration: nil)
         deviceMgr?.delegate = self
     }
 

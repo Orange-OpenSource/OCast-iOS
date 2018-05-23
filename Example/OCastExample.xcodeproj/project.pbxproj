@@ -13,7 +13,6 @@
 		E4A1887DAFDD0FA7EA70D844 /* Pods_OCastExample_ObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D7D172A0BFB019AD2463665 /* Pods_OCastExample_ObjC.framework */; };
 		EB0BBD641EC2F49A00EC9489 /* DiscoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB0BBD631EC2F49A00EC9489 /* DiscoveryTests.swift */; };
 		EB1A2E021EE6EA2A009EFC81 /* DeviceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2E011EE6EA2A009EFC81 /* DeviceManagerTests.swift */; };
-		EB6192641EEAE4EC004303C4 /* SocketProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB6192631EEAE4EC004303C4 /* SocketProviderTests.swift */; };
 		EB95693E1FBD7D76001D83D0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EB9569331FBD7D76001D83D0 /* AppDelegate.m */; };
 		EB95693F1FBD7D76001D83D0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EB9569341FBD7D76001D83D0 /* Assets.xcassets */; };
 		EB9569401FBD7D76001D83D0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EB9569351FBD7D76001D83D0 /* LaunchScreen.storyboard */; };
@@ -67,7 +66,6 @@
 		EB0BBD631EC2F49A00EC9489 /* DiscoveryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoveryTests.swift; sourceTree = "<group>"; };
 		EB1573321F27439800F6B174 /* OCastExample-ObjC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OCastExample-ObjC.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB1A2E011EE6EA2A009EFC81 /* DeviceManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceManagerTests.swift; sourceTree = "<group>"; };
-		EB6192631EEAE4EC004303C4 /* SocketProviderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketProviderTests.swift; sourceTree = "<group>"; };
 		EB9569321FBD7D76001D83D0 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		EB9569331FBD7D76001D83D0 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		EB9569341FBD7D76001D83D0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -168,7 +166,6 @@
 				EBDB55B31F603F71006FC8AB /* ApplicationManagerTests.swift */,
 				EBB6C7A91F1DFA610057A712 /* ReferenceDataMapperTests.swift */,
 				EBBE88841F2B76AC00A38112 /* DataMapperTests.swift */,
-				EB6192631EEAE4EC004303C4 /* SocketProviderTests.swift */,
 				EB0BBD631EC2F49A00EC9489 /* DiscoveryTests.swift */,
 				EB1A2E011EE6EA2A009EFC81 /* DeviceManagerTests.swift */,
 				EBB6C7A71F1DF56E0057A712 /* ReferenceLinkTest.swift */,
@@ -414,13 +411,11 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-OCastExample-Swift/Pods-OCastExample-Swift-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework",
 				"${BUILT_PRODUCTS_DIR}/OCast/OCast.framework",
-				"${BUILT_PRODUCTS_DIR}/SocketRocket/SocketRocket.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CocoaAsyncSocket.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OCast.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SocketRocket.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -436,13 +431,11 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-OCastExample-ObjC/Pods-OCastExample-ObjC-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework",
 				"${BUILT_PRODUCTS_DIR}/OCast/OCast.framework",
-				"${BUILT_PRODUCTS_DIR}/SocketRocket/SocketRocket.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CocoaAsyncSocket.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OCast.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SocketRocket.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -526,7 +519,6 @@
 				EBB03BC51F46D43900D5D991 /* MediaControllerTests.swift in Sources */,
 				EB1A2E021EE6EA2A009EFC81 /* DeviceManagerTests.swift in Sources */,
 				EBB6C7AA1F1DFA610057A712 /* ReferenceDataMapperTests.swift in Sources */,
-				EB6192641EEAE4EC004303C4 /* SocketProviderTests.swift in Sources */,
 				EBDB55B41F603F71006FC8AB /* ApplicationManagerTests.swift in Sources */,
 				EBB6C7A81F1DF56E0057A712 /* ReferenceLinkTest.swift in Sources */,
 				EBBE88851F2B76AC00A38112 /* DataMapperTests.swift in Sources */,
@@ -741,10 +733,6 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = "";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -766,10 +754,6 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = "";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";

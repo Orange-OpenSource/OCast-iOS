@@ -21,7 +21,7 @@ import Foundation
 // MARK: - Internal Driver protocols
 /// :nodoc:
 @objc public protocol DriverFactory: class {
-    func make(for ipAddress: String, with certificateInfo: CertificateInfo?) -> Driver
+    func make(for ipAddress: String, with sslConfiguration: SSLConfiguration?) -> Driver
 }
 
 // MARK: - Driver states

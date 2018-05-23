@@ -78,11 +78,11 @@ import Foundation
 @objc public class LinkProfile: NSObject {
     public let module: DriverModule
     public let app2appURL: String
-    public let certInfo: CertificateInfo?
-    public init(module: DriverModule, app2appURL: String, certInfo: CertificateInfo?) {
+    public let sslConfiguration: SSLConfiguration?
+    public init(module: DriverModule, app2appURL: String, sslConfiguration: SSLConfiguration?) {
         self.module = module
         self.app2appURL = app2appURL
-        self.certInfo = certInfo
+        self.sslConfiguration = sslConfiguration
     }
 }
 

@@ -38,24 +38,6 @@ internal final class DefaultDataStream: DataStream {
 }
 
 class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
-
-    var testID = 0
-    
-    func testMutliStream () {
-        let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: nil)
-        
-        let stream = DefaultDataStream (forService: "serviceExample")
-        appliMgr.manage(stream: stream)
-        
-        let stream2 = DefaultDataStream (forService: "serviceExample-2")
-        appliMgr.manage(stream: stream2)
-        
-        // Multiple streams can be created.
-        XCTAssert(stream !== stream2)
-        XCTAssert(stream.serviceId != stream2.serviceId)
-    }
     
     func testMediaControllerCreation () {
         
@@ -85,47 +67,6 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         XCTAssert(mediaController === mediaController2)
     }
     
-    func testOnMessageConnectedOK () {
-        testID = 1
-        
-        let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager(with: device)
-        let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: nil)
-        
-        appliMgr.start(onSuccess: onSuccess, onError: onError(error:))
-        
-        let data : [String:Any] = ["name" : "connectionStatus", "params" : ["status":"connected"]]
-        appliMgr.onMessage(data: data)
-    }
-    
-    func testOnMessageConnectedKO () {
-        testID = 2
-        
-        let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let deviceMgr = DeviceManager(with: device)
-        let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController (for: device, with: applicationData, andDriver: nil)
-        
-        appliMgr.start(onSuccess: onSuccess, onError: onError(error:))
-        
-        let data : [String:Any] = ["name" : "connectionStatus", "params" : ["status":"internal error"]]
-        appliMgr.onMessage(data: data)
-    }
-    
-    func onSuccess () {
-        if testID == 1 {
-            XCTAssert(true)
-        } else {
-            XCTAssertTrue(false)
-        }
-    }
-    
-    func onError (error: NSError?) {
-        XCTAssertTrue(false)
-    }
-    
-    //MARK: - Unused protocols
     func didReceiveEvent(playbackStatus: PlaybackStatus) {}
     func didReceiveEvent(metadata: Metadata) {}
 }

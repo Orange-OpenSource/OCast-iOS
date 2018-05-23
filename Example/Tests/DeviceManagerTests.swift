@@ -21,13 +21,11 @@ import XCTest
 @testable import OCast
 
 class DeviceManagerTests: XCTestCase {
-
-    var testID = 0
     
     func testDeviceManageCreation () {
         
         var device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "theDriver", modelName: "")
-        var deviceMgr = DeviceManager (with: device, withCertificateInfo: nil)
+        var deviceMgr = DeviceManager (with: device, sslConfiguration: nil)
         
         // Must fail: The manufacturer does not macth any existing driver.
         XCTAssertNil(deviceMgr)
@@ -47,16 +45,5 @@ class DeviceManagerTests: XCTestCase {
         let deviceMgr = DeviceManager(with: device)
         
         XCTAssertNotNil(deviceMgr)
-        
-        deviceMgr?.applicationController(for: "myApp", onSuccess: onApplicationSuccess, onError: onError(error:))
     }
-    
-    public func onApplicationSuccess(app: ApplicationController) {
-    
-    }
-    
-    func onError (error: NSError?) {
-        
-    }
-    
 }
