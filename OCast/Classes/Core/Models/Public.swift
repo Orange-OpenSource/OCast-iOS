@@ -135,11 +135,15 @@ public struct DataMapper {
  */
 @objcMembers
 @objc public final class SSLConfiguration: NSObject {
-
-    public var serverCertificates: [Data]?
+    /// The device certificates
+    public var deviceCertificates: [Data]?
+    /// The client certificate configuration (certificate and password)
     public var clientCertificate: SSLConfigurationClientCertificate?
+    /// `true` (default) if you must validate the certificate host, `false` if the device hasn't a domain name.
     public var validatesHost: Bool
+    /// `true` (default) to validate the entire SSL chain, otherwise `false`.
     public var validatesCertificateChain: Bool
+    /// `true` to use self-signed certificates, otherwise `false` (default).
     public var disablesSSLCertificateValidation: Bool
     
     public override init() {
@@ -151,12 +155,12 @@ public struct DataMapper {
     /// Initializer
     ///
     /// - Parameters:
-    ///   - serverCertificates: The server certificates (DER format) used for SSL one-way
+    ///   - deviceCertificates: The device certificates (DER format) used for SSL one-way
     ///   - clientCertificate: The client certificate (PKCS12 format) and the password used for SSL two-way
-    public convenience init(serverCertificates: [Data]? = nil, clientCertificate: SSLConfigurationClientCertificate? = nil) {
+    public convenience init(deviceCertificates: [Data]? = nil, clientCertificate: SSLConfigurationClientCertificate? = nil) {
         self.init()
         
-        self.serverCertificates = serverCertificates
+        self.deviceCertificates = deviceCertificates
         self.clientCertificate = clientCertificate
     }
 }
@@ -166,8 +170,9 @@ public struct DataMapper {
  */
 @objcMembers
 @objc public class SSLConfigurationClientCertificate: NSObject {
-
+    /// The client certificate
     public let certificate: Data
+    /// The password to import the certificate
     public let password: String
     
     /// Initializer

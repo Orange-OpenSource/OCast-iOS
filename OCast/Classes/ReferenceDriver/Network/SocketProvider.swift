@@ -129,8 +129,8 @@ final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
     /// - Parameter sslConfiguration: The SSL configuration to apply.
     private func setup(sslConfiguration: SSLConfiguration?) {
         if let sslConfiguration = sslConfiguration {
-            if let serverCertificates = sslConfiguration.serverCertificates {
-                let certificates = serverCertificates.map({ SSLCert(data: $0) })
+            if let deviceCertificates = sslConfiguration.deviceCertificates {
+                let certificates = deviceCertificates.map({ SSLCert(data: $0) })
                 let sslSecurity = SSLSecurity(certs: certificates, usePublicKeys: false)
                 sslSecurity.validatedDN = sslConfiguration.validatesHost
                 sslSecurity.validateEntireChain = sslConfiguration.validatesCertificateChain
