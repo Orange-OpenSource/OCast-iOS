@@ -131,28 +131,57 @@ public struct DataMapper {
 }
 
 /**
- Used to transfer certificate information from the DeviceManager to the Driver.
- Not implemented in this version.
+ Used to configure the SSL connection
  */
 @objcMembers
-@objc public final class CertificateInfo: NSObject {
-
-    public var clientCertificate: Data?
-    public var serverCACertificate: Data?
-    public var serverRootCACertificate: Data?
-    public var password: String?
+@objc public final class SSLConfiguration: NSObject {
+    /// The device certificates
+    public var deviceCertificates: [Data]?
+    /// The client certificate configuration (certificate and password)
+    public var clientCertificate: SSLConfigurationClientCertificate?
+    /// `true` (default) if you must validate the certificate host, `false` if the device hasn't a domain name.
+    public var validatesHost: Bool
+    /// `true` (default) to validate the entire SSL chain, otherwise `false`.
+    public var validatesCertificateChain: Bool
+    /// `true` to use self-signed certificates, otherwise `false` (default).
+    public var disablesSSLCertificateValidation: Bool
+    
+    public override init() {
+        validatesHost = true
+        validatesCertificateChain = true
+        disablesSSLCertificateValidation = false
+    }
     
     /// Initializer
     ///
     /// - Parameters:
-    ///   - serverRootCACertificate: The root server certificate (DER format) used for SSL one-way (can be nil if the serverCACert includes the root certificate)
-    ///   - serverCACertificate: The server certificate (DER format) used for SSL one-way
-    ///   - clientCertificate: The client certificate (DER format) used for SSL two-way
-    ///   - password: The password used for SSL two way
-    public init(serverRootCACertificate: Data?, serverCACertificate: Data?, clientCertificate: Data?, password: String?) {
-        self.serverRootCACertificate = serverRootCACertificate
-        self.serverCACertificate = serverCACertificate
+    ///   - deviceCertificates: The device certificates (DER format) used for SSL one-way
+    ///   - clientCertificate: The client certificate (PKCS12 format) and the password used for SSL two-way
+    public convenience init(deviceCertificates: [Data]? = nil, clientCertificate: SSLConfigurationClientCertificate? = nil) {
+        self.init()
+        
+        self.deviceCertificates = deviceCertificates
         self.clientCertificate = clientCertificate
+    }
+}
+
+/**
+ Used to configure the SSL client certificate
+ */
+@objcMembers
+@objc public class SSLConfigurationClientCertificate: NSObject {
+    /// The client certificate
+    public let certificate: Data
+    /// The password to import the certificate
+    public let password: String
+    
+    /// Initializer
+    ///
+    /// - Parameters:
+    ///   - certificate: The certificate (PKCS12 format)
+    ///   - password: The certificate password
+    public init(certificate: Data, password: String) {
+        self.certificate = certificate
         self.password = password
     }
 }

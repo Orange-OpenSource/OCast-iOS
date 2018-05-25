@@ -75,16 +75,13 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     func connect() {
 
         isDisconnecting = false
-
-        if commandSocket == nil {
-            OCastLog.debug(("WS: Creating Command socket."))
-            commandSocket = SocketProvider(certificateInfo: profile.certInfo)
+        
+        if let socket = SocketProvider(urlString: profile.app2appURL, sslConfiguration: profile.sslConfiguration) {
+            commandSocket = socket
             commandSocket?.delegate = self
-        }
-
-        if let commandSocket = commandSocket {
-            OCastLog.debug(("WS: Connecting the command socket"))
-            commandSocket.connect(with: profile.app2appURL)
+            commandSocket?.connect()
+        } else {
+            OCastLog.debug(("WS: Cannot create the socket provider."))
         }
     }
 
@@ -126,24 +123,22 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     }
 
     // MARK: - SocketProviderDelegate methods
-    func onDisconnected(from socket: SocketProvider, code: Int, reason: String!) {
-
-        if commandSocket == socket {
-            OCastLog.debug("WS: Command is disconnected with code (\(code)), \(reason)")
+    func socketProvider(_ socketProvider: SocketProvider, didDisconnectWithError error: Error?) {
+        if commandSocket == socketProvider {
+            OCastLog.debug("WS: Command is disconnected with error : \(String(describing: error))")
             isDisconnecting ? delegate?.didDisconnect(module: profile.module) : delegate?.didFail(module: profile.module)
         }
     }
 
-    func onConnected(from socket: SocketProvider) {
-        if commandSocket == socket {
+    func socketProvider(_ socketProvider: SocketProvider, didConnectToURL url: URL) {
+        if commandSocket == socketProvider {
             OCastLog.debug("WS: Command is connected.")
             delegate?.didConnect(module: profile.module)
         }
     }
 
-    func onMessageReceived(from socket: SocketProvider, message: String) {
-
-        if commandSocket == socket {
+    func socketProvider(_ socketProvider: SocketProvider, didReceiveMessage message: String) {
+        if commandSocket == socketProvider {
             OCastLog.debug("WS: Received data: \(message)")
             
             guard let ocastData = DataMapper().decodeOCastData(for: message) else {

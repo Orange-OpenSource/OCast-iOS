@@ -26,8 +26,8 @@ import Foundation
         // private initializer to force the use of the singleton instance
     }
 
-   public func make(for ipAddress: String, with certificateInfo: CertificateInfo?) -> Driver {
-        return ReferenceDriver(ipAddress: ipAddress, with: certificateInfo)
+   public func make(for ipAddress: String, with sslConfiguration: SSLConfiguration?) -> Driver {
+        return ReferenceDriver(ipAddress: ipAddress, with: sslConfiguration)
     }
 }
 
@@ -70,7 +70,7 @@ import Foundation
 
     // MARK: - Private interface
     private var ipAddress: String
-    private var certificateInfo: CertificateInfo?
+    private var sslConfiguration: SSLConfiguration?
     
     public private(set) var links: [DriverModule: Link] = [:]
     private var linksState: [DriverModule: DriverState] = [:]
@@ -80,9 +80,9 @@ import Foundation
     private var successDisconnect: [DriverModule: () -> Void] = [:]
     
     // MARK: - Initialization
-    public init(ipAddress: String, with certificateInfo: CertificateInfo?) {
+    public init(ipAddress: String, with sslConfiguration: SSLConfiguration?) {
         self.ipAddress = ipAddress
-        self.certificateInfo = certificateInfo
+        self.sslConfiguration = sslConfiguration
         linksState[.application] = .disconnected
         linksState[.publicSettings] = .disconnected
         linksState[.privateSettings] = .disconnected
@@ -133,7 +133,7 @@ import Foundation
                     let linkProfile = LinkProfile(
                         module: module,
                         app2appURL: app2appURL ?? "",
-                        certInfo: certificateInfo)
+                        sslConfiguration: sslConfiguration)
                     
                     // Check if the same link is already existing in another module
                     if let otherLink = links.first(where: { (_, l) -> Bool in

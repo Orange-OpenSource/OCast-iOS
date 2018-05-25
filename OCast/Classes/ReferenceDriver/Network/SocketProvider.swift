@@ -16,30 +16,42 @@
 //
 
 import Foundation
-import SocketRocket
 
+/// The delegate of a SocketProvider object must adopt the SocketProviderDelegate protocol.
 protocol SocketProviderDelegate {
-    func onDisconnected(from socket: SocketProvider, code: Int, reason: String!)
-    func onConnected(from socket: SocketProvider)
-    func onMessageReceived(from socket: SocketProvider, message: String)
+    
+    /// Tells the delegate that the socket provider is connected to the device.
+    ///
+    /// - Parameters:
+    ///   - socketProvider: The socket provider connected.
+    ///   - url: The connection URL.
+    func socketProvider(_ socketProvider: SocketProvider, didConnectToURL url: URL)
+    
+    /// Tells the delegate that the socket provider has been disconnected from the device.
+    ///
+    /// - Parameters:
+    ///   - socketProvider: The socket provider that was connected.
+    ///   - error: The error.
+    func socketProvider(_ socketProvider: SocketProvider, didDisconnectWithError error: Error?)
+    
+    /// Tells the delegate that the socket provider has received a message.
+    ///
+    /// - Parameters:
+    ///   - socketProvider: The connected socket provider.
+    ///   - message: The message received.
+    func socketProvider(_ socketProvider: SocketProvider, didReceiveMessage message: String)
 }
 
-final class SocketProvider: NSObject, SRWebSocketDelegate {
-
-    enum State {
-        case connected
-        case disconnected
-    }
+/// Class to manage the web socket connection
+final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
     
-    private let certificateInfo: CertificateInfo?
-    
-    private var socket: SRWebSocket?
+    private var socket: WebSocket
     
     private var pingPongTimerRetry: Int8 = 0
     
     private var pingPongTimer = Timer()
     
-    private let pingPongTimerTimeout: TimeInterval = 5
+    private let pingPongTimerTimeInterval = 5.0
     
     private let pingPongTimerMaxRetry: Int8 = 2
     
@@ -47,55 +59,101 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
 
     var delegate: SocketProviderDelegate?
     
-    private(set) var state: State
-    
     // MARK: Initializer
     
-    init(certificateInfo: CertificateInfo?) {
-        self.certificateInfo = certificateInfo
-        state = .disconnected
+    /// Parameterized initializer. If the URL is not valid, the initializer will fail.
+    ///
+    /// - Parameters:
+    ///   - urlString: The URL used to perform the connection.
+    ///   - sslConfiguration: The SSL configuration for secure connections.
+    init?(urlString: String, sslConfiguration: SSLConfiguration?) {
+        guard let url = URL(string: urlString) else { return nil }
+        
+        socket = WebSocket(url: url)
+        
+        super.init()
+    
+        setup(sslConfiguration: sslConfiguration)
+        socket.delegate = self
+        socket.pongDelegate = self
     }
     
     // MARK: Internal methods
 
-    func connect(with command: String) {
-        if socket == nil || (socket?.readyState != .CONNECTING && socket?.readyState != .OPEN) {
-            OCastLog.debug("Socket: Connecting...")
-            socket = socket(with: command)
-            socket?.open()
-            socket?.delegate = self
-        } else {
-            OCastLog.debug("Socket: Ignoring connect due to socket state = \(String(describing: socket?.readyState.rawValue))")
-            delegate?.onConnected(from: self)
-        }
-    }
-
-    func disconnect() {
-        if socket?.readyState != .CLOSED {
-            resetPingPongTimer()
-            OCastLog.debug("Socket: Disconnecting...")
-            socket?.close()
-        }
-    }
-
-    func sendMessage(message: String) -> Bool {
-        guard message.count <= maxPayloadSize else { return false }
+    /// Connects the socket to the remote host.
+    ///
+    /// - Returns: `true` if the connection is performed, `false` if the the socket is already connected.
+    @discardableResult
+    func connect() -> Bool {
+        guard !socket.isConnected else { return false }
         
-        socket?.send(message)
+        stopPingPongTimer()
+        OCastLog.debug("Socket: Connecting...")
+        socket.connect()
+        
+        return true
+    }
+
+    /// Disconnects the socket from the remote host.
+    ///
+    /// - Returns: `true` if the disconnection is performed, `false` if the the socket is not connected.
+    @discardableResult
+    func disconnect() -> Bool {
+        guard socket.isConnected else { return false }
+
+        stopPingPongTimer()
+        OCastLog.debug("Socket: Disconnecting...")
+        socket.disconnect()
+        
+        return true
+    }
+
+    /// Sends a message on the socket.
+    ///
+    /// - Parameter message: The message to send.
+    /// - Returns: `true` if the send is performed, `false` if the the socket is not connected
+    /// or the payload is too long.
+    @discardableResult
+    func sendMessage(message: String) -> Bool {
+        guard socket.isConnected, message.count <= maxPayloadSize else { return false }
+        
+        socket.write(string: message)
         
         return true
     }
     
     // MARK: Private methods
 
-    private func socket(with command: String) -> SRWebSocket? {
-       return SRWebSocket(url: URL(string: command), protocols: nil, allowsUntrustedSSLCertificates: true)
-    }
-
-    private func sendPing() {
-        if socket?.readyState == .OPEN {
-            socket?.sendPing(nil)
+    /// Setups the socket with a SSL configuration.
+    ///
+    /// - Parameter sslConfiguration: The SSL configuration to apply.
+    private func setup(sslConfiguration: SSLConfiguration?) {
+        if let sslConfiguration = sslConfiguration {
+            if let deviceCertificates = sslConfiguration.deviceCertificates {
+                let certificates = deviceCertificates.map({ SSLCert(data: $0) })
+                let sslSecurity = SSLSecurity(certs: certificates, usePublicKeys: false)
+                sslSecurity.validatedDN = sslConfiguration.validatesHost
+                sslSecurity.validateEntireChain = sslConfiguration.validatesCertificateChain
+                socket.security = sslSecurity
+            }
+            socket.disableSSLCertValidation = sslConfiguration.disablesSSLCertificateValidation
+            if let clientCertificate = sslConfiguration.clientCertificate {
+                socket.sslClientCertificate = try? SSLClientCertificate(pkcs12Data: clientCertificate.certificate,
+                                                                        password: clientCertificate.password)
+            }
         }
+    }
+    
+    /// Sends a ping on the socket.
+    ///
+    /// - Returns: `true` if the send is performed, `false` if the socket is not connected.
+    @discardableResult
+    private func sendPing() -> Bool {
+        guard socket.isConnected else { return false }
+        
+        socket.write(ping: Data())
+        
+        return true
     }
 
     // MARK: - Timer management
@@ -103,72 +161,55 @@ final class SocketProvider: NSObject, SRWebSocketDelegate {
     @objc func pingPongTimerExpiry(timer _: Timer) {
         if pingPongTimerRetry == pingPongTimerMaxRetry {
             OCastLog.debug(("Socket: PingPong timer max number of retries reached. Disconnecting."))
-
-            resetPingPongTimer()
-            state = .disconnected
-            delegate?.onDisconnected(from: self, code: 0, reason: "Remote seems down.")
-
-            socket = nil
-
+            // Force to close the socket without sending the frame to the server to be notified earlier
+            socket.disconnect(forceTimeout: 0)
         } else {
             pingPongTimerRetry += 1
-            pingPongTimer = Timer.scheduledTimer(timeInterval: pingPongTimerTimeout, target: self, selector: #selector(pingPongTimerExpiry), userInfo: nil, repeats: false)
-            sendPing()
+            startPingPongTimer()
         }
     }
 
-    private func resetPingPongTimer() {
+    /// Starts the ping pong timer.
+    private func startPingPongTimer() {
+        pingPongTimer = Timer.scheduledTimer(timeInterval: pingPongTimerTimeInterval,
+                                             target: self,
+                                             selector: #selector(pingPongTimerExpiry),
+                                             userInfo: nil,
+                                             repeats: false)
+        sendPing()
+    }
+    
+    /// Stops the ping pong timer.
+    private func stopPingPongTimer() {
         pingPongTimerRetry = 0
         pingPongTimer.invalidate()
     }
 
-    // MARK: - SRWebSocketDelegate methods
+    // MARK: - WebSocketDelegate methods
 
-    func webSocket(_ webSocket: SRWebSocket!, didReceiveMessage message: Any!) {
-        if webSocket == socket {
-            delegate?.onMessageReceived(from: self, message: message as? String ?? "")
-        }
+    func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
+        delegate?.socketProvider(self, didReceiveMessage: text)
+    }
+    
+    func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
     }
 
-    func webSocketDidOpen(_ webSocket: SRWebSocket!) {
-        OCastLog.debug("Socket: did open")
-
-        if webSocket == socket {
-            OCastLog.debug("Socket: send onConnected.")
-            state = .connected
-            delegate?.onConnected(from: self)
-
-            pingPongTimer = Timer.scheduledTimer(timeInterval: pingPongTimerTimeout, target: self, selector: #selector(pingPongTimerExpiry), userInfo: nil, repeats: false)
-            sendPing()
-        }
+    func websocketDidConnect(socket: WebSocketClient) {
+        OCastLog.debug("Socket: Connected")
+        delegate?.socketProvider(self, didConnectToURL: self.socket.currentURL)
+        startPingPongTimer()
     }
 
-    func webSocket(_ webSocket: SRWebSocket!, didCloseWithCode code: Int, reason: String!, wasClean _: Bool) {
-        OCastLog.debug("Socket: did close")
-
-        if webSocket == socket {
-            OCastLog.debug("Socket: send onDisconnect")
-            resetPingPongTimer()
-            state = .disconnected
-            delegate?.onDisconnected(from: self, code: code, reason: reason)
-        }
+    func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
+        OCastLog.debug("Socket: Disconnected")
+        stopPingPongTimer()
+        delegate?.socketProvider(self, didDisconnectWithError: error)
     }
-
-    func webSocket(_ webSocket: SRWebSocket!, didFailWithError error: Error!) {
-        OCastLog.debug("Socket did fail")
-
-        if webSocket == socket {
-            OCastLog.debug("Socket: send onDisconnect")
-            resetPingPongTimer()
-            state = .disconnected
-            delegate?.onDisconnected(from: self, code: 0, reason: error.localizedDescription)
-        }
-    }
-
-    func webSocket(_ webSocket: SRWebSocket!, didReceivePong _: Data!) {
-        if webSocket == socket {
-            OCastLog.debug("Socket: Got a Pong")
-            pingPongTimerRetry = 0
-        }
+    
+    // MARK: - WebSocketPongDelegate methods
+    
+    func websocketDidReceivePong(socket: WebSocketClient, data: Data?) {
+        OCastLog.debug("Socket: Got a Pong")
+        pingPongTimerRetry = 0
     }
 }

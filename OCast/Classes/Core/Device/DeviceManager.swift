@@ -25,7 +25,7 @@ import Foundation
 /**
  Device manager is used to get control over your device.
  ```
- deviceManager = DeviceManager (from: self, with: device, withCertificateInfo: nil)
+ deviceManager = DeviceManager(with: device, sslConfiguration: nil)
  ```
 
  */
@@ -37,7 +37,7 @@ import Foundation
     // application controllers
     private var applicationControllers: [ApplicationController] = []
     // ssl
-    private var certificateInfo: CertificateInfo?
+    private var sslConfiguration: SSLConfiguration?
     // drivers
     private static var driverFactories: [String: DriverFactory] = [:]
     private var driver: Driver?
@@ -50,15 +50,15 @@ import Foundation
 
      - Parameters:
          - device: the device to be managed
-         - certificateInfo: Optional. An array of certificates to establish secured connections to the device.
+         - sslConfiguration: Optional. The SSL configuration to establish secured connections to the device.
      */
-    public init?(with device: Device, withCertificateInfo certificateInfo: CertificateInfo? = nil) {
+    public init?(with device: Device, sslConfiguration: SSLConfiguration? = nil) {
         if DeviceManager.driverFactories[device.manufacturer] == nil {
             OCastLog.error("DeviceManager: Driver for device is not registered")
             return nil
         }
         self.device = device
-        self.certificateInfo = certificateInfo
+        self.sslConfiguration = sslConfiguration
         super.init()
         driver = driver(for: device)
     }
@@ -212,7 +212,7 @@ import Foundation
     // MARK: - Private methods
     private func driver(for device: Device) -> Driver? {
         if let factory = DeviceManager.driverFactories[device.manufacturer] {
-            return factory.make(for: device.ipAddress, with: certificateInfo)
+            return factory.make(for: device.ipAddress, with: sslConfiguration)
         } else {
             OCastLog.error("DeviceManager: Could not initialize the \(device.manufacturer) driver.")
             return nil

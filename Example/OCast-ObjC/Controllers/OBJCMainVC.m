@@ -180,7 +180,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     }
     
     // Create a device manager, then get an application controller to start the Web application.
-    DeviceManager * deviceMgr = [[DeviceManager alloc] initWith:selectedDevice withCertificateInfo:nil];
+    DeviceManager * deviceMgr = [[DeviceManager alloc] initWith:selectedDevice sslConfiguration:nil];
     
     if (deviceMgr == nil) {
         NSLog(@"->Could not instanciate a device manager");

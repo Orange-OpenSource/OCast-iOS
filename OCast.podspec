@@ -49,9 +49,11 @@ s.subspec 'Core' do |core|
 end
 
 s.subspec 'ReferenceDriver' do |reference|
-    reference.source_files   = 'OCast/Classes/ReferenceDriver/**/*'
-    reference.dependency 'SocketRocket' , '0.5.1'
+    reference.source_files   = 'OCast/Classes/ReferenceDriver/**/*', 'Starscream/Sources/*.swift'
     reference.dependency 'OCast/Core'
+    reference.libraries      = 'z'
+    reference.preserve_paths = 'Starscream/zlib/*'
+    reference.pod_target_xcconfig = { 'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/Starscream/zlib' }
 end
 
 end

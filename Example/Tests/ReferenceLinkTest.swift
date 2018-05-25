@@ -22,15 +22,6 @@ import XCTest
 
 class ReferenceLinkTests: XCTestCase {
     
-    var testId = ""
-    var linkDownCount = 0
-    var browserLink:ReferenceLink?
-    
-    var isSuccessCallBack1 = false
-    var isSuccessCallBack2 = false
-    var isErrorCallBack1 = false
-    var isErrorCallBack2 = false
-    
     override func setUp() {
         super.setUp()
     }
@@ -38,87 +29,12 @@ class ReferenceLinkTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
     }
-
-    func onSuccessTestID(data: Command) {
-
-        switch testId {
-
-        case "replyOK", "eventOK":
-            XCTAssert(true)
-        default:
-            XCTAssert(false)
-        }
-    }
-    
-    func onErrorTestID (error: NSError?) {
-        switch testId {
-        case "-1", "replyNOK","payloadNOK" :
-            XCTAssert(true)
-        default:
-            XCTAssert(false)
-        }
-
-    }
     
     func testSequenceID() {
-        browserLink = ReferenceLink(withDelegate: nil, andProfile: LinkProfile(module: .application, app2appURL: "192.168.1.40", certInfo: nil))
-        XCTAssert (browserLink?.getSequenceId() == 1)
-        browserLink?.sequenceID = Int.max
-        XCTAssert(browserLink?.getSequenceId() == 1)
+        let browserLink = ReferenceLink(withDelegate: nil, andProfile: LinkProfile(module: .application, app2appURL: "192.168.1.40", sslConfiguration: nil))
+        XCTAssert (browserLink.getSequenceId() == 1)
+        browserLink.sequenceID = Int.max
+        XCTAssert(browserLink.getSequenceId() == 1)
     }
-    
-    // MARK: - Link protocol
-    func didReceive(event: Event) {
-        switch testId {
-        case "eventOK":
-            XCTAssert(true)
-        default :
-            XCTAssert (false)
-        }
-    }
-    
-    func didConnect(linkWithIdentifier identifier: Int8) {
-        guard let link = browserLink else {
-            XCTAssert(false)
-            return
-        }
-        
-        switch testId {
-        case "pingPong":
-            // False until a link stub is implemented.
-            XCTAssert(false)
-            
-        default:
-            XCTAssert(link.commandSocket?.state == .connected)
-        }
-    }
-    
-    func didDisconnect(linkWithIdentifier identifier: Int8) {
-        guard let link = browserLink else {
-            XCTAssert(false)
-            return
-        }
-        
-        switch testId {
-        case "pingPong":
-            
-            XCTAssert(linkDownCount == 0)
-            
-            linkDownCount = 1
-            
-            XCTAssert(link.commandSocket?.state == .disconnected)
-            
-        case "disconnectOK":
-            XCTAssert (true)
-            
-        default:
-            XCTAssert(false)
-        }
-    }
-
-    func didFail(linkWithIdentifier identifier: Int8) {
-        
-    }
-    
 }
 
