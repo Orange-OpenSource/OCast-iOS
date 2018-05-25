@@ -18,7 +18,7 @@
 import Foundation
 
 /// The delegate of a SocketProvider object must adopt the SocketProviderDelegate protocol.
-protocol SocketProviderDelegate {
+public protocol SocketProviderDelegate: class {
     
     /// Tells the delegate that the socket provider is connected to the device.
     ///
@@ -43,7 +43,7 @@ protocol SocketProviderDelegate {
 }
 
 /// Class to manage the web socket connection
-final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
+public final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
     
     private var socket: WebSocket
     
@@ -57,7 +57,7 @@ final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
     
     private let maxPayloadSize: Int = 4096
 
-    var delegate: SocketProviderDelegate?
+    public weak var delegate: SocketProviderDelegate?
     
     // MARK: Initializer
     
@@ -66,7 +66,7 @@ final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
     /// - Parameters:
     ///   - urlString: The URL used to perform the connection.
     ///   - sslConfiguration: The SSL configuration for secure connections.
-    init?(urlString: String, sslConfiguration: SSLConfiguration?) {
+    public init?(urlString: String, sslConfiguration: SSLConfiguration?) {
         guard let url = URL(string: urlString) else { return nil }
         
         socket = WebSocket(url: url)
@@ -79,12 +79,12 @@ final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
     }
     
     // MARK: Internal methods
-
+    
     /// Connects the socket to the remote host.
     ///
     /// - Returns: `true` if the connection is performed, `false` if the the socket is already connected.
     @discardableResult
-    func connect() -> Bool {
+    public func connect() -> Bool {
         guard !socket.isConnected else { return false }
         
         stopPingPongTimer()
@@ -98,7 +98,7 @@ final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
     ///
     /// - Returns: `true` if the disconnection is performed, `false` if the the socket is not connected.
     @discardableResult
-    func disconnect() -> Bool {
+    public func disconnect() -> Bool {
         guard socket.isConnected else { return false }
 
         stopPingPongTimer()
@@ -114,7 +114,7 @@ final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
     /// - Returns: `true` if the send is performed, `false` if the the socket is not connected
     /// or the payload is too long.
     @discardableResult
-    func sendMessage(message: String) -> Bool {
+    public func sendMessage(message: String) -> Bool {
         guard socket.isConnected, message.count <= maxPayloadSize else { return false }
         
         socket.write(string: message)
@@ -187,28 +187,27 @@ final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDelegate {
 
     // MARK: - WebSocketDelegate methods
 
-    func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
+    public func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
         delegate?.socketProvider(self, didReceiveMessage: text)
     }
     
-    func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
+    public func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
     }
 
-    func websocketDidConnect(socket: WebSocketClient) {
+    public func websocketDidConnect(socket: WebSocketClient) {
         OCastLog.debug("Socket: Connected")
         delegate?.socketProvider(self, didConnectToURL: self.socket.currentURL)
         startPingPongTimer()
     }
 
-    func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
+    public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         OCastLog.debug("Socket: Disconnected")
         stopPingPongTimer()
         delegate?.socketProvider(self, didDisconnectWithError: error)
     }
     
     // MARK: - WebSocketPongDelegate methods
-    
-    func websocketDidReceivePong(socket: WebSocketClient, data: Data?) {
+    public func websocketDidReceivePong(socket: WebSocketClient, data: Data?) {
         OCastLog.debug("Socket: Got a Pong")
         pingPongTimerRetry = 0
     }
