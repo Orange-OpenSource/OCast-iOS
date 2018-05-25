@@ -1,6 +1,6 @@
 OCast Release notes
 ============================
-Version 1.0.3, May 2018
+Version 1.1.0, May 2018
 ============================
 - migrate websocket from SocketRocket to Starscream
 - minor fixes

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
 s.name             = 'OCast'
-s.version          = '1.0.3'
+s.version          = '1.1.0'
 s.summary          = 'OCast SDK provides an application with all necessary functions to cast any contents to an Orange stick.'
 
 # This description is used to generate tags and improve search results.
