@@ -206,13 +206,11 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         // Retrieve runLink to stop application
         var runLink:String!
         if let link = applicationData.runLink,
-            let url = URL(string: link),
-            UIApplication.shared.canOpenURL(url) {
-                runLink = url.absoluteString
+            let url = URL(string: link) {
+            runLink = url.absoluteString
         }
         else if let link = applicationData.runLink,
-                let url = URL(string: "\(target)/\(link)"),
-                UIApplication.shared.canOpenURL(url) {
+            let url = URL(string: "\(target)/\(link)") {
             runLink = url.absoluteString
         } else {
             runLink = "\(target)/run"
