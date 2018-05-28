@@ -43,6 +43,7 @@ s.ios.deployment_target = '8.0'
 s.swift_version = '4.1'
 s.source_files = 'OCast/**/*'
 
+
 s.subspec 'Core' do |core|
     core.source_files   = 'OCast/Classes/Core/**/*'
     core.dependency 'CocoaAsyncSocket', '7.6.3'
@@ -52,8 +53,12 @@ s.subspec 'ReferenceDriver' do |reference|
     reference.source_files   = 'OCast/Classes/ReferenceDriver/**/*', 'Starscream/Sources/*.swift'
     reference.dependency 'OCast/Core'
     reference.libraries      = 'z'
-    reference.preserve_paths = 'Starscream/zlib/*'
-    reference.pod_target_xcconfig = { 'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/Starscream/zlib' }
+    reference.pod_target_xcconfig = { 'SWIFT_INCLUDE_PATHS' => '${BUILT_PRODUCTS_DIR}/StarscreamModuleMap' }
+    reference.script_phase = {
+        :name => 'Generate Module Map',
+        :script => '${PODS_TARGET_SRCROOT}/Starscream/Scripts/generate_modulemap.sh',
+        :execution_position => :before_compile
+    }
 end
 
 end
