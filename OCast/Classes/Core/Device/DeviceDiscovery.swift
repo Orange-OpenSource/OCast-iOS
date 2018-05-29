@@ -254,7 +254,7 @@ import CocoaAsyncSocket
             }
         }
 
-        if mSearchIdx == type(of: mSearchIdx).max {
+        if mSearchIdx == Int.max {
             OCastLog.debug("mSearchIdx reached the maximum allowed value.")
             currentDevicesIdx.keys.forEach({
                 currentDevicesIdx[$0] = 0
@@ -313,50 +313,47 @@ import CocoaAsyncSocket
     }
 
     // MARK: - Device management
+    
     func createDevice(with xmlData: Data, for applicationURL: String?) {
         let parserHelper = XMLHelper()
-        parserHelper.completionHandler = {
-            (error, keys, keysAttributes) in
-            if error == nil {
-                guard
-                    let deviceID = keys?["UDN"],
-                    let friendlyName = keys?["friendlyName"],
-                    let manufacturer = keys?["manufacturer"] else {
-                        OCastLog.error("Missing attribute for device : \(keys ?? [:]).")
-                        return
+        parserHelper.completionHandler = { error, keys, _ in
+            if error == nil, let keys = keys {
+                DispatchQueue.main.async {
+                    self.createDevice(fromXMLKeys: keys, for: applicationURL)
                 }
-                let modelName = keys?["modelName"] ?? ""
-                
-                if !self.currentDevices.contains(where: { (id, _) -> Bool in
-                    return id == deviceID
-                }) {
-                    guard let url = applicationURL,
-                        let baseURL = URL(string: url),
-                        let ipAddress = baseURL.host,
-                        let ipPort = baseURL.port else {
-                            OCastLog.error("URL for Application-(DIAL)URL is invalid (\(applicationURL ?? "")")
-                            return
-                    }
-                    
-                    let device = Device(baseURL: baseURL,
-                                        ipAddress: ipAddress,
-                                        servicePort: UInt16(ipPort),
-                                        deviceID: deviceID,
-                                        friendlyName: friendlyName,
-                                        manufacturer: manufacturer,
-                                        modelName: modelName)
-                    
-                    self.currentDevices[device.deviceID] = device
-                    DispatchQueue.main.async {
-                        self.delegate?.deviceDiscovery(self, didAddDevice: device)
-                    }
-                }
-                self.currentDevicesIdx[deviceID] = self.mSearchIdx
-            } else {
-                OCastLog.error("Error while parsing XML.")
             }
         }
         parserHelper.parseDocument(data: xmlData)
+    }
+    
+    private func createDevice(fromXMLKeys keys: [String: String], for applicationURL: String?) {
+        guard let deviceID = keys["UDN"],
+            let friendlyName = keys["friendlyName"],
+            let manufacturer = keys["manufacturer"] else { return }
+        
+        let modelName = keys["modelName"] ?? ""
+        
+        let deviceAlreadyDiscovered = currentDevices.contains(where: { (id, _) -> Bool in return id == deviceID })
+        
+        if !deviceAlreadyDiscovered {
+            guard let url = applicationURL,
+                let baseURL = URL(string: url),
+                let ipAddress = baseURL.host,
+                let ipPort = baseURL.port else { return }
+            
+            let device = Device(baseURL: baseURL,
+                                ipAddress: ipAddress,
+                                servicePort: UInt16(ipPort),
+                                deviceID: deviceID,
+                                friendlyName: friendlyName,
+                                manufacturer: manufacturer,
+                                modelName: modelName)
+            
+            currentDevices[device.deviceID] = device
+            delegate?.deviceDiscovery(self, didAddDevice: device)
+        }
+        
+        currentDevicesIdx[deviceID] = mSearchIdx
     }
 
     // MARK: - Private Helpers
