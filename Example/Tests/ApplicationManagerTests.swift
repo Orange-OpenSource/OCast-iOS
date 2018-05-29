@@ -43,7 +43,7 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: nil)
+        let appliMgr = ApplicationController(for: device, with: applicationData, target: "", driver:nil)
         
         let mediaController = appliMgr.mediaController(with: self)
 
@@ -57,7 +57,7 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
     func testMultiMediaController () {
         let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController(for: device, with: applicationData, andDriver: nil)
+        let appliMgr = ApplicationController(for: device, with: applicationData, target: "", driver:nil)
         
         let mediaController = appliMgr.mediaController(with: self)
         
