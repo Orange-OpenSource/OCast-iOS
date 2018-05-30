@@ -231,7 +231,7 @@ import Foundation
     }
     
     private func target(from baseURL: URL?, with applicationName: String) -> String? {
-        return URL(string: applicationName, relativeTo: device.baseURL)?.absoluteString
+        return baseURL?.appendingPathComponent(applicationName).absoluteString
     }
 
     private func applicationData(applicationName: String, target: String, onSuccess: @escaping (_ applicationDescription: ApplicationDescription) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
