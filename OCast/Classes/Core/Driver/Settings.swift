@@ -24,6 +24,7 @@ import Foundation
 }
 
 /// :nodoc:
+@objc
 public protocol PublicSettings {
     var publicSettingsEventDelegate:PublicSettingsEventDelegate? { get set }
     // Receive event settings
@@ -57,6 +58,7 @@ extension PublicSettings {
     func didReceiveEvent(blueetoothMouseClicked: String)
 }
 
+@objc
 public protocol PrivateSettings {
     var privateSettingsEventDelegate: PrivateSettingsEventDelegate? { get set }
     // Receive event settings
