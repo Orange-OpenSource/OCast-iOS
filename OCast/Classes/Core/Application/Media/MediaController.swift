@@ -43,7 +43,8 @@ import Foundation
  */
 @objcMembers
 public final class MediaController: NSObject, DataStream {
-
+    private static let mediaControllerErrorDomainName = "MediaController"
+    
     private let delegate: MediaControllerDelegate?
     
     internal init(with delegate: MediaControllerDelegate?) {
@@ -59,9 +60,7 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func prepare(for data: MediaPrepare, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-
         let params: [String: Any] = [
             "url": data.url.absoluteString,
             "frequency": data.frequency,
@@ -76,25 +75,10 @@ public final class MediaController: NSObject, DataStream {
         let dict: [String: Any] = ["name": "prepare", "params": params, "options": options]
         
         dataSender?.send(message: dict,
-                    onSuccess: { response in
-
-                        guard let errorCode = self.code(from: response) else {
-                            // TODO: create error
-                            onError(nil)
-                            return
-                        }
-
-                        if errorCode == MediaErrorCode.noError {
-                            onSuccess()
-                            return
-                        }
-
-                        let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                        onError(newError)
-                    },
-
-                    onError: { error in onError(error) }
-        )
+                         onSuccess: { response in
+                            self.handleResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
 
     /**
@@ -103,66 +87,30 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func pause(withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let dict: [String: Any] = ["name": "pause", "params": [], "options": options]
         
         dataSender?.send(message: dict,
-
-                    onSuccess: { response in
-
-                        guard let errorCode = self.code(from: response) else {
-                            // TODO: create error
-                            onError(nil)
-                            return
-                        }
-
-                        if errorCode == MediaErrorCode.noError {
-                            onSuccess()
-                            return
-                        }
-
-                        let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                        onError(newError)
-                    },
-
-                    onError: { error in onError(error) }
-        )
+                         onSuccess: { response in
+                            self.handleResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
-
+    
     /**
      Stops the current media
      - Parameters:
      - onSuccess: the closure to be called in case of success.
      - onError: the closure to be called in case of error
      */
-
     public func stop(withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let dict: [String: Any] = ["name": "stop", "params": [], "options": options]
         
         dataSender?.send(message: dict,
-
-                    onSuccess: { response in
-
-                        guard let errorCode = self.code(from: response) else {
-                            // TODO: create error
-                            onError(nil)
-                            return
-                        }
-
-                        if errorCode == MediaErrorCode.noError {
-                            onSuccess()
-                            return
-                        }
-
-                        let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                        onError(newError)
-                    },
-
-                    onError: { error in onError(error) }
-        )
+                         onSuccess: { response in
+                            self.handleResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
 
     /**
@@ -171,32 +119,14 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func resume(withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let dict: [String: Any] = ["name": "resume", "params": [], "options": options]
         
         dataSender?.send(message: dict,
-
-                    onSuccess: { response in
-
-                        guard let errorCode = self.code(from: response) else {
-                            // TODO: create error
-                            onError(nil)
-                            return
-                        }
-
-                        if errorCode == MediaErrorCode.noError {
-                            onSuccess()
-                            return
-                        }
-
-                        let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                        onError(newError)
-                    },
-
-                    onError: { error in onError(error) }
-        )
+                         onSuccess: { response in
+                            self.handleResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
 
     /**
@@ -206,33 +136,15 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func play(to position: UInt, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let params: [String: Any] = ["position": position]
         let dict: [String: Any] = ["name": "play", "params": params, "options": options]
         
         dataSender?.send(message: dict,
-
-                    onSuccess: { response in
-
-                        guard let errorCode = self.code(from: response) else {
-                            // TODO: create error
-                            onError(nil)
-                            return
-                        }
-
-                        if errorCode == MediaErrorCode.noError {
-                            onSuccess()
-                            return
-                        }
-
-                        let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                        onError(newError)
-                    },
-
-                    onError: { error in onError(error) }
-        )
+                         onSuccess: { response in
+                            self.handleResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
 
     /**
@@ -242,32 +154,15 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func volume(to level: Float, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let params: [String: Any] = ["volume": level]
         let dict: [String: Any] = ["name": "volume", "params": params, "options": options]
         
-        dataSender?.send(
-            message: dict,
-            onSuccess: {
-            response in
-                guard let errorCode = self.code(from: response) else {
-                    // TODO: create error
-                    onError(nil)
-                    return
-                }
-
-                if errorCode == MediaErrorCode.noError {
-                        onSuccess()
-                        return
-                }
-
-                let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                onError(newError)
-            },
-            onError: onError
-        )
+        dataSender?.send(message: dict,
+                         onSuccess: { response in
+                            self.handleResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
 
     /**
@@ -277,31 +172,15 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func seek(to position: UInt, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let params: [String: Any] = ["position": position]
         let dict: [String: Any] = ["name": "seek", "params": params, "options": options]
         
-        dataSender?.send(
-            message: dict,
-            onSuccess: {
-                response in
-                    guard let errorCode = self.code(from: response) else {
-                        // TODO: create error
-                        onError(nil)
-                        return
-                    }
-
-                    if errorCode == MediaErrorCode.noError {
-                        onSuccess()
-                        return
-                    }
-                    let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                    onError(newError)
-            },
-            onError: onError
-        )
+        dataSender?.send(message: dict,
+                         onSuccess: { response in
+                            self.handleResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
 
     /**
@@ -313,30 +192,15 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func track(type: TrackType, id: String, enabled: Bool, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let params: [String: Any] = ["type": type.toString(), "trackId": id, "enabled": enabled]
         let dict: [String: Any] = ["name": "track", "params": params, "options": options]
-
-        dataSender?.send(
-            message: dict,
-            onSuccess: {
-                response in
-                    guard let errorCode = self.code(from: response) else {
-                        // TODO: create error
-                        onError(nil)
-                        return
-                    }
-                    if errorCode == MediaErrorCode.noError {
-                        onSuccess()
-                        return
-                    }
-                    let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                    onError(newError)
-            },
-            onError: onError
-        )
+        
+        dataSender?.send(message: dict,
+                         onSuccess: { response in
+                            self.handleResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
 
     /**
@@ -346,31 +210,15 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success.
          - onError: the closure to be called in case of error
      */
-
     public func mute(isMuted: Bool, withOptions options: [String: Any] = [:], onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let params: [String: Any] = ["mute": isMuted]
         let dict: [String: Any] = ["name": "mute", "params": params, "options": options]
         
-        dataSender?.send(
-            message: dict,
-            onSuccess: {
-                response in
-                    guard let errorCode = self.code(from: response) else {
-                        // TODO: create error
-                        onError(nil)
-                        return
-                    }
-
-                    if errorCode == MediaErrorCode.noError {
-                        onSuccess()
-                        return
-                    }
-                    let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                    onError(newError)
-            },
-            onError: onError
-        )
+        dataSender?.send(message: dict,
+                         onSuccess: { response in
+                            self.handleResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
 
     /**
@@ -379,36 +227,14 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success. Return the metadata description.
          - onError: the closure to be called in case of error
      */
-
     public func metadata(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: Metadata) -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let dict: [String: Any] = ["name": "getMetadata", "params": [], "options": options]
         
-        dataSender?.send(
-            message: dict,
-            onSuccess: {
-                response in
-                    guard let errorCode = self.code(from: response) else {
-                        // TODO: create error
-                        onError(nil)
-                        return
-                    }
-
-                    if errorCode != MediaErrorCode.noError {
-                        let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                        onError(newError)
-                        return
-                    }
-                    guard let metaData = self.metadata(from: response) else {
-                        // TODO: creer error
-                        onError(nil)
-                        return
-                    }
-                    onSuccess(metaData)
-
-            },
-            onError: onError
-        )
+        dataSender?.send(message: dict,
+                         onSuccess: { response in
+                            self.handleMetadataResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
 
     /**
@@ -417,44 +243,20 @@ public final class MediaController: NSObject, DataStream {
          - onSuccess: the closure to be called in case of success. Return the media status description.
          - onError: the closure to be called in case of error
      */
-
     public func playbackStatus(withOptions options: [String: Any] = [:], onSuccess: @escaping (_: PlaybackStatus) -> Void, onError: @escaping (NSError?) -> Void) {
-        
         let dict: [String: Any] = ["name": "getPlaybackStatus", "params": [], "options": options]
         
-        dataSender?.send(
-            message: dict,
-            onSuccess: {
-                response in
-
-                    guard let errorCode = self.code(from: response) else {
-                        // TODO: create error
-                        onError(nil)
-                        return
-                    }
-
-                    if errorCode != MediaErrorCode.noError {
-                        let newError = NSError(domain: "MediaController", code: errorCode.rawValue, userInfo: ["MediaError": errorCode.toString()])
-                        onError(newError)
-                        return
-                    }
-
-                    guard let metaData = self.playbackStatus(from: response) else {
-                        // TODO: creer erreur
-                        onError(nil)
-                        return
-                    }
-
-                    onSuccess(metaData)
-            },
-            onError: onError
-        )
+        dataSender?.send(message: dict,
+                         onSuccess: { response in
+                            self.handlePlaybackStatusResponse(response, onSuccess: onSuccess, onError: onError)
+        },
+                         onError: onError)
     }
     
     // MARK: - Internal
-    func code(from response: [String: Any]?) -> MediaErrorCode? {
-        guard
-            let message = response,
+    
+    func code(from response: [String: Any]?) -> MediaErrorCode {
+        guard let message = response,
             let code = message["code"] as? Int,
             let errorCode = MediaErrorCode(rawValue: code) else {
                 return MediaErrorCode.invalidErrorCode
@@ -463,49 +265,85 @@ public final class MediaController: NSObject, DataStream {
     }
     
     func metadata(from response: [String: Any]?) -> Metadata? {
-        guard
-            let response = response,
-            let data = response["data"] as? [String: Any],
-            let mediaData = DataMapper().mediaData(with: data),
-            let metaData = DataMapper().metadata(with: mediaData) else {
-                return nil
-        }
+        guard let response = response,
+            let metaData = DataMapper().metadata(with: response) else { return nil }
+        
         return metaData
     }
     
     func playbackStatus(from response: [String: Any]?) -> PlaybackStatus? {
-        guard
-            let response = response,
-            let data = response["data"] as? [String: Any],
-            let mediaData = DataMapper().mediaData(with: data) else {
-                return nil
+        guard let response = response,
+            let playbackStatus = DataMapper().playbackStatus(with: response) else { return nil }
+        
+        return playbackStatus
+    }
+    
+    private func error(from errorCode: MediaErrorCode) -> NSError {
+        return NSError(domain: MediaController.mediaControllerErrorDomainName, code: errorCode.rawValue)
+    }
+    
+    private func handleResponse(_ response: [String: Any]?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+        let errorCode = code(from: response)
+        
+        if errorCode == MediaErrorCode.noError {
+            onSuccess()
+        } else {
+            onError(error(from: errorCode))
         }
-        return DataMapper().playbackStatus(with: mediaData)
+    }
+    
+    private func handleMetadataResponse(_ response: [String: Any]?, onSuccess: @escaping (_: Metadata) -> Void, onError: @escaping (NSError?) -> Void) {
+        let errorCode = code(from: response)
+        
+        if errorCode == MediaErrorCode.noError {
+            if let metaData = metadata(from: response) {
+                onSuccess(metaData)
+            } else {
+                onError(NSError(domain: MediaController.mediaControllerErrorDomainName, code: MediaErrorCode.invalidMetadata.rawValue))
+            }
+        } else {
+            onError(error(from: errorCode))
+        }
+    }
+    
+    private func handlePlaybackStatusResponse(_ response: [String: Any]?, onSuccess: @escaping (_: PlaybackStatus) -> Void, onError: @escaping (NSError?) -> Void) {
+        let errorCode = code(from: response)
+        
+        if errorCode == MediaErrorCode.noError {
+            if let playbackStatus = playbackStatus(from: response) {
+                onSuccess(playbackStatus)
+            } else {
+                onError(NSError(domain: MediaController.mediaControllerErrorDomainName, code: MediaErrorCode.invalidPlaybackStatus.rawValue))
+            }
+        } else {
+            onError(error(from: errorCode))
+        }
     }
 
     // MARK: - DataStream implementation
 
     /// :nodoc:
     public var dataSender: DataSender?
+    
     /// :nodoc:
     public let serviceId = "org.ocast.media"
+    
     /// :nodoc:
     public func onMessage(data: [String: Any]) {
-
         guard let mediaData = DataMapper().mediaData(with: data) else {
-            OCastLog.debug("Receive a bad formatted message : ")
+            OCastLog.debug("Receive a bad formatted message")
             return
         }
 
         switch mediaData.name {
             case "playbackStatus":
-                let playbackStatus = DataMapper().playbackStatus(with: mediaData)
-                delegate?.didReceiveEvent(playbackStatus: playbackStatus)
-            case "metadataChanged":
-                guard let metaData = DataMapper().metadata(with: mediaData) else {
-                    return
+                if let playbackStatus = DataMapper().playbackStatus(with: mediaData) {
+                    delegate?.didReceiveEvent(playbackStatus: playbackStatus)
                 }
-                delegate?.didReceiveEvent(metadata: metaData)
+            case "metadataChanged":
+                if let metaData = DataMapper().metadata(with: mediaData) {
+                    delegate?.didReceiveEvent(metadata: metaData)
+                }
             default:
                 return
         }
