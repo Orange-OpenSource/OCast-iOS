@@ -184,11 +184,17 @@ import Foundation
             onSuccess(controller)
             return
         }
+        
+        guard let target = self.target(from: device.baseURL, with: applicationName) else {
+            onError(NSError(domain: "ErrorDomain", code: 0, userInfo: ["Error": "Bad target URL"]))
+            return
+        }
 
         applicationData(
             applicationName: applicationName,
+            target: target,
             onSuccess: { (description) in
-                let newController = ApplicationController(for: self.device, with: description, andDriver: self.driver)
+                let newController = ApplicationController(for: self.device, with: description, target: target, driver: self.driver)
                 self.driver?.register(self, forModule: .application)
                 self.applicationControllers.append(newController)
                 onSuccess(newController)
@@ -223,10 +229,12 @@ import Foundation
         applicationControllers.forEach { $0.reset() }
         applicationControllers.removeAll()
     }
+    
+    private func target(from baseURL: URL?, with applicationName: String) -> String? {
+        return URL(string: applicationName, relativeTo: device.baseURL)?.absoluteString
+    }
 
-    private func applicationData(applicationName: String, onSuccess: @escaping (_ applicationDescription: ApplicationDescription) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-
-        let target = "\(device.baseURL)/\(applicationName)"
+    private func applicationData(applicationName: String, target: String, onSuccess: @escaping (_ applicationDescription: ApplicationDescription) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         
         initiateHttpRequest(from: self, with: .get, to: target, onSuccess: { (response, data) in
             guard let data = data else {

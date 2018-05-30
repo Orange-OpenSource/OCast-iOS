@@ -68,12 +68,14 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     private var isConnectedEvent = false
     
     // MARK: - Public interface
-    init(for device: Device, with applicationData: ApplicationDescription, andDriver driver: Driver?) {
+    init(for device: Device, with applicationData: ApplicationDescription, target: String, driver: Driver?) {
         self.device = device
         self.applicationData = applicationData
+        self.target = target
         self.driver = driver
-        target = "\(device.baseURL)/\(applicationData.name)"
+        
         super.init()
+        
         semaphore = DispatchSemaphore(value: 0)
     }
 
@@ -201,19 +203,11 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         }
     }
     
-    private func stopApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        
-        // Retrieve runLink to stop application
-        var runLink:String!
-        if let link = applicationData.runLink,
-            let url = URL(string: link) {
-            runLink = url.absoluteString
-        }
-        else if let link = applicationData.runLink,
-            let url = URL(string: "\(target)/\(link)") {
-            runLink = url.absoluteString
-        } else {
-            runLink = "\(target)/run"
+    private func stopApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {        
+        guard let runLink = URL(string: target)?.appendingPathComponent(applicationData.runLink ?? "run").absoluteString else {
+            let error = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Bad run link"])
+            onError(error)
+            return
         }
 
         initiateHttpRequest(from: self, with: .delete, to: runLink, onSuccess: { (_, _) in
