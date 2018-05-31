@@ -19,7 +19,7 @@
 import Foundation
 
 @objc public protocol BrowserDelegate {
-    func send(data: [String: Any], onSuccess: @escaping (Any?) -> Void, onError: @escaping (NSError?) -> Void)
+    func send(data: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void)
     func register(for delegate: EventDelegate)
 }
 
@@ -47,9 +47,9 @@ final class Browser: NSObject, EventDelegate {
         delegate?.send(
             data: streamData,
             onSuccess: {
-                response in
-                    OCastLog.debug("Browser: Received response from driver: \(String(describing: response))")
-                    onSuccess(response as? [String: Any])
+                message in
+                    OCastLog.debug("Browser: Received response from driver: \(String(describing: message))")
+                    onSuccess(message?["data"] as? [String: Any])
             },
             onError: {
                 error in

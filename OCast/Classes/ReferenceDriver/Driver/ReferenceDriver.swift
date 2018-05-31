@@ -258,7 +258,7 @@ import Foundation
     }
     
     // MARK: BrowserDelegate methods
-    open func send(data: [String: Any], onSuccess: @escaping (Any?) -> Void, onError: @escaping (NSError?) -> Void) {
+    open func send(data: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
         
         guard let link = links[.application] else {
             let error = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: 0, userInfo: ["Error": "Link doesn't exists."])
@@ -272,8 +272,8 @@ import Foundation
             payload: payload,
             forDomain: ReferenceDomainName.browser.rawValue,
             onSuccess: {
-                cmdResponse in
-                    onSuccess(cmdResponse.reply)
+                commandReply in
+                    onSuccess(commandReply.message)
             },
             onError: {
                 error in

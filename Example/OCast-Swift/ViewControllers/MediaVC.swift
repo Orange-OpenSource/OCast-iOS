@@ -101,7 +101,7 @@ extension MainVC {
             subtitle: "Intoxicated_Piano",
             logo: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/")!,
             mediaType: .audio,
-            transferMode: .streamed,
+            transferMode: .buffered,
             autoplay: true)
         
         mediaController?.prepare(for: prepareMedia,
@@ -157,7 +157,7 @@ extension MainVC {
             subtitle: "Brought to you by Orange OCast",
             logo: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/")!,
             mediaType: .video,
-            transferMode: .streamed,
+            transferMode: .buffered,
             autoplay: true)
 
         mediaController?.prepare(for: prepareMedia,

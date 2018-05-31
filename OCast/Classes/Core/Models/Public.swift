@@ -61,8 +61,7 @@ public struct DataMapper {
         return BrowserData(service: service, data: data)
     }
     
-    func mediaData(with data: [String: Any]) -> StreamData? {
-        
+    func streamData(with data: [String: Any]) -> StreamData? {
         guard let name = data["name"] as? String,
             let params = data["params"] as? [String: Any] else {
                 return nil
@@ -73,37 +72,37 @@ public struct DataMapper {
     }
     
     func metadata(with data: StreamData) -> Metadata? {
+        let params = data.params
         
-        guard let logoURL = URL(string: data.params["logo"] as? String ?? "") else {
-            return nil
-        }
+        guard let mediaType = params["mediaType"] as? String,
+            let logo = params["logo"] as? String,
+            let logoURL = URL(string: logo) else { return nil }
         
-        let audioTracks = tracks(with: data.params["audioTracks"])
-        let videoTracks = tracks(with: data.params["videoTracks"])
-        let textTracks = tracks(with: data.params["textTracks"])
+        let audioTracks = tracks(with: params["audioTracks"])
+        let videoTracks = tracks(with: params["videoTracks"])
+        let textTracks = tracks(with: params["textTracks"])
         
-        if let mediaType = data.params["mediaType"] as? String {
-            return Metadata(title: data.params["title"] as? String ?? "",
-                            subtitle: data.params["subtitle"] as? String ?? "",
-                            logo: logoURL,
-                            mediaType: MediaType(type: mediaType),
-                            audioTracks: audioTracks,
-                            videoTracks: videoTracks,
-                            textTracks: textTracks)
-        }
-        
-        return nil
+        return Metadata(title: params["title"] as? String ?? "",
+                        subtitle: params["subtitle"] as? String ?? "",
+                        logo: logoURL,
+                        mediaType: MediaType(type: mediaType),
+                        audioTracks: audioTracks,
+                        videoTracks: videoTracks,
+                        textTracks: textTracks)
     }
     
-    func playbackStatus(with data: StreamData) -> PlaybackStatus {
+    func playbackStatus(with data: StreamData) -> PlaybackStatus? {
+        let params = data.params
         
-        let duration = data.params["duration"] as? Double ?? 0.0
-        let mute = data.params["mute"] as? Bool ?? true
-        let position = data.params["position"] as? Double ?? 0.0
-        let state = data.params["state"] as? Int ?? 0
-        let volume = data.params["volume"] as? Double ?? 0
+        guard let state = params["state"] as? Int,
+            let playerState = PlayerState(rawValue: state) else { return nil }
         
-        return PlaybackStatus(duration: duration, mute: mute, position: position, state: PlayerState(rawValue: state)!, volume: volume)
+        let duration = params["duration"] as? Double ?? 0.0
+        let mute = params["mute"] as? Bool ?? true
+        let position = params["position"] as? Double ?? 0.0
+        let volume = params["volume"] as? Double ?? 0
+        
+        return PlaybackStatus(duration: duration, mute: mute, position: position, state: playerState, volume: volume)
     }
     
     func tracks(with data: Any?) -> [TrackDescription]? {
@@ -283,9 +282,11 @@ public struct DataMapper {
     case playerNotReady = 2413
     case invalidTrack = 2414
     case unknowMediaType = 2415
-    case unknownTransferMode = 2006
+    case unknownTransferMode = 2416
     case unknownError = 2500
     /// :nodoc:
+    case invalidMetadata = 9997
+    case invalidPlaybackStatus = 9998
     case invalidErrorCode = 9999
 }
 

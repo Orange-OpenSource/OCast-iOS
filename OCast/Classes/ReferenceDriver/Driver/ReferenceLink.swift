@@ -171,25 +171,13 @@ final class ReferenceLink: Link, SocketProviderDelegate {
                 delegate?.didReceive(event: Event(source: ocastData.source, message: message))
             case .reply:
                 let status = ocastData.status ?? ""
-                
+            
                 if status.uppercased() == "OK" {
-                    let data = message["data"] as? [String: Any]
-                    let commandName = data?["name"] as? String
-                    let response = data?["params"] as? [String: Any]
-                    if let statusCode = response?["code"] as? Int,
-                        statusCode != 0 {
-                        // Erreur
-                        if let errorCallback = errorCallbacks[ocastData.identifier] {
-                            let error = NSError(domain: ErrorDomain, code: statusCode, userInfo: [ErrorDomain: "\(status)"])
-                            errorCallback(error)
-                        }
-                    } else if let successCallback = successCallbacks[ocastData.identifier] {
-                        let response = CommandReply(command: commandName, reply: response)
-                        successCallback(response)
+                    if let successCallback = successCallbacks[ocastData.identifier] {
+                        let reply = CommandReply(message: message)
+                        successCallback(reply)
                     }
-                    
                 } else {
-                    
                     if let errorCallback = errorCallbacks[ocastData.identifier] {
                         let error = NSError(domain: ErrorDomain, code: DriverError.remoteError.rawValue, userInfo: [ErrorDomain: "\(status)"])
                         errorCallback(error)
