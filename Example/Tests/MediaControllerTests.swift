@@ -39,7 +39,7 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         
         let mediaController = appliMgr.mediaController(with: self)
         
-        let data: [String:Any] = ["code":0]
+        let data: [String:Any] = ["name": "test", "params": ["code": 0]]
         
         let code = mediaController.code(from: data)
         XCTAssert(code == MediaErrorCode.noError)
@@ -88,8 +88,7 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         
         let mediaController = appliMgr.mediaController(with: self)
 
-        
-        let data : [String:Any] = ["title":"Planète interdite","subtitle":"Brought to you by Orange OCast","logo":"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/","mediaType":"video","transferMode":"streamed","audioTracks":[["language":"fre","label":"#1 Fre","enabled":true,"id":"0"],["language":"eng","label":"#2 Eng","enabled":false,"id":"1"]],"videoTracks":[],"textTracks":[],"code":0]
+        let data : [String:Any] = ["name": "test", "params": ["title":"Planète interdite","subtitle":"Brought to you by Orange OCast","logo":"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/","mediaType":"video","transferMode":"streamed","audioTracks":[["language":"fre","label":"#1 Fre","enabled":true,"id":"0"],["language":"eng","label":"#2 Eng","enabled":false,"id":"1"]],"videoTracks":[],"textTracks":[],"code":0]]
         
         guard let info =  mediaController.metadata(from: data) else {
             XCTAssert(false)
@@ -143,9 +142,8 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let appliMgr = ApplicationController(for: device, with: applicationData, target: "", driver:nil)
         
         let mediaController = appliMgr.mediaController(with: self)
-
     
-        let data : [String:Any] = ["state":2,"volume":1,"mute":false,"position":1.486712077,"duration":5910.209,"code":0]
+        let data : [String:Any] = ["name": "test", "params": ["state":2,"volume":1,"mute":false,"position":1.486712077,"duration":5910.209,"code":0]]
         
         guard let info = mediaController.playbackStatus(from: data) else  {
             XCTAssert(false)

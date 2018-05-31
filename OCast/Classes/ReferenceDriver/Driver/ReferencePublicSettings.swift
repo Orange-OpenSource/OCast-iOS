@@ -37,8 +37,7 @@ extension ReferenceDriver: PublicSettings {
             forDomain: ReferenceDomainName.settings.rawValue,
             onSuccess: {
                 commandReply in
-                    guard  commandReply.command == PublicSettingsConstants.COMMAND_STATUS,
-                        let statusInfo = DataMapper().statusInfo(for: commandReply.reply) else {
+                    guard let statusInfo = DataMapper().statusInfo(for: commandReply.message) else {
                             // FIXME: create error
                             onError(nil)
                             return
@@ -69,13 +68,10 @@ extension ReferenceDriver: PublicSettings {
             forDomain: ReferenceDomainName.settings.rawValue,
             onSuccess: {
                 commandReply in
-                guard
-                    commandReply.command == PublicSettingsConstants.COMMAND_DEVICE_ID,
-                    let response = commandReply.reply as? [String: Any],
-                    let id = response["id"] as? String else {
-                        // FIXME: create error
-                        onError(nil)
-                        return
+                guard let id = commandReply.message["id"] as? String else {
+                    // FIXME: create error
+                    onError(nil)
+                    return
                 }
                 onSuccess(id)
         }) { (error) in

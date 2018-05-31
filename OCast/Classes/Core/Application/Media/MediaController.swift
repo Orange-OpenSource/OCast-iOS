@@ -256,8 +256,9 @@ public final class MediaController: NSObject, DataStream {
     // MARK: - Internal
     
     func code(from response: [String: Any]?) -> MediaErrorCode {
-        guard let message = response,
-            let code = message["code"] as? Int,
+        guard let data = response,
+            let streamData = DataMapper().streamData(with: data),
+            let code = streamData.params["code"] as? Int,
             let errorCode = MediaErrorCode(rawValue: code) else {
                 return MediaErrorCode.invalidErrorCode
         }
@@ -265,15 +266,17 @@ public final class MediaController: NSObject, DataStream {
     }
     
     func metadata(from response: [String: Any]?) -> Metadata? {
-        guard let response = response,
-            let metaData = DataMapper().metadata(with: response) else { return nil }
+        guard let data = response,
+            let streamData = DataMapper().streamData(with: data),
+            let metaData = DataMapper().metadata(with: streamData) else { return nil }
         
         return metaData
     }
     
     func playbackStatus(from response: [String: Any]?) -> PlaybackStatus? {
-        guard let response = response,
-            let playbackStatus = DataMapper().playbackStatus(with: response) else { return nil }
+        guard let data = response,
+            let streamData = DataMapper().streamData(with: data),
+            let playbackStatus = DataMapper().playbackStatus(with: streamData) else { return nil }
         
         return playbackStatus
     }
@@ -330,18 +333,18 @@ public final class MediaController: NSObject, DataStream {
     
     /// :nodoc:
     public func onMessage(data: [String: Any]) {
-        guard let mediaData = DataMapper().mediaData(with: data) else {
+        guard let streamData = DataMapper().streamData(with: data) else {
             OCastLog.debug("Receive a bad formatted message")
             return
         }
 
-        switch mediaData.name {
+        switch streamData.name {
             case "playbackStatus":
-                if let playbackStatus = DataMapper().playbackStatus(with: mediaData) {
+                if let playbackStatus = DataMapper().playbackStatus(with: streamData) {
                     delegate?.didReceiveEvent(playbackStatus: playbackStatus)
                 }
             case "metadataChanged":
-                if let metaData = DataMapper().metadata(with: mediaData) {
+                if let metaData = DataMapper().metadata(with: streamData) {
                     delegate?.didReceiveEvent(metadata: metaData)
                 }
             default:

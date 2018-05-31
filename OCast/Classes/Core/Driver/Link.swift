@@ -50,16 +50,14 @@ import Foundation
 }
 
 @objc public class CommandReply: NSObject {
-    public let command: String?
-    public var reply: Any?
-    public init(command: String? = "", reply: Any?) {
-        self.command = command
-        self.reply = reply
+    public var message: [String: Any]
+    public init(message: [String: Any]) {
+        self.message = message
     }
     
     public override var description: String {
         get {
-            return "Reply for Command: \(command ?? "noname") / Reply: \(reply ?? "nil")"
+            return "Reply : \(message)"
         }
     }
 }

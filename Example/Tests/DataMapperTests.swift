@@ -219,18 +219,18 @@ class DataMapperTests: XCTestCase {
 
     func testMediaController () {
         var data: [String:Any] = ["name":"playbackStatus","params":["state":"buffering","volume":1,"mute":false,"position":1 ,"duration":10]]
-        var result = DataMapper().mediaData(with: data)
+        var result = DataMapper().streamData(with: data)
         XCTAssert(result?.name == "playbackStatus")
         XCTAssert(result?.options == nil)
         XCTAssert(result?.params != nil)
         
         data = ["params":["state":"buffering","volume":1,"mute":false,"position":1 ,"duration":10]]
-        result = DataMapper().mediaData(with: data)
+        result = DataMapper().streamData(with: data)
         XCTAssert(result == nil)
         
         
         data = ["name":"playbackStatus"]
-        result = DataMapper().mediaData(with: data)
+        result = DataMapper().streamData(with: data)
         XCTAssert(result == nil)
         
     }
