@@ -18,12 +18,6 @@
 
 import Foundation
 
-// MARK: - Internal Driver protocols
-/// :nodoc:
-@objc public protocol DriverFactory: class {
-    func make(for ipAddress: String, with sslConfiguration: SSLConfiguration?) -> Driver
-}
-
 // MARK: - Driver states
 /// :nodoc:
 @objc public enum DriverState:Int {
@@ -50,6 +44,7 @@ import Foundation
 
 /// :nodoc:
 @objc public protocol Driver: BrowserDelegate {
+    init(ipAddress: String, with sslConfiguration: SSLConfiguration?)
     var browserEventDelegate: EventDelegate? { get set }
     func privateSettingsAllowed() -> Bool
     func connect(for module: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)

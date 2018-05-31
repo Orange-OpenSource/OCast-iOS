@@ -39,8 +39,8 @@ import Foundation
     // ssl
     private var sslConfiguration: SSLConfiguration?
     // drivers
-    private static var driverFactories: [String: DriverFactory] = [:]
     private var driver: Driver
+    private static var registeredDrivers: [String: Driver.Type] = [:]
     private var device: Device
 
     // MARK: - Public interface
@@ -188,18 +188,18 @@ import Foundation
      Registers a driver to connect to a device.
 
      - Parameters:
-        - name: Driver manufacturer's name. Caps sensitive. This value must match the manufacturer name present in the response to a MSEARCH Target.
-        - factory: The factory instance that is in chrage of buildng a driver instance.
+        - driverType: The Type of the driver class to register (for example ReferenceDriver.self)
+        - name: The Driver manufacturer's name. Caps sensitive. This value must match the manufacturer name present in the response to a MSEARCH Target.
      */
-   public static func registerDriver(forName name: String, factory: DriverFactory) -> Bool {
-        driverFactories[name] = factory
-        return true
+    public static func registerDriver(_ driverType: Driver.Type, forManufacturer name: String) {
+        registeredDrivers[name] = driverType
     }
 
     // MARK: - Private methods
+
     private static func driver(for device: Device, with sslConfiguration: SSLConfiguration?) -> Driver? {
-        if let factory = DeviceManager.driverFactories[device.manufacturer] {
-            return factory.make(for: device.ipAddress, with: sslConfiguration)
+        if let driverType = DeviceManager.registeredDrivers[device.manufacturer] {
+            return driverType.init(ipAddress: device.ipAddress, with: sslConfiguration)
         } else {
             OCastLog.error("DeviceManager: Could not initialize the \(device.manufacturer) driver.")
             return nil
