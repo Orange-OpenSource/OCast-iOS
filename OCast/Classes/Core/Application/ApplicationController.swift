@@ -236,12 +236,14 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
             }
             self.xmlParser.completionHandler = { (error, result, attributes) -> Void in
                 if error == nil {
-                    guard let state = result?["state"], let _ = result?["name"] else {
+                    guard let state = result?["state"],
+                        let _ = result?["name"],
+                        let newState = State(rawValue: state) else {
                         let newError = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Missing parameters state/name"])
                         onError(newError)
                         return
                     }
-                    self.currentState = State(rawValue: state)!
+                    self.currentState = newState
                     onSuccess()
                 } else {
                     let newError = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Parsing error for \(self.target)\n Error: \(error?.localizedDescription ?? "")."])

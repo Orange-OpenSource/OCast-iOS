@@ -40,7 +40,7 @@ import Foundation
     private var sslConfiguration: SSLConfiguration?
     // drivers
     private static var driverFactories: [String: DriverFactory] = [:]
-    private var driver: Driver?
+    private var driver: Driver
     private var device: Device
 
     // MARK: - Public interface
@@ -53,19 +53,16 @@ import Foundation
          - sslConfiguration: Optional. The SSL configuration to establish secured connections to the device.
      */
     public init?(with device: Device, sslConfiguration: SSLConfiguration? = nil) {
-        if DeviceManager.driverFactories[device.manufacturer] == nil {
-            OCastLog.error("DeviceManager: Driver for device is not registered")
-            return nil
-        }
+        guard let driver = DeviceManager.driver(for: device, with: sslConfiguration) else { return nil }
+        
         self.device = device
         self.sslConfiguration = sslConfiguration
+        self.driver = driver
+        
         super.init()
-        driver = driver(for: device)
     }
 
     /**
-     Not implemented in this version.
-     
      
      Used to get a reference to the publicSettingController class
      - Parameters:
@@ -73,13 +70,6 @@ import Foundation
          - onError: the closure to be called in case of error
      */
     public func publicSettingsController(onSuccess: @escaping (_: PublicSettings) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-
-        guard let driver = driver else {
-            let newError = NSError(domain: "DeviceManager", code: 0, userInfo: ["Error": "Driver is not created."])
-            onError(newError)
-            return
-        }
-
         if driver.state(for: .publicSettings) == .connected, let driver = driver as? PublicSettings {
             onSuccess(driver)
             return
@@ -89,7 +79,7 @@ import Foundation
 
         driver.connect(for: .publicSettings, with: nil,
                        onSuccess: {
-                            if let publicSettingsCtrl = driver as? PublicSettings {
+                            if let publicSettingsCtrl = self.driver as? PublicSettings {
                                 onSuccess(publicSettingsCtrl)
                             } else {
                                 // TODO: create error
@@ -101,8 +91,6 @@ import Foundation
     }
 
     /**
-     Not implemented in this version.
-     
      
      Used to release the reference to the publicSettingController class.
      - Parameters:
@@ -110,7 +98,7 @@ import Foundation
          - onError: the closure to be called in case of error
      */
     public func releasePublicSettingsController(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        driver?.disconnect(for: .publicSettings, onSuccess: onSuccess, onError: onError)
+        driver.disconnect(for: .publicSettings, onSuccess: onSuccess, onError: onError)
     }
 
     /**
@@ -123,13 +111,6 @@ import Foundation
          - onError: the closure to be called in case of error
      */
     public func privateSettingsController(onSuccess: @escaping (_: PrivateSettings) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-
-        guard let driver = driver else {
-            let newError = NSError(domain: "DeviceManager", code: 0, userInfo: ["Error": "Driver is not created."])
-            onError(newError)
-            return
-        }
-
         if !driver.privateSettingsAllowed() {
             let newError = NSError(domain: "DeviceManager", code: 0, userInfo: ["Error": "Private settings are not available"])
             onError(newError)
@@ -145,7 +126,7 @@ import Foundation
 
         driver.connect(for: .privateSettings, with: nil,
                        onSuccess: {
-                            if let privateSettingsCtrl = driver as? PrivateSettings {
+                            if let privateSettingsCtrl = self.driver as? PrivateSettings {
                                 onSuccess(privateSettingsCtrl)
                             }  else {
                                 // TODO: create error
@@ -166,7 +147,7 @@ import Foundation
          - onError: the closure to be called in case of error
      */
     public func releasePrivateSettingsController(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        driver?.disconnect(for: .privateSettings, onSuccess: onSuccess, onError: onError)
+        driver.disconnect(for: .privateSettings, onSuccess: onSuccess, onError: onError)
     }
 
     /**
@@ -195,7 +176,7 @@ import Foundation
             target: target,
             onSuccess: { (description) in
                 let newController = ApplicationController(for: self.device, with: description, target: target, driver: self.driver)
-                self.driver?.register(self, forModule: .application)
+                self.driver.register(self, forModule: .application)
                 self.applicationControllers.append(newController)
                 onSuccess(newController)
         },
@@ -216,7 +197,7 @@ import Foundation
     }
 
     // MARK: - Private methods
-    private func driver(for device: Device) -> Driver? {
+    private static func driver(for device: Device, with sslConfiguration: SSLConfiguration?) -> Driver? {
         if let factory = DeviceManager.driverFactories[device.manufacturer] {
             return factory.make(for: device.ipAddress, with: sslConfiguration)
         } else {
