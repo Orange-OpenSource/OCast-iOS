@@ -38,6 +38,7 @@ public struct PublicSettingsConstants {
     public static let COMMAND_STATUS = "getUpdateStatus"
     public static let COMMAND_DEVICE_ID = "getDeviceID"
     public static let SERVICE_SETTINGS_DEVICE = "org.ocast.settings.device"
+    public static let EVENT_STATUS = "updateStatus"
 }
 
 extension PublicSettings {

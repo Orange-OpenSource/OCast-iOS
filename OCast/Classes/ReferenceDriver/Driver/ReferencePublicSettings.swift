@@ -37,7 +37,9 @@ extension ReferenceDriver: PublicSettings {
             forDomain: ReferenceDomainName.settings.rawValue,
             onSuccess: {
                 commandReply in
-                    guard let statusInfo = DataMapper().statusInfo(for: commandReply.message) else {
+                guard let data = commandReply.message["data"] as? [String: Any],
+                    let streamData = DataMapper().streamData(with: data),
+                    let statusInfo = DataMapper().statusInfo(with: streamData) else {
                             // FIXME: create error
                             onError(nil)
                             return
@@ -68,10 +70,12 @@ extension ReferenceDriver: PublicSettings {
             forDomain: ReferenceDomainName.settings.rawValue,
             onSuccess: {
                 commandReply in
-                guard let id = commandReply.message["id"] as? String else {
-                    // FIXME: create error
-                    onError(nil)
-                    return
+                guard let data = commandReply.message["data"] as? [String: Any],
+                    let streamData = DataMapper().streamData(with: data),
+                    let id = streamData.params["id"] as? String else {
+                        // FIXME: create error
+                        onError(nil)
+                        return
                 }
                 onSuccess(id)
         }) { (error) in
@@ -82,7 +86,17 @@ extension ReferenceDriver: PublicSettings {
         }
     }
     
-    open func didReceivePublicSettingsEvent(withMessage message: [String : Any]) {
+    open func didReceivePublicSettingsEvent(withMessage message: [String: Any]) {
+        guard let data = message["data"] as? [String: Any],
+            let streamData = DataMapper().streamData(with: data) else {
+            OCastLog.debug("Reference Driver Public Settings : Receive a bad formatted message")
+            return
+        }
         
+        if streamData.name == PublicSettingsConstants.EVENT_STATUS,
+            let statusInfo = DataMapper().statusInfo(with: streamData) {
+            
+            publicSettingsEventDelegate?.didReceiveEvent(updateStatus: statusInfo)
+        }
     }
 }
