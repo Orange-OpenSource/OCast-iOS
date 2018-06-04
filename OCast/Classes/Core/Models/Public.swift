@@ -118,14 +118,12 @@ public struct DataMapper {
         }
     }
     
-    func statusInfo(for data: Any?) -> StatusInfo? {
-        guard let message = data as? [String:Any] else {
-            return nil
-        }
+    func statusInfo(with data: StreamData) -> StatusInfo? {
+        let params = data.params
         
-        return StatusInfo(version: message["version"]  as? String,
-                          state:   message["state"]    as? String,
-                          progress:message["progress"] as? Int ?? 0)
+        return StatusInfo(version: params["version"] as? String,
+                          state: params["state"] as? String,
+                          progress: params["progress"] as? Int ?? 0)
     }
 }
 
