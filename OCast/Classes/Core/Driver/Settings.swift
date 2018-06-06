@@ -52,7 +52,7 @@ extension PublicSettings {
 // MARK: - PrivateSettings protocol
 @objc public protocol PrivateSettingsEventDelegate {
     func didReceiveEvent(connectionStatus: String)
-    func didReceiveEvent(bluetoothDeviceInfo: String)
+    func didReceiveEvent(bluetoothDeviceInfo: BluetoothDevice)
     func didReceiveEvent(bluetoothKeyPressed: String)
     func didReceiveEvent(bluetoothMouseMovedToPositionX x: Int, andY y: Int)
     func didReceiveEvent(blueetoothMouseClicked: String)
@@ -64,20 +64,21 @@ public protocol PrivateSettings {
     // Receive event settings
     func didReceivePrivateSettingsEvent(withMessage message: [String: Any])
     // Network
-    func scanAPs(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
+    func scanAPs(pinCode: Int, onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
     func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
-    func setAP(ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func setAP(pinCode: Int, ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
-    func pbWPS(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func pbWPS(pinCode: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func getWifiInfo(onSuccess:@escaping (WifiInfo) -> (), onError:@escaping (NSError?) -> ())
     func getNetworkInfo(onSuccess:@escaping (NetworkInfo) -> (), onError:@escaping (NSError?) -> ())
+    func getAPPinCode(onSuccess: @escaping (Int) -> (), onError: @escaping (NSError?) -> ())
     // Device
     func setDevice(name: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func getInfo(onSuccess:@escaping (VersionInfo) -> (), onError:@escaping (NSError?) -> ())
     func reboot(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func getDeviceInfo(onSuccess:@escaping (DeviceInfo) -> (), onError:@escaping (NSError?) -> ())
     func reset(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
-    func checkFlash(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func checkStick(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     // bluetooth
     func startDiscovery(profiles: [String], timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func stopDiscovery(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
@@ -88,25 +89,28 @@ public protocol PrivateSettings {
 
 extension PrivateSettings {
     // Network
-    public func scanAPs(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {
+    public func scanAPs(pinCode: Int, onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     public func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
-    public func setAP(ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+    public func setAP(pinCode: Int, ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     public func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
-    public func pbWPS(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+    public func pbWPS(pinCode: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     public func getWifiInfo(onSuccess:@escaping (WifiInfo) -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     public func getNetworkInfo(onSuccess:@escaping (NetworkInfo) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    func getAPPinCode(onSuccess: @escaping (Int) -> (), onError: @escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     // Device
@@ -125,7 +129,7 @@ extension PrivateSettings {
     public func reset(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
-    public func checkFlash(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+    public func checkStick(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     // bluetooth
