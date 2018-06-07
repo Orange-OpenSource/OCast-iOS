@@ -38,9 +38,8 @@ class DeviceManagerTests: XCTestCase {
     
        
     func testApplicationController () {
-        if !DeviceManager.registerDriver(forName: "Orange SA", factory: ReferenceDriverFactory.shared) {
-            XCTFail()
-        }
+        DeviceManager.registerDriver(ReferenceDriver.self, forManufacturer: "Orange SA")
+        
         let device = Device(baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
         let deviceMgr = DeviceManager(with: device)
         

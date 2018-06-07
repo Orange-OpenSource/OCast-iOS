@@ -17,20 +17,6 @@
 
 import Foundation
 
-@objcMembers
-@objc public final class ReferenceDriverFactory: NSObject, DriverFactory {
-
-    public static let shared = ReferenceDriverFactory()
-
-    private override init() {
-        // private initializer to force the use of the singleton instance
-    }
-
-   public func make(for ipAddress: String, with sslConfiguration: SSLConfiguration?) -> Driver {
-        return ReferenceDriver(ipAddress: ipAddress, with: sslConfiguration)
-    }
-}
-
 /**
  Provides the Reference driver implementation.
  The driver needs to be registered by the application as shonw below:
@@ -80,7 +66,7 @@ import Foundation
     private var successDisconnect: [DriverModule: () -> Void] = [:]
     
     // MARK: - Initialization
-    public init(ipAddress: String, with sslConfiguration: SSLConfiguration?) {
+    public required init(ipAddress: String, with sslConfiguration: SSLConfiguration?) {
         self.ipAddress = ipAddress
         self.sslConfiguration = sslConfiguration
         linksState[.application] = .disconnected

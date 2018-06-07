@@ -82,9 +82,7 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
         
         setupUI ()
 
-        if !DeviceManager.registerDriver(forName: ReferenceDriver.manufacturer, factory: ReferenceDriverFactory.shared) {
-            return
-        }
+        DeviceManager.registerDriver(ReferenceDriver.self, forManufacturer: "Orange SA")
         
         deviceDiscovery = DeviceDiscovery(forTargets: [referenceST])
         deviceDiscovery.delegate = self

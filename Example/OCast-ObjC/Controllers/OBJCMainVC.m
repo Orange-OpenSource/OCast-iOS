@@ -53,10 +53,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 
     [_stickIcon setEnabled:NO];
     
-    if ([DeviceManager registerDriverForName:ReferenceDriver.manufacturer factory:ReferenceDriverFactory.shared] == NO) {
-        NSLog(@"-> Driver could not be registered.");
-        return;
-    }
+    [DeviceManager registerDriver:ReferenceDriver.class forManufacturer: @"Orange SA"];
     
     deviceDiscovery = [[DeviceDiscovery alloc] initForTargets:@[ReferenceDriver.searchTarget]];
     deviceDiscovery.delegate = self;
