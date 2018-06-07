@@ -27,6 +27,12 @@ public struct OCastData {
     public let message: [String: Any]?
 }
 
+public struct StreamData {
+    public let name: String
+    public let params: [String: Any]
+    public let options: [String: Any]?
+}
+
 public struct DataMapper {
     
     public init() {
@@ -61,7 +67,7 @@ public struct DataMapper {
         return BrowserData(service: service, data: data)
     }
     
-    func streamData(with data: [String: Any]) -> StreamData? {
+    public func streamData(with data: [String: Any]) -> StreamData? {
         guard let name = data["name"] as? String,
             let params = data["params"] as? [String: Any] else {
                 return nil

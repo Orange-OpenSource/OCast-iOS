@@ -26,13 +26,6 @@ struct BrowserData {
     let data: [String: Any]?
 }
 
-// Used to transfer data from/to the Stream north interface
-struct StreamData {
-    let name: String
-    let params: [String: Any]
-    let options: [String: Any]?
-}
-
 // Used by the MediaControler
 
 extension MediaType {
@@ -167,14 +160,16 @@ public final class BluetoothDevice: NSObject {
     public let profiles: [String]?
     public let state: String?
     public let battery: Int
+    public let version: String?
     
-    @objc public init(name: String?, macAddress: String?, cod: String?, profiles: [String]?, state: String?, battery: Int) {
+    @objc public init(name: String?, macAddress: String?, cod: String?, profiles: [String]?, state: String?, battery: Int, version: String?) {
         self.name = name
         self.macAddress = macAddress
         self.cod = cod
         self.profiles = profiles
         self.state = state
         self.battery = battery
+        self.version = version
     }
 }
 
