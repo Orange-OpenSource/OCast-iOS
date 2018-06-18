@@ -84,7 +84,7 @@ public protocol PrivateSettings {
     func startDiscovery(profiles: [String], timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func stopDiscovery(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func getDevices(profiles: [String], onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ())
-    func sendCommand(name: String, macAddress: String, onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ())
+    func sendCommand(type: BluetoothCommandType, macAddress: String, onSuccess:@escaping (BluetoothDeviceState) -> (), onError:@escaping (NSError?) -> ())
     func sendPinCode(code: String, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ())
 }
 
@@ -143,7 +143,7 @@ extension PrivateSettings {
     public func getDevices(profiles: [String], onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
-    public func sendCommand(name: String, macAddress: String, onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ()) {
+    public func sendCommand(type: BluetoothCommandType, macAddress: String, onSuccess:@escaping (BluetoothDeviceState) -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     public func sendPinCode(code: String, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {
