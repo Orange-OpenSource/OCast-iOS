@@ -19,8 +19,16 @@
 import Foundation
 
 // MARK: - PublicSettings protocol
+
+/// The delegate of a PublicSettings object must adopt the PublicSettingsEventDelegate protocol in order to receive public setting events.
 @objc public protocol PublicSettingsEventDelegate {
-    func didReceiveEvent(updateStatus: StatusInfo)
+    
+    /// Tells the delegate that the publicsettings has received a status event.
+    ///
+    /// - Parameters:
+    ///   - publicSettings: The `PublicSettings` instance.
+    ///   - updateStatus: The `StatusInfo`object containing status information.
+    func publicSettings(_ publicSettings: PublicSettings, didReceiveUpdateStatus updateStatus: StatusInfo)
 }
 
 /// :nodoc:
