@@ -170,6 +170,14 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         [_stickIcon setEnabled:NO];
     }
 }
+    
+- (void)deviceDiscoveryDidDisconnect:(DeviceDiscovery *)deviceDiscovery withError:(NSError *)error {
+    if (error != nil) {
+        devices = [[NSArray<Device *> alloc] init];
+        [_stickPickerView reloadAllComponents];
+        [_stickIcon setEnabled:NO];
+    }
+}
 
 #pragma mark - User's actions
 

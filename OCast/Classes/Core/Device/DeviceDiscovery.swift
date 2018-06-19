@@ -38,6 +38,14 @@ import CocoaAsyncSocket
          - device: lost device information . See `Device` for details.
      */
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device)
+    
+    /**
+     Gets called when the discovery is stopped by error or not. All the devices are removed.
+     - Parameters:
+        - deviceDiscovery: module (delegate) registered for notifications
+        - error: the error if there's a problem, nil if the `DeviceDiscovery` has been stopped normally.
+     */
+    func deviceDiscoveryDidDisconnect(_ deviceDiscovery: DeviceDiscovery, withError error: Error?)
 }
 
 /**
@@ -205,7 +213,6 @@ import CocoaAsyncSocket
      */
     @objc public func stop() {
         ssdpSocket?.close()
-        mSearchTimer.invalidate()
         isRunning = false
     }
 
@@ -239,8 +246,12 @@ import CocoaAsyncSocket
     }
 
     /// :nodoc:
-    public final func udpSocketDidClose(_: GCDAsyncUdpSocket, withError _: Error?) {
-        OCastLog.debug("UDP Socket did close")
+    public final func udpSocketDidClose(_ sock: GCDAsyncUdpSocket, withError error: Error?) {
+        mSearchTimer.invalidate()
+        isRunning = false
+        resetContext()
+        
+        delegate?.deviceDiscoveryDidDisconnect(self, withError: error)
     }
 
     func sendMSearch() {

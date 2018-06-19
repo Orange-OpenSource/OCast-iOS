@@ -108,6 +108,7 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
     func deviceManager(_ deviceManager: DeviceManager, privateSettingsDidDisconnectWithError error: NSError) {}
 
     // MARK: - DeviceDiscoveryDelegate methods
+    
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {
         devices = deviceDiscovery.devices
         
@@ -131,6 +132,14 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
         }
         
         OCastLog.debug ("-> Device lost = \(device.friendlyName). Now managing \(devices.count) device(s).")
+    }
+    
+    func deviceDiscoveryDidDisconnect(_ deviceDiscovery: DeviceDiscovery, withError error: Error?) {        
+        if error != nil {
+            devices.removeAll()
+            stickPickerView.reloadAllComponents()
+            setUIStickDisconnected()
+        }
     }
     
     func onDeviceSelected(device: Device) {

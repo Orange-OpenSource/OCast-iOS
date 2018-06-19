@@ -20,8 +20,10 @@ import XCTest
 @testable import OCast
 
 class DummyDiscovery : DeviceDiscoveryDelegate {
+    
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device) {}
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {}
+    func deviceDiscoveryDidDisconnect(_ deviceDiscovery: DeviceDiscovery, withError error: Error?) {}
 }
 
 class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate {
@@ -269,4 +271,5 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate {
         XCTFail()
     }
     
+    func deviceDiscoveryDidDisconnect(_ deviceDiscovery: DeviceDiscovery, withError error: Error?) {}
 }
