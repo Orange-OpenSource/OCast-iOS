@@ -131,6 +131,15 @@ public final class WifiInfo: NSObject {
 }
 
 /// :nodoc:
+@objc public enum WifiStatus: Int {
+    case ok
+    case ipError
+    case associationError
+    case wpsError
+    case accessPointError
+}
+
+/// :nodoc:
 @objcMembers
 @objc public final class NetworkInfo: NSObject {
     public let ipAddress: String?

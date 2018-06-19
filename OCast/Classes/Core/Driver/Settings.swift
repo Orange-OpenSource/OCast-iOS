@@ -59,12 +59,45 @@ extension PublicSettings {
 }
 
 // MARK: - PrivateSettings protocol
+
+/// The delegate of a PrivateSettings object must adopt the PrivateSettingsEventDelegate protocol in order to receive private setting events.
 @objc public protocol PrivateSettingsEventDelegate {
-    func didReceiveEvent(connectionStatus: String)
-    func didReceiveEvent(bluetoothDeviceInfo: BluetoothDevice)
-    func didReceiveEvent(bluetoothKeyPressed: String)
-    func didReceiveEvent(bluetoothMouseMovedToPositionX x: Int, andY y: Int)
-    func didReceiveEvent(blueetoothMouseClicked: String)
+    
+    /// Tells the delegate that the privatesettings has received a WiFi status event.
+    ///
+    /// - Parameters:
+    ///   - privateSettings: The `PrivateSettings` instance.
+    ///   - wifiStatus: The `WifiStatus` object containing Wifi information.
+    func privateSettings(_ privateSettings: PrivateSettings, didReceiveWifiConnectionStatus wifiStatus: WifiStatus)
+    
+    /// Tells the delegate that the privatesettings has received a device info event.
+    ///
+    /// - Parameters:
+    ///   - privateSettings: The `PrivateSettings` instance.
+    ///   - bluetoothDevice: The `BluetoothDevice` object containing device information.
+    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothDeviceInfo bluetoothDevice: BluetoothDevice)
+    
+    /// Tells the delegate that the privatesettings has received a bluetooth keyboard event.
+    ///
+    /// - Parameters:
+    ///   - privateSettings: The `PrivateSettings` instance.
+    ///   - key: The key typed by the user.
+    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothKeyPressed key: String)
+    
+    /// Tells the delegate that the privatesettings has received a bluetooth mouse position event.
+    ///
+    /// - Parameters:
+    ///   - privateSettings: The `PrivateSettings` instance.
+    ///   - x: The mouse x position.
+    ///   - y: The mouse y position.
+    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothMouseMovedToX x: Int, Y y: Int)
+    
+    /// Tells the delegate that the privatesettings has received a bluetooth mouse click event.
+    ///
+    /// - Parameters:
+    ///   - privateSettings: The `PrivateSettings` instance.
+    ///   - key: The button clicked by the user.
+    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBlueetoothMouseClicked key: String)
 }
 
 @objc
