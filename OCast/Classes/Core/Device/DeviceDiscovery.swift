@@ -329,10 +329,9 @@ import CocoaAsyncSocket
     private func createDevice(fromXMLKeys keys: [String: String], for applicationURL: String?) {
         guard let deviceID = keys["UDN"],
             let friendlyName = keys["friendlyName"],
-            let manufacturer = keys["manufacturer"] else { return }
-        
-        let modelName = keys["modelName"] ?? ""
-        
+            let manufacturer = keys["manufacturer"],
+            let modelName = keys["modelName"] else { return }
+                
         let deviceAlreadyDiscovered = currentDevices.contains(where: { (id, _) -> Bool in return id == deviceID })
         
         if !deviceAlreadyDiscovered {

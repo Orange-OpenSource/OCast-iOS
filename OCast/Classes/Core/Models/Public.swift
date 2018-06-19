@@ -220,14 +220,14 @@ public struct DataMapper {
     ///   - friendlyName: friendly name
     ///   - manufacturer: manufacturer's name
     ///   - modelName: model name
-    init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String?) {
+    init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String) {
         self.baseURL = baseURL
         self.ipAddress = ipAddress
         self.servicePort = servicePort
         self.deviceID = deviceID
         self.friendlyName = friendlyName
         self.manufacturer = manufacturer
-        self.modelName = modelName!
+        self.modelName = modelName
     }
 }
 
