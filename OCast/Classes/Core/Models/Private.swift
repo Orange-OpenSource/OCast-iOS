@@ -84,6 +84,29 @@ extension TrackType {
     }
 }
 
+extension StickState {
+    
+    init(state : String) {
+        switch (state) {
+        case "notChecked": self = .notChecked
+        case "upToDate": self = .upToDate
+        case "newVersionFound": self = .newVersionFound
+        case "newVersionReady": self = .newVersionReady
+        case "downloading": self = .downloading
+        case "error": self = .error
+        case "success": self = .success
+        default: self = .notChecked
+        }
+    }
+}
+
+/// :nodoc:
+@objc public enum WifiMode: Int {
+    case station
+    case accessPoint
+}
+
+/// :nodoc:
 @objcMembers
 public final class WifiInfo: NSObject {
     public let ssid: String?
@@ -93,9 +116,9 @@ public final class WifiInfo: NSObject {
     public let security: Int?
     public let ip: String?
     public let macAddress: String?
-    public let mode: String?
+    public let mode: WifiMode
     
-    public init (ssid: String?, bssid: String?, frequency: Float?, rssi: Int?, security: Int?, ip: String?, macAddress: String?, mode: String?) {
+    public init (ssid: String?, bssid: String?, frequency: Float?, rssi: Int?, security: Int?, ip: String?, macAddress: String?, mode: WifiMode) {
         self.ssid = ssid
         self.bssid = bssid
         self.frequency = frequency
@@ -121,7 +144,7 @@ public final class WifiInfo: NSObject {
     }
 }
 
-
+/// :nodoc:
 @objcMembers
 public final class VersionInfo: NSObject {
     public let name: String?
@@ -135,6 +158,7 @@ public final class VersionInfo: NSObject {
     }
 }
 
+/// :nodoc:
 @objcMembers
 public final class DeviceInfo: NSObject {
     public let vendor: String?
@@ -152,17 +176,26 @@ public final class DeviceInfo: NSObject {
     }
 }
 
+/// :nodoc:
+@objc public enum BluetoothDeviceState: Int {
+    case paired
+    case connected
+    case unpaired
+    case remove
+}
+
+/// :nodoc:
 @objcMembers
 public final class BluetoothDevice: NSObject {
     public let name: String?
     public let macAddress: String?
     public let cod: String?
     public let profiles: [String]?
-    public let state: String?
+    public let state: BluetoothDeviceState
     public let battery: Int
     public let version: String?
     
-    @objc public init(name: String?, macAddress: String?, cod: String?, profiles: [String]?, state: String?, battery: Int, version: String?) {
+    @objc public init(name: String?, macAddress: String?, cod: String?, profiles: [String]?, state: BluetoothDeviceState, battery: Int, version: String?) {
         self.name = name
         self.macAddress = macAddress
         self.cod = cod
@@ -172,5 +205,14 @@ public final class BluetoothDevice: NSObject {
         self.version = version
     }
 }
+
+/// :nodoc:
+@objc public enum BluetoothCommandType: Int {
+    case pair
+    case unpair
+    case connect
+    case disconnect
+}
+
 
 

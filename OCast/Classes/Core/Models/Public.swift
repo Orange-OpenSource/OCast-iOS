@@ -127,8 +127,10 @@ public struct DataMapper {
     func statusInfo(with data: StreamData) -> StatusInfo? {
         let params = data.params
         
+        guard let state = params["state"] as? String else { return nil }
+        
         return StatusInfo(version: params["version"] as? String,
-                          state: params["state"] as? String,
+                          state: StickState(state: state),
                           progress: params["progress"] as? Int ?? 0)
     }
 }
@@ -247,15 +249,36 @@ public struct DataMapper {
     }
 }
 
+/**
+ Stick state
+ 
+ - `.notChecked`: not checked
+ - `.upToDate`: up to date
+ - `.newVersionFound`: new firmware available
+ - `.newVersionReady`: new firmware ready to download
+ - `.downloading`: new firmware downloading
+ - `.error`: error during the firmware update
+ - `.success`: firmware updated with success
+ 
+ */
+@objc public enum StickState: Int {
+    case notChecked
+    case upToDate
+    case newVersionFound
+    case newVersionReady
+    case downloading
+    case error
+    case success
+}
+
 /// :nodoc:
-// Not impemented in this version.
 @objcMembers
 @objc public final class StatusInfo: NSObject {
     public let version: String?
-    public let state: String?
-    public let progress: Int?
+    public let state: StickState
+    public let progress: Int
 
-    @objc public init(version: String?, state: String?, progress: Int) {
+    @objc public init(version: String?, state: StickState, progress: Int) {
         self.version = version
         self.state = state
         self.progress = progress
