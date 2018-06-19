@@ -67,7 +67,6 @@ extension HttpProtocol {
                     return
                 }
 
-                OCastLog.debug(("OK (\(httpResponse.statusCode)) for \(command.rawValue)/\(url)"))
                 onSuccess(httpResponse, data)
             }
         }

@@ -202,14 +202,12 @@ import Foundation
 
     // MARK: - Link Protocol
     open func didConnect(module: DriverModule) {
-        OCastLog.debug("Reference Driver: Link is connected.")
         linksState[module] = .connected
         successConnect[module]?()
         successConnect.removeValue(forKey: module)
     }
 
     open func didDisconnect(module: DriverModule) {
-        OCastLog.debug("Reference Driver: Link is disconnected.")
         linksState[module] = .disconnected
         links.removeValue(forKey: module)
         successDisconnect[module]?()
@@ -217,7 +215,6 @@ import Foundation
     }
 
     open func didFail(module: DriverModule) {
-        OCastLog.debug(("Reference Driver: Unexpected link disconnection."))
         successConnect.removeValue(forKey: module)
         successDisconnect.removeValue(forKey: module)
         linksState[module] = .disconnected

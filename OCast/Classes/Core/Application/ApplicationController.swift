@@ -159,7 +159,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
      */
 
     public func manage(stream: DataStream) {
-        OCastLog.debug("ApplicationMgr: manage Stream for \(stream.serviceId)")
         if browser == nil {
             browser = Browser()
             browser?.delegate = driver
@@ -268,7 +267,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         if name == "connectedStatus" {
             let params = data["params"] as? [String: String]
             if params?["status"] == "connected" {
-                OCastLog.debug("ApplicationMgr: Got the 'Connected' webapp message.")
                 isConnectedEvent = true
                 semaphore?.signal()
             }

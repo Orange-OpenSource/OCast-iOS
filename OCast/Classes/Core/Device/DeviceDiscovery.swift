@@ -224,8 +224,6 @@ import CocoaAsyncSocket
         guard let udpData: NSString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else {
             return
         }
-
-        //OCastLog.debug("Ok From \(udpSocket.localHost() ?? "") on port \(udpSocket.localPort())\n\(udpData)")
  
         guard let searchTarget = getStickSearchTarget(fromUDPData: udpData as String) else {
             OCastLog.error("Search Target is missing or corrputed. Aborting.")
@@ -284,7 +282,6 @@ import CocoaAsyncSocket
             if let deviceIdx = currentDevicesIdx[deviceId] {
                 
                 if deviceIdx + self.mSearchRetry <= mSearchIdx {
-                    OCastLog.debug("Lost device \(cachedDevice.friendlyName)")
                     
                     currentDevices.removeValue(forKey: deviceId)
                     currentDevicesIdx.removeValue(forKey: deviceId)
@@ -312,7 +309,6 @@ import CocoaAsyncSocket
 
         let applicationDIALURL = httpResponse?.allHeaderFields["Application-DIAL-URL"]
         let applicationURL = httpResponse?.allHeaderFields["Application-URL"]
-        OCastLog.debug("HTTP Response: DIAL-URL:\(applicationDIALURL ?? ""), URL:\(applicationURL ?? "")")
 
         if let appURL = applicationDIALURL {
             return appURL as? String
