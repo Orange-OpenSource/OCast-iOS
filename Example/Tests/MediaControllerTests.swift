@@ -182,9 +182,7 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
     }
     
     
-    func didReceiveEvent(playbackStatus: PlaybackStatus) {
-    }
+    func mediaController(_ mediaController: MediaController, didReceivePlaybackStatus playbackStatus: PlaybackStatus) {}
     
-    func didReceiveEvent(metadata: Metadata) {
-    }
+    func mediaController(_ mediaController: MediaController, didReceiveMetadata metadata: Metadata) {}
 }

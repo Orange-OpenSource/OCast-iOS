@@ -23,14 +23,14 @@ extension MainVC {
     
     //MARK: - Media Controller protocol
 
-    func didReceiveEvent(metadata: Metadata) {
+    func mediaController(_ mediaController: MediaController, didReceiveMetadata metadata: Metadata) {
         OCastLog.debug(("-> MetaData from MediaController: \(metadata)"))
         
         metadataTitleLabel.text = metadata.title
         updateTracks(from: metadata)
     }
     
-    func didReceiveEvent(playbackStatus: PlaybackStatus) {
+    func mediaController(_ mediaController: MediaController, didReceivePlaybackStatus playbackStatus: PlaybackStatus) {
         mediaDuration = playbackStatus.duration
         
         OCastLog.debug("-> MediaStatus position: \(playbackStatus.position.format(f: ".2"))")
@@ -251,7 +251,8 @@ extension MainVC {
         mediaController?.metadata(
             onSuccess: { metadata in
                 OCastLog.debug("->MetaData is OK.")
-                 self.didReceiveEvent(metadata: metadata)
+                self.metadataTitleLabel.text = metadata.title
+                self.updateTracks(from: metadata)
                 
         },
             onError: {error in

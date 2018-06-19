@@ -333,7 +333,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 
 #pragma mark -  MediaControllerDelegate methods
 
-- (void)didReceiveEventWithPlaybackStatus:(PlaybackStatus * _Nonnull)playbackStatus {
+- (void)mediaController:(MediaController *)mediaController didReceivePlaybackStatus:(PlaybackStatus *)playbackStatus {
     NSLog(@"-> Got onPlaybackStatus: Position = %f", playbackStatus.position);
     NSLog(@"-> Got onPlaybackStatus: Volume = %f", playbackStatus.volume);
     NSLog(@"-> Got onPlaybackStatus: Duration = %f", playbackStatus.duration);
@@ -365,7 +365,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     });
 };
 
-- (void)didReceiveEventWithMetadata:(Metadata * _Nonnull)metadata {
+- (void)mediaController:(MediaController *)mediaController didReceiveMetadata:(Metadata *)metadata {
     NSLog(@"-> MetaData changed: %@", metadata);
     
     TrackDescription *track;
