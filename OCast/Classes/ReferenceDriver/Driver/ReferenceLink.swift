@@ -17,12 +17,6 @@
 
 import Foundation
 
-class ReferenceLinkFactory : LinkFactory {
-    static func make(withDelegate delegate: LinkDelegate, andProfile profile: LinkProfile) -> Link {
-        return ReferenceLink(withDelegate: delegate, andProfile: profile)
-    }
-}
-
 public enum ReferenceDomainName: String {
     case browser = "browser"
     case settings = "settings"
@@ -56,11 +50,6 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     // MARK: - Internal
     let linkUUID = UUID().uuidString
     var commandSocket: SocketProvider?
-    var port: UInt16 = 4434
-    var socketTimer: Timer?
-    
-    var commandPrefix: String!
-    
     var isDisconnecting: Bool = false
     var sequenceID: Int = 0
     var successCallbacks: [Int: (CommandReply) -> Void] = [:]
