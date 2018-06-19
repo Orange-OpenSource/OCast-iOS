@@ -21,10 +21,6 @@ import OCast
 
 class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate, DeviceManagerDelegate, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
-    func deviceDidDisconnect(module: DriverModule, withError error: NSError?) {
-        
-    }
-    
     @IBOutlet var webAppLabel: UITextField!
     @IBOutlet var webAppStatusLabel: UILabel!
     @IBOutlet var positionLabel: UILabel!
@@ -96,8 +92,9 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
 
     
     //MARK: DeviceManagerDelegate methods
-    func deviceDidDisconnect(withError error: NSError) {
-        OCastLog.debug("-> Connection to the stick is down.")
+    
+    func deviceManager(_ deviceManager: DeviceManager, applicationDidDisconnectWithError error: NSError) {
+        OCastLog.debug("-> Application is disconnected.")
         resetContext ()
         guard deviceDiscovery.start() else {
             return
@@ -106,6 +103,10 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
         stickPickerView.reloadAllComponents()
     }
     
+    func deviceManager(_ deviceManager: DeviceManager, publicSettingsDidDisconnectWithError error: NSError) {}
+    
+    func deviceManager(_ deviceManager: DeviceManager, privateSettingsDidDisconnectWithError error: NSError) {}
+
     // MARK: - DeviceDiscoveryDelegate methods
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {
         devices = deviceDiscovery.devices

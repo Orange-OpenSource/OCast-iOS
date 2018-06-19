@@ -34,7 +34,7 @@ import Foundation
 }
 
 @objc public protocol DriverDelegate {
-    func didFail(module: DriverModule, withError error: NSError?)
+    func driver(_ driver: Driver, didDisconnectModule module: DriverModule, withError error: NSError)
 }
 
 /// :nodoc:

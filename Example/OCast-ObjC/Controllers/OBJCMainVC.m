@@ -121,8 +121,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 
 #pragma mark - DeviceManagerDelegate methods
 
-- (void)deviceDidDisconnectWithModule:(enum DriverModule)module_ withError:(NSError * _Nullable)error {
-    NSLog(@"-> Driver is disconnected.");
+- (void)deviceManager:(DeviceManager * _Nonnull)deviceManager applicationDidDisconnectWithError:(NSError * _Nonnull)error {
+    NSLog(@"-> Application is disconnected.");
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.webAppStatus.text = @"disconnected";
@@ -143,8 +143,11 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     if ([deviceDiscovery start] == NO) {
         NSLog(@"-> Could not start the discovery process.");
     }
-    
 }
+    
+- (void)deviceManager:(DeviceManager * _Nonnull)deviceManager privateSettingsDidDisconnectWithError:(NSError * _Nonnull)error {}
+    
+- (void)deviceManager:(DeviceManager * _Nonnull)deviceManager publicSettingsDidDisconnectWithError:(NSError * _Nonnull)error {}
 
 #pragma mark - DeviceDiscoveryDelegate methods
 

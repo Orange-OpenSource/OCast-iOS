@@ -224,7 +224,7 @@ import Foundation
         links[module]?.disconnect()
         links.removeValue(forKey: module)
         let newError = NSError(domain: "Reference driver", code: 0, userInfo: ["Error": "Unexpected link disconnection"])
-        delegates[module]?.didFail(module: module, withError: newError)
+        delegates[module]?.driver(self, didDisconnectModule: module, withError: newError)
     }
 
     open func didReceive(event: Event) {
