@@ -45,7 +45,7 @@ import CocoaAsyncSocket
         - deviceDiscovery: module (delegate) registered for notifications
         - error: the error if there's a problem, nil if the `DeviceDiscovery` has been stopped normally.
      */
-    func deviceDiscoveryDidDisconnect(_ deviceDiscovery: DeviceDiscovery, withError error: Error?)
+    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, withError error: Error?)
 }
 
 /**
@@ -105,7 +105,7 @@ import CocoaAsyncSocket
     public weak var delegate: DeviceDiscoveryDelegate?
     private let ssdpAddress = "239.255.255.250"
     private let ssdpPort: UInt16 = 1900
-    private var ssdpSocket: GCDAsyncUdpSocket?
+    private var ssdpSocket: GCDAsyncUdpSocket
     private var error: NSError?
     
     private var mSearchTargets: [String]
@@ -116,8 +116,6 @@ import CocoaAsyncSocket
     
     private var currentDevices = [String: Device]()
     private var currentDevicesIdx = [String: Int]()
-    
-    public private(set) var isRunning: Bool 
     
     /// List of current active devices
     public var devices: [Device] {
@@ -131,10 +129,10 @@ import CocoaAsyncSocket
          - policy:  `Reliability` level for discovery process
      */
     @objc public init(forTargets searchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
+        ssdpSocket = GCDAsyncUdpSocket()
         mSearchIdx = 0
         self.mSearchTargets = searchTargets
-        isRunning = false
-
+        
         switch policy {
         case .high:
             mSearchTimeout = ReliabilityParams.high.mSearchTimeout
@@ -146,7 +144,11 @@ import CocoaAsyncSocket
             mSearchTimeout = ReliabilityParams.low.mSearchTimeout
             mSearchRetry = ReliabilityParams.low.mSearchRetry
         }
-
+        
+        super.init()
+        
+        ssdpSocket.setDelegate(self)
+        ssdpSocket.setDelegateQueue(DispatchQueue.main)
     }
 
     /**
@@ -168,33 +170,16 @@ import CocoaAsyncSocket
      */
     @discardableResult
     @objc public func start() -> Bool {
-
-        guard !isRunning else {
+        guard !ssdpSocket.isConnected() else {
             OCastLog.error("This instance is alreay running. Aborting.")
             return false
         }
-
-        ssdpSocket?.close()
-
-        ssdpSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.main)
-
-        guard let ssdpSocket = ssdpSocket else {
-            OCastLog.error("Could not create the UDP socket")
-            return false
-        }
-
+        
         do {
             try ssdpSocket.bind(toPort: 0)
-        } catch {
-            OCastLog.error("Could not bind the UDP socket")
-            ssdpSocket.close()
-            return false
-        }
-
-        do {
             try ssdpSocket.beginReceiving()
         } catch {
-            OCastLog.error("Could not setup the receiving call back")
+            OCastLog.error("Cannot start the discovery")
             ssdpSocket.close()
             return false
         }
@@ -203,8 +188,6 @@ import CocoaAsyncSocket
         sendMSearch()
         mSearchTimer = Timer.scheduledTimer(timeInterval: mSearchTimeout, target: self, selector: #selector(mSearchTimerExpiry), userInfo: nil, repeats: true)
 
-        isRunning = true
-
         return true
     }
 
@@ -212,32 +195,19 @@ import CocoaAsyncSocket
      Stops a discovery process.
      */
     @objc public func stop() {
-        ssdpSocket?.close()
-        isRunning = false
+        ssdpSocket.close()
     }
 
     // MARK: - UDP management
 
     /// :nodoc:
     public func udpSocket(_ udpSocket : GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext _: Any?) {
-        
-        guard let udpData: NSString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else {
-            return
-        }
- 
-        guard let searchTarget = getStickSearchTarget(fromUDPData: udpData as String) else {
-            OCastLog.error("Search Target is missing or corrputed. Aborting.")
-            return
-        }
-
-        if !isTargetMatching(for: searchTarget) {
-            OCastLog.debug("Warning: Search Target is not as exepected \(searchTarget). Aborting.")
-            return
-        }
-
-        guard let location = getStickLocation(fromUDPData: udpData as String) else {
-            OCastLog.error("Location parameter is missing.")
-            return
+        guard let udpString = String(data: data, encoding: .utf8),
+            let searchTarget = getStickSearchTarget(fromUDPData: udpString),
+            isTargetMatching(for: searchTarget),
+            let location = getStickLocation(fromUDPData: udpString) else {
+                OCastLog.error("Bad SSDP response")
+                return
         }
 
         initiateHttpRequest(from: self, with: .get, to: location, onSuccess: didReceiveHttpResponse(response:with:), onError: { _ in })
@@ -246,29 +216,18 @@ import CocoaAsyncSocket
     /// :nodoc:
     public final func udpSocketDidClose(_ sock: GCDAsyncUdpSocket, withError error: Error?) {
         mSearchTimer.invalidate()
-        isRunning = false
         resetContext()
         
-        delegate?.deviceDiscoveryDidDisconnect(self, withError: error)
+        delegate?.deviceDiscoveryDidStop(self, withError: error)
     }
 
     func sendMSearch() {
-        if let ssdpSocket = ssdpSocket {
-            var tagIndex = 0
-            mSearchTargets.forEach { (target) in
-                let mSearchString = "M-SEARCH * HTTP/1.1\r\nHOST: \(ssdpAddress):\(ssdpPort)\r\nMan: \"ssdp:discover\"\r\nMX:\(mSearchTimeout) \r\nST: \(target)\r\n\r\n"
+        var tagIndex = 0
+        mSearchTargets.forEach { (target) in
+            let mSearchString = "M-SEARCH * HTTP/1.1\r\nHOST: \(ssdpAddress):\(ssdpPort)\r\nMan: \"ssdp:discover\"\r\nMX:\(mSearchTimeout) \r\nST: \(target)\r\n\r\n"
             
-                ssdpSocket.send(mSearchString.data(using: String.Encoding.utf8)!, toHost: ssdpAddress, port: ssdpPort, withTimeout: 1, tag: tagIndex)
-                tagIndex += 1
-            }
-        }
-
-        if mSearchIdx == Int.max {
-            OCastLog.debug("mSearchIdx reached the maximum allowed value.")
-            currentDevicesIdx.keys.forEach({
-                currentDevicesIdx[$0] = 0
-            })
-            mSearchIdx = 0
+            ssdpSocket.send(mSearchString.data(using: String.Encoding.utf8)!, toHost: ssdpAddress, port: ssdpPort, withTimeout: 1, tag: tagIndex)
+            tagIndex += 1
         }
 
         mSearchIdx += 1

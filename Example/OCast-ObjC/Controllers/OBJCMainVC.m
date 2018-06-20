@@ -171,7 +171,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     }
 }
     
-- (void)deviceDiscoveryDidDisconnect:(DeviceDiscovery *)deviceDiscovery withError:(NSError *)error {
+- (void)deviceDiscoveryDidStop:(DeviceDiscovery *)deviceDiscovery withError:(NSError *)error {
     if (error != nil) {
         devices = [[NSArray<Device *> alloc] init];
         [_stickPickerView reloadAllComponents];
