@@ -57,7 +57,6 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
     var appliMgr: ApplicationController?
 
     var customStream : CustomStream?
-    var mediaController: MediaController?
     var shouldPause: Bool = true
     var shouldMute: Bool = true
     var mediaDuration: Double = 0.0

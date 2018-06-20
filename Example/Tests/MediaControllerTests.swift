@@ -37,11 +37,10 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController (for: device, with: applicationData, target: "", driver:nil)
         
-        let mediaController = appliMgr.mediaController(with: self)
         
         let data: [String:Any] = ["name": "test", "params": ["code": 0]]
         
-        let code = mediaController.code(from: data)
+        let code = appliMgr.mediaController.code(from: data)
         XCTAssert(code == MediaErrorCode.noError)
     }
     
@@ -54,11 +53,10 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController (for: device, with: applicationData, target: "", driver:nil)
         
-        let mediaController = appliMgr.mediaController(with: self)
 
         let data: [String:Any] = ["code":1]
         
-        let code = mediaController.code(from: data)
+        let code = appliMgr.mediaController.code(from: data)
         XCTAssertEqual(code, MediaErrorCode.invalidErrorCode)
     }
     
@@ -70,13 +68,10 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController (for: device, with: applicationData, target: "", driver:nil)
         
-        let mediaController = appliMgr.mediaController(with: self)
-
-        
         // Code is missing
         let data: [String:Any] = [:]
 
-        let code = mediaController.code(from: data)
+        let code = appliMgr.mediaController.code(from: data)
         XCTAssertEqual(code, MediaErrorCode.invalidErrorCode)
     }
     
@@ -86,11 +81,9 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController (for: device, with: applicationData, target: "", driver:nil)
         
-        let mediaController = appliMgr.mediaController(with: self)
-
         let data : [String:Any] = ["name": "test", "params": ["title":"Planète interdite","subtitle":"Brought to you by Orange OCast","logo":"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/","mediaType":"video","transferMode":"streamed","audioTracks":[["language":"fre","label":"#1 Fre","enabled":true,"id":"0"],["language":"eng","label":"#2 Eng","enabled":false,"id":"1"]],"videoTracks":[],"textTracks":[],"code":0]]
         
-        guard let info =  mediaController.metadata(from: data) else {
+        guard let info =  appliMgr.mediaController.metadata(from: data) else {
             XCTAssert(false)
             return
         }
@@ -104,8 +97,7 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController (for: device, with: applicationData, target: "", driver:nil)
         
-        let mediaController = appliMgr.mediaController(with: self)
-
+        let mediaController = appliMgr.mediaController
         
         if mediaController.metadata(from: nil) != nil {
             XCTAssert(false)
@@ -141,11 +133,9 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController(for: device, with: applicationData, target: "", driver:nil)
         
-        let mediaController = appliMgr.mediaController(with: self)
-    
         let data : [String:Any] = ["name": "test", "params": ["state":2,"volume":1,"mute":false,"position":1.486712077,"duration":5910.209,"code":0]]
         
-        guard let info = mediaController.playbackStatus(from: data) else  {
+        guard let info = appliMgr.mediaController.playbackStatus(from: data) else  {
             XCTAssert(false)
             return
         }
@@ -160,9 +150,8 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController (for: device, with: applicationData, target: "", driver:nil)
         
-        let mediaController = appliMgr.mediaController(with: self)
+        let mediaController = appliMgr.mediaController
 
-        
         if mediaController.playbackStatus(from: nil) != nil {
             XCTAssert(false)
         }

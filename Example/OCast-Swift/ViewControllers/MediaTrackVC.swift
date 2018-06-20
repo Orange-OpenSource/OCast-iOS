@@ -103,7 +103,7 @@ extension MainVC {
         
         let nextIdx = (currentAudioIdx + 1) % audioTracks.count
         
-        mediaController?.track(type: .audio, id: tracksIDs[nextIdx], enabled: true,
+        appliMgr?.mediaController.track(type: .audio, id: tracksIDs[nextIdx], enabled: true,
                                onSuccess: {
                                 DispatchQueue.main.async {
                                     OCastLog.debug("-> Audio track is set.")
@@ -128,7 +128,7 @@ extension MainVC {
         
         let nextIdx = (currentVideoIdx + 1) % videoTracks.count
         
-        mediaController?.track(type: .video, id: tracksIDs[nextIdx], enabled: true,
+        appliMgr?.mediaController.track(type: .video, id: tracksIDs[nextIdx], enabled: true,
                                onSuccess: {
                                 DispatchQueue.main.async {
                                     OCastLog.debug("-> Video track is set.")
@@ -151,7 +151,7 @@ extension MainVC {
         
         let nextIdx = (currentTextIdx + 1) % textTracks.count
         
-        mediaController?.track(type: .text, id: tracksIDs[nextIdx], enabled: true,
+        appliMgr?.mediaController.track(type: .text, id: tracksIDs[nextIdx], enabled: true,
                                onSuccess: {
                                     DispatchQueue.main.async {
                                         OCastLog.debug("-> Text track is set.")

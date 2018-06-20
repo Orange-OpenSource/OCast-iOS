@@ -105,7 +105,6 @@ extension MainVC {
     
     func resetContext () {
         customStream = nil
-        mediaController = nil
         appliMgr = nil
         connectedButton.isEnabled = false
         
@@ -133,9 +132,7 @@ extension MainVC {
                                                         self.appliMgr?.manage(stream: self.customStream!)
                                                     }
                                                     
-                                                    if self.mediaController == nil {
-                                                        self.mediaController = self.appliMgr?.mediaController(with: self)
-                                                    }
+                                                    self.appliMgr?.mediaController.delegate = self
                                                     
                                                     onSuccess()
                                                     self.setUIWebAppConnected ()

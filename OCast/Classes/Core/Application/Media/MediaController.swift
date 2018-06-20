@@ -46,12 +46,9 @@ import Foundation
 public final class MediaController: NSObject, DataStream {
     private static let mediaControllerErrorDomainName = "MediaController"
     
-    private let delegate: MediaControllerDelegate?
+    /// The delegate to receive media events
+    public weak var delegate: MediaControllerDelegate?
     
-    internal init(with delegate: MediaControllerDelegate?) {
-        self.delegate = delegate
-    }
-
     // MARK: - Public interface
 
     /**

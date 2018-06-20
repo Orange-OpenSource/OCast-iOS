@@ -226,11 +226,6 @@ import Foundation
             return nil
         }
     }
-
-    private func resetAllContexts() {
-        applicationControllers.forEach { $0.reset() }
-        applicationControllers.removeAll()
-    }
     
     private func target(from baseURL: URL?, with applicationName: String) -> String? {
         return baseURL?.appendingPathComponent(applicationName).absoluteString
