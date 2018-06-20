@@ -25,14 +25,14 @@ import Foundation
     ///
     /// - Parameters:
     ///   - mediaController: The `MediaController` instance.
-    ///   - playbackStatus: The `PlaybackStatus`object containing playback information.
+    ///   - playbackStatus: The `PlaybackStatus` object containing playback information.
     func mediaController(_ mediaController: MediaController, didReceivePlaybackStatus playbackStatus: PlaybackStatus)
 
     /// Tells the delegate that the mediaController has received a metadata event.
     ///
     /// - Parameters:
     ///   - mediaController: The `MediaController` instance.
-    ///   - metadata: The `Metadata`object containing metadata information.
+    ///   - metadata: The `Metadata` object containing metadata information.
     func mediaController(_ mediaController: MediaController, didReceiveMetadata metadata: Metadata)
 }
 
@@ -48,6 +48,9 @@ public final class MediaController: NSObject, DataStream {
     
     /// The delegate to receive media events
     public weak var delegate: MediaControllerDelegate?
+    
+    // Prevent
+    internal override init() {}
     
     // MARK: - Public interface
 

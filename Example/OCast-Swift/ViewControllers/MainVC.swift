@@ -102,10 +102,6 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
         stickPickerView.reloadAllComponents()
     }
     
-    func deviceManager(_ deviceManager: DeviceManager, publicSettingsDidDisconnectWithError error: NSError) {}
-    
-    func deviceManager(_ deviceManager: DeviceManager, privateSettingsDidDisconnectWithError error: NSError) {}
-
     // MARK: - DeviceDiscoveryDelegate methods
     
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {

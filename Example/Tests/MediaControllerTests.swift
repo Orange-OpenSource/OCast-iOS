@@ -19,7 +19,7 @@
 import XCTest
 @testable import OCast
 
-class MediaControllerTests: XCTestCase, MediaControllerDelegate {
+class MediaControllerTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
@@ -169,9 +169,4 @@ class MediaControllerTests: XCTestCase, MediaControllerDelegate {
             XCTAssert(false)
         }
     }
-    
-    
-    func mediaController(_ mediaController: MediaController, didReceivePlaybackStatus playbackStatus: PlaybackStatus) {}
-    
-    func mediaController(_ mediaController: MediaController, didReceiveMetadata metadata: Metadata) {}
 }

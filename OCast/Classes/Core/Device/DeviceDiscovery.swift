@@ -224,9 +224,9 @@ import CocoaAsyncSocket
     func sendMSearch() {
         var tagIndex = 0
         mSearchTargets.forEach { (target) in
-            let mSearchString = "M-SEARCH * HTTP/1.1\r\nHOST: \(ssdpAddress):\(ssdpPort)\r\nMan: \"ssdp:discover\"\r\nMX:\(mSearchTimeout) \r\nST: \(target)\r\n\r\n"
+            let mSearchString = "M-SEARCH * HTTP/1.1\r\nHOST: \(ssdpAddress):\(ssdpPort)\r\nMAN: \"ssdp:discover\"\r\nMX:\(mSearchTimeout) \r\nST: \(target)\r\n\r\n"
             
-            ssdpSocket.send(mSearchString.data(using: String.Encoding.utf8)!, toHost: ssdpAddress, port: ssdpPort, withTimeout: 1, tag: tagIndex)
+            ssdpSocket.send(mSearchString.data(using: .utf8)!, toHost: ssdpAddress, port: ssdpPort, withTimeout: 1, tag: tagIndex)
             tagIndex += 1
         }
 

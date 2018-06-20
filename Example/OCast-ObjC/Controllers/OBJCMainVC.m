@@ -143,10 +143,6 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"-> Could not start the discovery process.");
     }
 }
-    
-- (void)deviceManager:(DeviceManager * _Nonnull)deviceManager privateSettingsDidDisconnectWithError:(NSError * _Nonnull)error {}
-    
-- (void)deviceManager:(DeviceManager * _Nonnull)deviceManager publicSettingsDidDisconnectWithError:(NSError * _Nonnull)error {}
 
 #pragma mark - DeviceDiscoveryDelegate methods
 

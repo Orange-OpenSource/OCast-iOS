@@ -33,14 +33,14 @@ import Foundation
     /// - Parameters:
     ///   - deviceManager: The `DeviceManager`instance.
     ///   - error: The error.
-    func deviceManager(_ deviceManager: DeviceManager, publicSettingsDidDisconnectWithError error: NSError)
+    @objc optional func deviceManager(_ deviceManager: DeviceManager, publicSettingsDidDisconnectWithError error: NSError)
     
     /// Tells the delegate that the private settings is disconnected.
     ///
     /// - Parameters:
     ///   - deviceManager: The `DeviceManager`instance.
     ///   - error: The error.
-    func deviceManager(_ deviceManager: DeviceManager, privateSettingsDidDisconnectWithError error: NSError)
+    @objc optional func deviceManager(_ deviceManager: DeviceManager, privateSettingsDidDisconnectWithError error: NSError)
 }
 
 /**
@@ -266,9 +266,9 @@ import Foundation
         case .application:
             delegate?.deviceManager(self, applicationDidDisconnectWithError: error)
         case .publicSettings:
-            delegate?.deviceManager(self, publicSettingsDidDisconnectWithError: error)
+            delegate?.deviceManager?(self, publicSettingsDidDisconnectWithError: error)
         case .privateSettings:
-            delegate?.deviceManager(self, privateSettingsDidDisconnectWithError: error)
+            delegate?.deviceManager?(self, privateSettingsDidDisconnectWithError: error)
         }
     }
 
