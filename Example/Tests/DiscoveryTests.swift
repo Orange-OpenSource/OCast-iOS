@@ -20,8 +20,10 @@ import XCTest
 @testable import OCast
 
 class DummyDiscovery : DeviceDiscoveryDelegate {
+    
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device) {}
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {}
+    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, withError error: Error?) {}
 }
 
 class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate {
@@ -30,14 +32,18 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate {
     let searchTarget02 = "urn:vucast-manufacturer-02-org:service:vucast:1"
     var deviceDiscovery : DeviceDiscovery!
     var deviceDiscovery02 : DeviceDiscovery!
+    var closeExpectation: XCTestExpectation!
     
     var testIdx = 0
-    
+
     override func setUp() {
         super.setUp()
       
         deviceDiscovery = DeviceDiscovery(forTargets: [searchTarget01, searchTarget02])
+        deviceDiscovery.delegate = self
         deviceDiscovery02 = DeviceDiscovery(forTargets: [searchTarget01, searchTarget02])
+        deviceDiscovery02.delegate = self
+        closeExpectation = XCTestExpectation(description: "Discovery stopped")
     }
     
     override func tearDown() {
@@ -147,21 +153,12 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate {
     }
     
     func test10StartStop () {
-        
-        // deviceDiscovey has already been initialized, but not yet started.
-        
-        XCTAssert(!deviceDiscovery.isRunning)
-        
         // Start
         XCTAssert (deviceDiscovery.start())
-      
-        XCTAssert(deviceDiscovery.isRunning)
-        
         deviceDiscovery.stop()
-        XCTAssert(!deviceDiscovery.isRunning)
+        wait(for: [closeExpectation], timeout: 5.0)
+        
         XCTAssert (deviceDiscovery.start())
-        
-        
         // A start() without a previuos stop() should be ignored => The ssdp socket must be unchanged
         XCTAssert (!deviceDiscovery.start())
     }
@@ -269,4 +266,7 @@ class DiscoveryTests: XCTestCase, DeviceDiscoveryDelegate {
         XCTFail()
     }
     
+    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, withError error: Error?) {
+        closeExpectation.fulfill()
+    }
 }

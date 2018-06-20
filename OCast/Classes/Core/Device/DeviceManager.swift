@@ -18,8 +18,29 @@
 
 import Foundation
 
+/// The delegate of a DeviceManager object must adopt the DeviceManagerDelegateDelegate protocol.
 @objc public protocol DeviceManagerDelegate {
-    func deviceDidDisconnect(module: DriverModule, withError error: NSError?)
+    
+    /// Tells the delegate that the application is disconnected.
+    ///
+    /// - Parameters:
+    ///   - deviceManager: The `DeviceManager`instance.
+    ///   - error: The error.
+    func deviceManager(_ deviceManager: DeviceManager, applicationDidDisconnectWithError error: NSError)
+    
+    /// Tells the delegate that the public settings is disconnected.
+    ///
+    /// - Parameters:
+    ///   - deviceManager: The `DeviceManager`instance.
+    ///   - error: The error.
+    @objc optional func deviceManager(_ deviceManager: DeviceManager, publicSettingsDidDisconnectWithError error: NSError)
+    
+    /// Tells the delegate that the private settings is disconnected.
+    ///
+    /// - Parameters:
+    ///   - deviceManager: The `DeviceManager`instance.
+    ///   - error: The error.
+    @objc optional func deviceManager(_ deviceManager: DeviceManager, privateSettingsDidDisconnectWithError error: NSError)
 }
 
 /**
@@ -205,11 +226,6 @@ import Foundation
             return nil
         }
     }
-
-    private func resetAllContexts() {
-        applicationControllers.forEach { $0.reset() }
-        applicationControllers.removeAll()
-    }
     
     private func target(from baseURL: URL?, with applicationName: String) -> String? {
         return baseURL?.appendingPathComponent(applicationName).absoluteString
@@ -245,8 +261,15 @@ import Foundation
     }
 
     // MARK: DriverDelegate methods
-    public func didFail(module: DriverModule, withError error: NSError?) {
-        delegate?.deviceDidDisconnect(module: module, withError: error)
+    public func driver(_ driver: Driver, didDisconnectModule module: DriverModule, withError error: NSError) {
+        switch module {
+        case .application:
+            delegate?.deviceManager(self, applicationDidDisconnectWithError: error)
+        case .publicSettings:
+            delegate?.deviceManager?(self, publicSettingsDidDisconnectWithError: error)
+        case .privateSettings:
+            delegate?.deviceManager?(self, privateSettingsDidDisconnectWithError: error)
+        }
     }
 
 }

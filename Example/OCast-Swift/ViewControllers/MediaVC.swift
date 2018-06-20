@@ -23,14 +23,14 @@ extension MainVC {
     
     //MARK: - Media Controller protocol
 
-    func didReceiveEvent(metadata: Metadata) {
+    func mediaController(_ mediaController: MediaController, didReceiveMetadata metadata: Metadata) {
         OCastLog.debug(("-> MetaData from MediaController: \(metadata)"))
         
         metadataTitleLabel.text = metadata.title
         updateTracks(from: metadata)
     }
     
-    func didReceiveEvent(playbackStatus: PlaybackStatus) {
+    func mediaController(_ mediaController: MediaController, didReceivePlaybackStatus playbackStatus: PlaybackStatus) {
         mediaDuration = playbackStatus.duration
         
         OCastLog.debug("-> MediaStatus position: \(playbackStatus.position.format(f: ".2"))")
@@ -61,7 +61,7 @@ extension MainVC {
         
         let position = sender.value * Float (mediaDuration)
         
-        mediaController?.seek(to: UInt(position),
+        appliMgr?.mediaController.seek(to: UInt(position),
                               onSuccess: {
                                 OCastLog.debug("->Seek is OK.")
                               },
@@ -75,7 +75,7 @@ extension MainVC {
     
     @IBAction func onVolumeSlider(_ sender: UISlider) {
         
-        mediaController?.volume(to: sender.value,
+        appliMgr?.mediaController.volume(to: sender.value,
                                 onSuccess: {
                                     OCastLog.debug("->Volume is OK.")
                                 },
@@ -104,7 +104,7 @@ extension MainVC {
             transferMode: .buffered,
             autoplay: true)
         
-        mediaController?.prepare(for: prepareMedia,
+        appliMgr?.mediaController.prepare(for: prepareMedia,
                                  onSuccess: {
                                     OCastLog.debug("->Prepare for music is OK.")
         },
@@ -127,7 +127,7 @@ extension MainVC {
             transferMode: .buffered,
             autoplay: true)
         
-        mediaController?.prepare(for: prepareMedia,
+        appliMgr?.mediaController.prepare(for: prepareMedia,
                                  onSuccess: {
                                     DispatchQueue.main.async {
                                     OCastLog.debug("->Prepare for picture is OK.")
@@ -160,7 +160,7 @@ extension MainVC {
             transferMode: .buffered,
             autoplay: true)
 
-        mediaController?.prepare(for: prepareMedia,
+        appliMgr?.mediaController.prepare(for: prepareMedia,
                                  onSuccess: {
                                     OCastLog.debug("->Prepare for film is OK.")
                                 },
@@ -174,9 +174,7 @@ extension MainVC {
     @IBAction func onMediaPause(_ sender: Any) {
         
         if shouldPause {
-            
-            
-            mediaController?.pause(onSuccess: {
+            appliMgr?.mediaController.pause(onSuccess: {
                                     OCastLog.debug("->Pause is OK.")
                                     },
                                    
@@ -187,7 +185,7 @@ extension MainVC {
             
         } else {
             
-            mediaController?.resume(onSuccess: {
+            appliMgr?.mediaController.resume(onSuccess: {
                                     OCastLog.debug("->Resume is OK.")
                                     },
                                     
@@ -201,7 +199,7 @@ extension MainVC {
     }
     
     @IBAction func onMute(_ sender: Any) {
-        mediaController?.mute(isMuted: shouldMute,
+        appliMgr?.mediaController.mute(isMuted: shouldMute,
                               onSuccess: {
                                 
                                 if self.shouldMute {
@@ -221,7 +219,7 @@ extension MainVC {
     }
     
     @IBAction func onMediaCtrlStop(_ sender: Any) {
-        mediaController?.stop(onSuccess: {
+        appliMgr?.mediaController.stop(onSuccess: {
                                 OCastLog.debug("->Stop is OK.")
                             },
                             onError: {error in
@@ -233,7 +231,7 @@ extension MainVC {
 
     
     @IBAction func onPlayerStatus(_ sender: Any) {
-        mediaController?.playbackStatus(
+        appliMgr?.mediaController.playbackStatus(
             onSuccess: { playbackStatus in
                         OCastLog.debug("->PlayBack Status is OK.")
                         self.playbackPosition.text = String (playbackStatus.position.format(f: ".1"))
@@ -248,10 +246,11 @@ extension MainVC {
     }
     
     @IBAction func onGetMetaData(_ sender: Any) {
-        mediaController?.metadata(
+        appliMgr?.mediaController.metadata(
             onSuccess: { metadata in
                 OCastLog.debug("->MetaData is OK.")
-                 self.didReceiveEvent(metadata: metadata)
+                self.metadataTitleLabel.text = metadata.title
+                self.updateTracks(from: metadata)
                 
         },
             onError: {error in

@@ -195,19 +195,19 @@ public struct DataMapper {
 @objcMembers
 @objc public final class Device: NSObject {
     /// base URL of the device
-    public var baseURL: URL
+    public let baseURL: URL
     /// IP address
-    public var ipAddress: String
+    public let ipAddress: String
     /// service port
-    public var servicePort: UInt16
+    public let servicePort: UInt16
     /// unique device ID (aka USN)
-    public var deviceID: String
+    public let deviceID: String
     /// friendly name
-    public var friendlyName: String
+    public let friendlyName: String
     /// manufacturer's name
-    public var manufacturer: String
+    public let manufacturer: String
     /// model name
-    public var modelName: String
+    public let modelName: String
 
     
     /// Create a Device
@@ -220,14 +220,14 @@ public struct DataMapper {
     ///   - friendlyName: friendly name
     ///   - manufacturer: manufacturer's name
     ///   - modelName: model name
-    init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String?) {
+    init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String) {
         self.baseURL = baseURL
         self.ipAddress = ipAddress
         self.servicePort = servicePort
         self.deviceID = deviceID
         self.friendlyName = friendlyName
         self.manufacturer = manufacturer
-        self.modelName = modelName!
+        self.modelName = modelName
     }
 }
 

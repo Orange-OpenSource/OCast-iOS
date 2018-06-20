@@ -38,7 +38,6 @@
 typedef void(^ErrorBlockType)(NSError*);
 
 ApplicationController *appliCtrl;
-MediaController *mediaCtrl;
 DeviceDiscovery *deviceDiscovery;
 Device *selectedDevice = nil;
 NSArray<Device *> * _Nonnull devices;
@@ -121,8 +120,8 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 
 #pragma mark - DeviceManagerDelegate methods
 
-- (void)deviceDidDisconnectWithModule:(enum DriverModule)module_ withError:(NSError * _Nullable)error {
-    NSLog(@"-> Driver is disconnected.");
+- (void)deviceManager:(DeviceManager * _Nonnull)deviceManager applicationDidDisconnectWithError:(NSError * _Nonnull)error {
+    NSLog(@"-> Application is disconnected.");
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.webAppStatus.text = @"disconnected";
@@ -143,7 +142,6 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     if ([deviceDiscovery start] == NO) {
         NSLog(@"-> Could not start the discovery process.");
     }
-    
 }
 
 #pragma mark - DeviceDiscoveryDelegate methods
@@ -164,6 +162,14 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     [_stickPickerView reloadAllComponents];
     
     if ([devices count] == 0) {
+        [_stickIcon setEnabled:NO];
+    }
+}
+    
+- (void)deviceDiscoveryDidStop:(DeviceDiscovery *)deviceDiscovery withError:(NSError *)error {
+    if (error != nil) {
+        devices = [[NSArray<Device *> alloc] init];
+        [_stickPickerView reloadAllComponents];
         [_stickIcon setEnabled:NO];
     }
 }
@@ -191,7 +197,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         [self startWebApp];
         
         [appliCtrl manageWithStream:self];
-        mediaCtrl = [appliCtrl mediaControllerWith:self];
+        appliCtrl.mediaController.delegate = self;
     };
     
     ErrorBlockType errorBlock = ^(NSError *error){
@@ -287,7 +293,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Prepare NOK");
     };
 
-    [mediaCtrl prepareFor:mediaPrepare withOptions:@{} onSuccess:successBlock onError:errorBlock];
+    [appliCtrl.mediaController prepareFor:mediaPrepare withOptions:@{} onSuccess:successBlock onError:errorBlock];
     [self getPlaybackStatus];
     [self getMetaData];
 }
@@ -303,7 +309,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Stop film is NOK");
     };
     
-    [mediaCtrl stopWithOptions:@{} onSuccess:successBlock onError:errorBlock];
+    [appliCtrl.mediaController stopWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 #pragma mark -  DataStreamable protocol
@@ -322,7 +328,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
 
 #pragma mark -  MediaControllerDelegate methods
 
-- (void)didReceiveEventWithPlaybackStatus:(PlaybackStatus * _Nonnull)playbackStatus {
+- (void)mediaController:(MediaController *)mediaController didReceivePlaybackStatus:(PlaybackStatus *)playbackStatus {
     NSLog(@"-> Got onPlaybackStatus: Position = %f", playbackStatus.position);
     NSLog(@"-> Got onPlaybackStatus: Volume = %f", playbackStatus.volume);
     NSLog(@"-> Got onPlaybackStatus: Duration = %f", playbackStatus.duration);
@@ -354,7 +360,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     });
 };
 
-- (void)didReceiveEventWithMetadata:(Metadata * _Nonnull)metadata {
+- (void)mediaController:(MediaController *)mediaController didReceiveMetadata:(Metadata *)metadata {
     NSLog(@"-> MetaData changed: %@", metadata);
     
     TrackDescription *track;
@@ -395,7 +401,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
     };
     
     if (metadata.audioTracks.count > 0) {
-        [mediaCtrl trackWithType:TrackTypeAudio id:@"0" enabled:YES withOptions:@{} onSuccess:successBlock onError:errorBlock];
+        [appliCtrl.mediaController trackWithType:TrackTypeAudio id:@"0" enabled:YES withOptions:@{} onSuccess:successBlock onError:errorBlock];
     }
 }
 
@@ -416,7 +422,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the Playback status Info");
     };
     
-    [mediaCtrl playbackStatusWithOptions:@{} onSuccess:successBlock onError:errorBlock];
+    [appliCtrl.mediaController playbackStatusWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 -(void)getMetaData {
@@ -463,7 +469,7 @@ NSString *applicationName = @"Orange-DefaultReceiver-DEV";
         NSLog(@"->Fail to get the MetaDataChanged Info");
     };
     
-    [mediaCtrl metadataWithOptions:@{} onSuccess:successBlock onError:errorBlock];
+    [appliCtrl.mediaController metadataWithOptions:@{} onSuccess:successBlock onError:errorBlock];
 }
 
 @end

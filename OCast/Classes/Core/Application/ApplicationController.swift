@@ -52,16 +52,22 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     var applicationData: ApplicationDescription
     
     var browser: Browser?
-    var mediaController: MediaController?
     
     enum State: String {
         case running
         case stopped
     }
     
+    /// The MediaController to manage media
+    public lazy var mediaController: MediaController = {
+        let mediaController = MediaController()
+        manage(stream: mediaController)
+        
+        return mediaController
+    }()
+    
     // XML Parser
     private let xmlParser = XMLHelper()
-    //private let keyList =  [XMLHelper.KeyDefinition(name: "state", isMandatory: true), XMLHelper.KeyDefinition(name: "name", isMandatory: true)]
     
     // Timer
     private var semaphore: DispatchSemaphore?
@@ -130,21 +136,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     }
 
     /**
-     Used to get a reference to the mediaController
-     - Returns: A pointer to the mediaController class
-     */
-
-    public func mediaController(with delegate: MediaControllerDelegate) -> MediaController {
-
-        if mediaController == nil {
-            mediaController = MediaController(with: delegate)
-            manage(stream: mediaController!)
-        }
-
-        return mediaController!
-    }
-
-    /**
      Used to get control over a user's specific stream. 
      
      You need this when dealing with custom streams. See `DataStream` for details on custom messaging.
@@ -159,7 +150,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
      */
 
     public func manage(stream: DataStream) {
-        OCastLog.debug("ApplicationMgr: manage Stream for \(stream.serviceId)")
         if browser == nil {
             browser = Browser()
             browser?.delegate = driver
@@ -170,12 +160,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         } else {
             OCastLog.error("Unable to manage stream (\(stream.serviceId) because browser is nil")
         }
-    }
-
-    // MARK: internal methods
-    internal func reset() {
-        browser = nil
-        mediaController = nil
     }
 
     // MARK: private methods
@@ -268,7 +252,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         if name == "connectedStatus" {
             let params = data["params"] as? [String: String]
             if params?["status"] == "connected" {
-                OCastLog.debug("ApplicationMgr: Got the 'Connected' webapp message.")
                 isConnectedEvent = true
                 semaphore?.signal()
             }

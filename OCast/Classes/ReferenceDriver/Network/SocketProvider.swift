@@ -208,7 +208,6 @@ public final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDel
     
     // MARK: - WebSocketPongDelegate methods
     public func websocketDidReceivePong(socket: WebSocketClient, data: Data?) {
-        OCastLog.debug("Socket: Got a Pong")
         pingPongTimerRetry = 0
     }
 }

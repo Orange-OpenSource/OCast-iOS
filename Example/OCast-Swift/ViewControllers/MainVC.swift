@@ -21,10 +21,6 @@ import OCast
 
 class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate, DeviceManagerDelegate, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
-    func deviceDidDisconnect(module: DriverModule, withError error: NSError?) {
-        
-    }
-    
     @IBOutlet var webAppLabel: UITextField!
     @IBOutlet var webAppStatusLabel: UILabel!
     @IBOutlet var positionLabel: UILabel!
@@ -61,7 +57,6 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
     var appliMgr: ApplicationController?
 
     var customStream : CustomStream?
-    var mediaController: MediaController?
     var shouldPause: Bool = true
     var shouldMute: Bool = true
     var mediaDuration: Double = 0.0
@@ -96,8 +91,9 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
 
     
     //MARK: DeviceManagerDelegate methods
-    func deviceDidDisconnect(withError error: NSError) {
-        OCastLog.debug("-> Connection to the stick is down.")
+    
+    func deviceManager(_ deviceManager: DeviceManager, applicationDidDisconnectWithError error: NSError) {
+        OCastLog.debug("-> Application is disconnected.")
         resetContext ()
         guard deviceDiscovery.start() else {
             return
@@ -107,6 +103,7 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
     }
     
     // MARK: - DeviceDiscoveryDelegate methods
+    
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {
         devices = deviceDiscovery.devices
         
@@ -130,6 +127,14 @@ class MainVC: UIViewController, DeviceDiscoveryDelegate, MediaControllerDelegate
         }
         
         OCastLog.debug ("-> Device lost = \(device.friendlyName). Now managing \(devices.count) device(s).")
+    }
+    
+    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, withError error: Error?) {
+        if error != nil {
+            devices.removeAll()
+            stickPickerView.reloadAllComponents()
+            setUIStickDisconnected()
+        }
     }
     
     func onDeviceSelected(device: Device) {

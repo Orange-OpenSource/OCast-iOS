@@ -45,29 +45,15 @@ class ApplicationManagerTests: XCTestCase, MediaControllerDelegate {
         let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
         let appliMgr = ApplicationController(for: device, with: applicationData, target: "", driver:nil)
         
-        let mediaController = appliMgr.mediaController(with: self)
-
-        XCTAssert(mediaController.serviceId == "org.ocast.media")
+        XCTAssert(appliMgr.mediaController.serviceId == "org.ocast.media")
         
         // 1 Stream must be created at browser level
         XCTAssert(appliMgr.browser?.streams.count == 1)
         XCTAssert(appliMgr.browser?.streams["org.ocast.media"] != nil)
     }
     
-    func testMultiMediaController () {
-        let device = Device (baseURL:URL (string: "http://")!, ipAddress: "0.0.0.0.0", servicePort: 0, deviceID: "deviceID", friendlyName: "firendlyName", manufacturer: "Orange SA", modelName: "")
-        let applicationData = ApplicationDescription (app2appURL: "", version: "", rel: "", href: "", name: "")
-        let appliMgr = ApplicationController(for: device, with: applicationData, target: "", driver:nil)
-        
-        let mediaController = appliMgr.mediaController(with: self)
-        
-        let mediaController2 = appliMgr.mediaController(with: self)
-        
-        // Only 1  mediacontroller instance can be created.
-        XCTAssert(mediaController === mediaController2)
-    }
+    func mediaController(_ mediaController: MediaController, didReceivePlaybackStatus playbackStatus: PlaybackStatus) {}
     
-    func didReceiveEvent(playbackStatus: PlaybackStatus) {}
-    func didReceiveEvent(metadata: Metadata) {}
+    func mediaController(_ mediaController: MediaController, didReceiveMetadata metadata: Metadata) {}
 }
 

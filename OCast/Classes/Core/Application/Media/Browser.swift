@@ -48,7 +48,6 @@ final class Browser: NSObject, EventDelegate {
             data: streamData,
             onSuccess: {
                 message in
-                    OCastLog.debug("Browser: Received response from driver: \(String(describing: message))")
                     onSuccess(message?["data"] as? [String: Any])
             },
             onError: {
@@ -68,7 +67,6 @@ final class Browser: NSObject, EventDelegate {
             return
         }
 
-        OCastLog.debug("Stream: Got data from Browser for service \(service).")
         streams[service]?.onMessage(data: data)
     }
 }

@@ -17,22 +17,23 @@
 //
 
 import Foundation
-/**
- Provides information on media.
- */
 
+/// The delegate of a MediaController object must adopt the MediaControllerDelegate protocol in order to receive media events.
 @objc public protocol MediaControllerDelegate {
-    /**
-     Gets called when a media status has been received from the web application
-     - Parameter playbackStatus: status information. See `PlaybackStatus` for details.
-     */
-    func didReceiveEvent(playbackStatus: PlaybackStatus)
+    
+    /// Tells the delegate that the mediaController has received a playback status event.
+    ///
+    /// - Parameters:
+    ///   - mediaController: The `MediaController` instance.
+    ///   - playbackStatus: The `PlaybackStatus` object containing playback information.
+    func mediaController(_ mediaController: MediaController, didReceivePlaybackStatus playbackStatus: PlaybackStatus)
 
-    /**
-     Gets called when the media metadata changed.
-     - Parameter metadata: metadata information. See `Metadata` for details.
-     */
-    func didReceiveEvent(metadata: Metadata)
+    /// Tells the delegate that the mediaController has received a metadata event.
+    ///
+    /// - Parameters:
+    ///   - mediaController: The `MediaController` instance.
+    ///   - metadata: The `Metadata` object containing metadata information.
+    func mediaController(_ mediaController: MediaController, didReceiveMetadata metadata: Metadata)
 }
 
 /** Provides basic media control.
@@ -45,12 +46,12 @@ import Foundation
 public final class MediaController: NSObject, DataStream {
     private static let mediaControllerErrorDomainName = "MediaController"
     
-    private let delegate: MediaControllerDelegate?
+    /// The delegate to receive media events
+    public weak var delegate: MediaControllerDelegate?
     
-    internal init(with delegate: MediaControllerDelegate?) {
-        self.delegate = delegate
-    }
-
+    // Prevent
+    internal override init() {}
+    
     // MARK: - Public interface
 
     /**
@@ -341,11 +342,11 @@ public final class MediaController: NSObject, DataStream {
         switch streamData.name {
             case "playbackStatus":
                 if let playbackStatus = DataMapper().playbackStatus(with: streamData) {
-                    delegate?.didReceiveEvent(playbackStatus: playbackStatus)
+                    delegate?.mediaController(self, didReceivePlaybackStatus: playbackStatus)
                 }
             case "metadataChanged":
                 if let metaData = DataMapper().metadata(with: streamData) {
-                    delegate?.didReceiveEvent(metadata: metaData)
+                    delegate?.mediaController(self, didReceiveMetadata: metaData)
                 }
             default:
                 return
