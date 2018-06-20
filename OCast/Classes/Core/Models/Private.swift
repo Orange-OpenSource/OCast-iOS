@@ -84,22 +84,6 @@ extension TrackType {
     }
 }
 
-extension StickState {
-    
-    init(state : String) {
-        switch (state) {
-        case "notChecked": self = .notChecked
-        case "upToDate": self = .upToDate
-        case "newVersionFound": self = .newVersionFound
-        case "newVersionReady": self = .newVersionReady
-        case "downloading": self = .downloading
-        case "error": self = .error
-        case "success": self = .success
-        default: self = .notChecked
-        }
-    }
-}
-
 /// :nodoc:
 @objc public enum WifiMode: Int {
     case station
