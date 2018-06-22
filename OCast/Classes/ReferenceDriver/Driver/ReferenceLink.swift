@@ -44,7 +44,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     }
     
     // MARK: - Interface
-    var delegate: LinkDelegate?
+    weak var delegate: LinkDelegate?
     var profile: LinkProfile
     
     // MARK: - Internal

@@ -46,8 +46,8 @@ import Foundation
     public static let ReferenceDriverErrorDomain = "ReferenceDriverErrorDomain"
 
     // MARK: - public
-    public var browserEventDelegate: EventDelegate?
-    public var publicSettingsEventDelegate: PublicSettingsEventDelegate?
+    public weak var browserEventDelegate: EventDelegate?
+    public weak var publicSettingsEventDelegate: PublicSettingsEventDelegate?
     
 
     // MARK: - Private interface
