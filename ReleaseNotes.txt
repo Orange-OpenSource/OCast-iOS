@@ -1,7 +1,10 @@
 OCast Release notes
 ============================
-Version x.y.z, In progress
+Version 1.2.0, June 2018
 ============================
+- refactoring
+- fix bugs
+- change interface of delegate
 
 ============================
 Version 1.1.0, May 2018
