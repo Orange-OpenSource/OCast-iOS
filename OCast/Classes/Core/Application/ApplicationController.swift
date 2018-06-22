@@ -187,14 +187,22 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         }
     }
     
-    private func stopApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {        
-        guard let runLink = URL(string: target)?.appendingPathComponent(applicationData.runLink ?? "run").absoluteString else {
+    private func stopApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+       
+        var stopLink:String!
+        if  let runLink = applicationData.runLink,
+            let url = URL(string: runLink),
+            let _ = url.host {
+            stopLink = runLink
+        } else if let runLink = URL(string: target)?.appendingPathComponent(applicationData.runLink ?? "run").absoluteString {
+            stopLink = runLink
+        } else {
             let error = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "Bad run link"])
             onError(error)
             return
         }
 
-        initiateHttpRequest(from: self, with: .delete, to: runLink, onSuccess: { (_, _) in
+        initiateHttpRequest(from: self, with: .delete, to: stopLink, onSuccess: { (_, _) in
             self.applicationStatus(onSuccess: {
                 if self.currentState == .stopped {
                     onSuccess()
