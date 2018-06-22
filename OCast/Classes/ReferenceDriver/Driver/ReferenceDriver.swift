@@ -21,10 +21,6 @@ import Foundation
  Provides the Reference driver implementation.
  The driver needs to be registered by the application as shonw below:
 
- ```
- DeviceManager.registerDriver(forName: ReferenceDriver.manufacturer, withFactory: ReferenceDriverFactory.sharedInstance)
- ```
-
  */
 @objcMembers
 @objc open class ReferenceDriver: NSObject, Driver, LinkDelegate {

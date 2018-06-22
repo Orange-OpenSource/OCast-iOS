@@ -69,10 +69,6 @@ import Foundation
     func didFail(module: DriverModule)
 }
 
-@objc public protocol LinkFactory {
-    static func make(withDelegate delegate: LinkDelegate, andProfile profile: LinkProfile) -> Link
-}
-
 @objc public class LinkProfile: NSObject {
     public let module: DriverModule
     public let app2appURL: String
