@@ -53,16 +53,15 @@ import Foundation
 @objcMembers
 @objc public final class DeviceManager: NSObject, DriverDelegate, HttpProtocol {
     
-    // MARK: - Internal
     public weak var delegate: DeviceManagerDelegate?
-    // application controllers
-    private var applicationControllers: [ApplicationController] = []
+    // Application controller
+    private var applicationController: ApplicationController?
     // ssl
     private var sslConfiguration: SSLConfiguration?
     // drivers
     private var driver: Driver
     private static var registeredDrivers: [String: Driver.Type] = [:]
-    private var device: Device
+    public private(set) var device: Device
 
     // MARK: - Public interface
 
@@ -179,11 +178,10 @@ import Foundation
      */
     public func applicationController(for applicationName: String, onSuccess: @escaping (_: ApplicationController) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         
-        let controller = applicationControllers.first(where: { (appController) -> Bool in
-            return appController.applicationData.name == applicationName
-        })
-        if let controller = controller {
-            onSuccess(controller)
+        if let applicationController = applicationController,
+            applicationController.applicationData.name == applicationName {
+            
+            onSuccess(applicationController)
             return
         }
         
@@ -198,10 +196,13 @@ import Foundation
             onSuccess: { (description) in
                 let newController = ApplicationController(for: self.device, with: description, target: target, driver: self.driver)
                 self.driver.register(self, forModule: .application)
-                self.applicationControllers.append(newController)
+                self.applicationController = newController
                 onSuccess(newController)
         },
-            onError: { onError($0) }
+            onError: {
+                self.applicationController = nil
+                onError($0)
+            }
         )
     }
 
@@ -264,6 +265,7 @@ import Foundation
     public func driver(_ driver: Driver, didDisconnectModule module: DriverModule, withError error: NSError) {
         switch module {
         case .application:
+            applicationController = nil
             delegate?.deviceManager(self, applicationDidDisconnectWithError: error)
         case .publicSettings:
             delegate?.deviceManager?(self, publicSettingsDidDisconnectWithError: error)
