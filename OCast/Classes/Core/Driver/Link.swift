@@ -22,6 +22,11 @@ import Foundation
 @objc public class Event: NSObject {
     public let source: String
     public var message: [String: Any]
+    /// Init an event
+    ///
+    /// - Parameters:
+    ///   - source: event's source
+    ///   - message: event's message
     public init(source: String, message: [String: Any]) {
         self.source = source
         self.message = message
@@ -37,6 +42,11 @@ import Foundation
 @objc public class Command: NSObject {
     public let command: String
     public var params: [String: Any]
+    /// Init a command
+    ///
+    /// - Parameters:
+    ///   - command: command's name
+    ///   - params: command's parameters
     public init(command: String = "", params: [String: Any]) {
         self.command = command
         self.params = params
@@ -51,6 +61,10 @@ import Foundation
 
 @objc public class CommandReply: NSObject {
     public var message: [String: Any]
+    
+    /// Init a Command's reply
+    ///
+    /// - Parameter message: reply's parameters
     public init(message: [String: Any]) {
         self.message = message
     }
@@ -62,10 +76,23 @@ import Foundation
     }
 }
 
+/// Link's delegate
 @objc public protocol LinkDelegate {
+    /// Called when an event has been received
+    ///
+    /// - Parameter event: event
     func didReceive(event: Event)
+    /// Called when the link is connected
+    ///
+    /// - Parameter module: module which is connected
     func didConnect(module: DriverModule)
+    /// Called when a module is disconnected
+    ///
+    /// - Parameter module: module which is disconnected
     func didDisconnect(module: DriverModule)
+    /// Called the link has failed
+    ///
+    /// - Parameter module: module which is failed
     func didFail(module: DriverModule)
 }
 
@@ -83,8 +110,22 @@ import Foundation
 @objc public protocol Link {
     var profile: LinkProfile { get }
     var delegate: LinkDelegate? { get }
+    /// Init a link
+    ///
+    /// - Parameters:
+    ///   - delegate: link's delegate
+    ///   - profile: link's profile
     init(withDelegate delegate: LinkDelegate?, andProfile profile: LinkProfile)
+    /// Connect the link
     func connect()
+    /// Disconnect the link
     func disconnect()
+    /// Send a command
+    ///
+    /// - Parameters:
+    ///   - payload: payload to send
+    ///   - domain: domain of the message
+    ///   - onSuccess: called when payload has been sent correctly.
+    ///   - onError: called when payload hasn's been sent.
     func send(payload: Command, forDomain domain: String, onSuccess: @escaping (CommandReply) -> Void, onError: @escaping (NSError?) -> Void)
 }

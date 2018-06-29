@@ -255,7 +255,6 @@ public final class MediaController: NSObject, DataStream {
     }
     
     // MARK: - Internal
-    
     func code(from response: [String: Any]?) -> MediaErrorCode {
         guard let data = response,
             let streamData = DataMapper().streamData(with: data),

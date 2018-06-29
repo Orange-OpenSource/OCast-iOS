@@ -64,14 +64,11 @@ import Foundation
     public private(set) var device: Device
 
     // MARK: - Public interface
-
-    /**
-     Initializes a new DeviceManager.
-
-     - Parameters:
-         - device: the device to be managed
-         - sslConfiguration: Optional. The SSL configuration to establish secured connections to the device.
-     */
+    /// Initializes a new DeviceManager.
+    ///
+    /// - Parameters:
+    ///   - device: the device to be managed
+    ///   - sslConfiguration: Optional. The SSL configuration to establish secured connections to the device.
     public init?(with device: Device, sslConfiguration: SSLConfiguration? = nil) {
         guard let driver = DeviceManager.driver(for: device, with: sslConfiguration) else { return nil }
         
@@ -82,13 +79,11 @@ import Foundation
         super.init()
     }
 
-    /**
-     
-     Used to get a reference to the publicSettingController class
-     - Parameters:
-         - onSuccess: the closure to be called in case of success. Returns a reference to the publicSettingController.
-         - onError: the closure to be called in case of error
-     */
+    /// Used to get a reference to the publicSettingController class
+    ///
+    /// - Parameters:
+    ///   - onSuccess: the closure to be called in case of success. Returns a reference to the publicSettingController.
+    ///   - onError: the closure to be called in case of error
     public func publicSettingsController(onSuccess: @escaping (_: PublicSettings) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         if driver.state(for: .publicSettings) == .connected, let driver = driver as? PublicSettings {
             onSuccess(driver)
@@ -110,26 +105,20 @@ import Foundation
         )
     }
 
-    /**
-     
-     Used to release the reference to the publicSettingController class.
-     - Parameters:
-         - onSuccess: the closure to be called in case of success.
-         - onError: the closure to be called in case of error
-     */
+    /// Used to release the reference to the publicSettingController class.
+    ///
+    /// - Parameters:
+    ///   - onSuccess: the closure to be called in case of success.
+    ///   - onError: the closure to be called in case of error
     public func releasePublicSettingsController(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         driver.disconnect(for: .publicSettings, onSuccess: onSuccess, onError: onError)
     }
 
-    /**
-     Not implemented in this version.
-     
-     
-     Used to get a reference to the privateSettingController class
-     - Parameters:
-         - onSuccess: the closure to be called in case of success; Returns a reference to the privateSettingController.
-         - onError: the closure to be called in case of error
-     */
+    /// Used to get a reference to the privateSettingController class
+    ///
+    /// - Parameters:
+    ///   - onSuccess: the closure to be called in case of success; Returns a reference to the privateSettingController.
+    ///   - onError: the closure to be called in case of error
     public func privateSettingsController(onSuccess: @escaping (_: PrivateSettings) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         if !driver.privateSettingsAllowed() {
             let newError = NSError(domain: "DeviceManager", code: 0, userInfo: ["Error": "Private settings are not available"])
@@ -157,25 +146,21 @@ import Foundation
         )
     }
 
-    /**
-     Not implemented in this version.
-     
-     
-     Used to release the reference to the privateSettingController class.
-     - Parameters:
-         - onSuccess: the closure to be called in case of success
-         - onError: the closure to be called in case of error
-     */
+    /// Used to release the reference to the privateSettingController class.
+    ///
+    /// - Parameters:
+    ///   - onSuccess: the closure to be called in case of success
+    ///   - onError: the closure to be called in case of error
     public func releasePrivateSettingsController(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         driver.disconnect(for: .privateSettings, onSuccess: onSuccess, onError: onError)
     }
 
-    /**
-     Used to get a reference to the applicationController class
-     - Parameters:
-         - onSuccess: the closure to be called in case of success. Returns a reference to the applicationController.
-         - onError: the closure to be called in case of error
-     */
+    /// Used to get a reference to the applicationController class
+    ///
+    /// - Parameters:
+    ///   - applicationName: application's name
+    ///   - onSuccess: the closure to be called in case of success. Returns a reference to the applicationController.
+    ///   - onError: the closure to be called in case of error
     public func applicationController(for applicationName: String, onSuccess: @escaping (_: ApplicationController) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         
         if let applicationController = applicationController,
@@ -205,20 +190,17 @@ import Foundation
             }
         )
     }
-
-    /**
-     Registers a driver to connect to a device.
-
-     - Parameters:
-        - driverType: The Type of the driver class to register (for example ReferenceDriver.self)
-        - name: The Driver manufacturer's name. Caps sensitive. This value must match the manufacturer name present in the response to a MSEARCH Target.
-     */
+    
+    /// Registers a driver to connect to a device.
+    ///
+    /// - Parameters:
+    ///   - driverType: The Type of the driver class to register (for example ReferenceDriver.self)
+    ///   - name: The Driver manufacturer's name. Caps sensitive. This value must match the manufacturer name present in the response to a MSEARCH Target.
     public static func registerDriver(_ driverType: Driver.Type, forManufacturer name: String) {
         registeredDrivers[name] = driverType
     }
 
     // MARK: - Private methods
-
     private static func driver(for device: Device, with sslConfiguration: SSLConfiguration?) -> Driver? {
         if let driverType = DeviceManager.registeredDrivers[device.manufacturer] {
             return driverType.init(ipAddress: device.ipAddress, with: sslConfiguration)

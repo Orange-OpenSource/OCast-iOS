@@ -43,14 +43,20 @@ import Foundation
  ```
  */
 @objcMembers
+
 public class ApplicationController: NSObject, DataStream, HttpProtocol {
 
+    /// device controlled
     var device: Device
+    // driver for device
     var driver: Driver?
+    // url of device
     var target: String
+    // application's state
     var currentState: State = .stopped
+    // application's information
     var applicationData: ApplicationDescription
-    
+    // browser
     var browser: Browser?
     
     enum State: String {
@@ -74,6 +80,13 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     private var isConnectedEvent = false
     
     // MARK: - Public interface
+    /// Create a controller for the application of stick
+    ///
+    /// - Parameters:
+    ///   - device: device to control
+    ///   - applicationData: application's information
+    ///   - target: target url of device
+    ///   - driver: driver for device
     init(for device: Device, with applicationData: ApplicationDescription, target: String, driver: Driver?) {
         self.device = device
         self.applicationData = applicationData
@@ -85,13 +98,11 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         semaphore = DispatchSemaphore(value: 0)
     }
 
-    /**
-     Starts the web application on the device and opens a dedicated connection at driver level to communicate with the stick.
-     Restart the web application if it is already running on the device.
-     - Parameters:
-         - onSuccess: the closure to be called in case of success.
-         - onError: the closure to be called in case of error
-     */
+    /// Starts the web application on the device and opens a dedicated connection at driver level to communicate with the stick.
+    ///
+    /// - Parameters:
+    ///   - onSuccess: the closure to be called in case of success.
+    ///   - onError: the closure to be called in case of error.
     public func start(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         manage(stream: self)
         if driver?.state(for: .application) != .connected {
@@ -117,12 +128,11 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         }
     }
 
-    /**
-     Stops the web application on the device. Releases the dedicated web application connection at driver level.
-     - Parameters:
-         - onSuccess: the closure to be called in case of success.
-         - onError: the closure to be called in case of error
-     */
+    ///  Stops the web application on the device. Releases the dedicated web application connection at driver level.
+    ///
+    /// - Parameters:
+    ///   - onSuccess: the closure to be called in case of success.
+    ///   - onError: the closure to be called in case of error.
     public func stop(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         applicationStatus(onSuccess: {
             if self.currentState == .running {
@@ -135,20 +145,15 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         }, onError: onError)
     }
 
-    /**
-     Used to get control over a user's specific stream. 
-     
-     You need this when dealing with custom streams. See `DataStream` for details on custom messaging.
-      ```
-        // Create a CustomStream class implementing the DataStream protocol
-        customStream = CustomStream() 
-     
-        // Register it so the application manager knows how to handle it.
-        applicationController.manageStream(for: customStream)
-      ```
-        - Parameter stream: custom stream to be managed
-     */
 
+    /// Used to get control over a user's specific stream.
+    /// You need this when dealing with custom streams. See `DataStream` for details on custom messaging.
+    /// Create a CustomStream class implementing the DataStream protocol
+    /// customStream = CustomStream()
+    /// Register it so the application manager knows how to handle it.
+    /// applicationController.manageStream(for: customStream)
+    ///
+    /// - Parameter stream: custom stream to be managed
     public func manage(stream: DataStream) {
         if browser == nil {
             browser = Browser()

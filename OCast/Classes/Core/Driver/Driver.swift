@@ -34,22 +34,61 @@ import Foundation
 }
 
 @objc public protocol DriverDelegate {
+    /// Called when driver's module has been disconnected
+    ///
+    /// - Parameters:
+    ///   - driver: driver
+    ///   - module: module
+    ///   - error: error which implies the disconnection
     func driver(_ driver: Driver, didDisconnectModule module: DriverModule, withError error: NSError)
 }
 
-/// :nodoc:
 @objc public protocol EventDelegate {
+    /// Called when the driver has received an event
+    ///
+    /// - Parameter message: event's message received.
     func didReceiveEvent(withMessage message: [String: Any])
 }
 
 /// :nodoc:
 @objc public protocol Driver: BrowserDelegate {
+    /// Init a driver for the specified ip address with (optional) ssl configuration
+    ///
+    /// - Parameters:
+    ///   - ipAddress: ip adress of the device
+    ///   - sslConfiguration: ssl configuration
     init(ipAddress: String, with sslConfiguration: SSLConfiguration?)
+    /// event delegate for browser's event
     var browserEventDelegate: EventDelegate? { get set }
+    /// Indicate if private settings are allow for this driver
+    ///
+    /// - Returns: true if allowed, false otherwise.
     func privateSettingsAllowed() -> Bool
+    /// Connect the driver the specified module with application's description
+    ///
+    /// - Parameters:
+    ///   - module: module to connect
+    ///   - info: application's description
+    ///   - onSuccess: handler called if connect is a success
+    ///   - onError: handler called if there is an error
     func connect(for module: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
+    /// Disconnect the specified module
+    ///
+    /// - Parameters:
+    ///   - module: module to disconnect
+    ///   - onSuccess: handler called if connect is a success
+    ///   - onError: handler called if there is an error
     func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
+    /// Returns the connection's state of the specified module
+    ///
+    /// - Parameter module: module
+    /// - Returns: state
     func state(for module: DriverModule) -> DriverState
+    /// Register a delegate for the specified module
+    ///
+    /// - Parameters:
+    ///   - delegate: delegate
+    ///   - module: module
     func register(_ delegate: DriverDelegate, forModule module: DriverModule)
 }
 

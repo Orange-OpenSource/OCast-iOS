@@ -89,6 +89,12 @@ public extension DataStreamable {
 /// :nodoc:
 
 @objc public protocol DataSender {
+    /// send a message
+    ///
+    /// - Parameters:
+    ///   - message: message to send
+    ///   - onSuccess: handler called when the message has been sent correctly.
+    ///   - onError: handler called when a error has been thrown during the sent.
     func send(message: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void)
 }
 

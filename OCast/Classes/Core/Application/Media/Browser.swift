@@ -19,7 +19,16 @@
 import Foundation
 
 @objc public protocol BrowserDelegate {
+    /// send a message to the browser
+    ///
+    /// - Parameters:
+    ///   - data: data to send
+    ///   - onSuccess: handler called when the data has been sent correctly.
+    ///   - onError: handler called when the data hasn't been send.
     func send(data: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void)
+    /// register an event delegate
+    ///
+    /// - Parameter delegate: delegate
     func register(for delegate: EventDelegate)
 }
 

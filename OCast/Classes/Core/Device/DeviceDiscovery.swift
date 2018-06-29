@@ -23,28 +23,26 @@ import CocoaAsyncSocket
  */
 
 @objc public protocol DeviceDiscoveryDelegate {
-    /**
-     Gets called when a new device is found.
-     - Parameters:
-         - deviceDiscovery: module (delegate) registered for notifications
-         - device: added device information . See `Device` for details.
-     */
+
+    /// Gets called when a new device is found.
+    ///
+    /// - Parameters:
+    ///   - deviceDiscovery: module (delegate) registered for notifications
+    ///   - device: added device information . See `Device` for details.
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device)
 
-    /**
-     Gets called when a device is lost.
-     - Parameters:
-         - deviceDiscovery: module (delegate) registered for notifications
-         - device: lost device information . See `Device` for details.
-     */
+    /// Gets called when a device is lost.
+    ///
+    /// - Parameters:
+    ///   - deviceDiscovery: module (delegate) registered for notifications
+    ///   - device: lost device information . See `Device` for details.
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device)
     
-    /**
-     Gets called when the discovery is stopped by error or not. All the devices are removed.
-     - Parameters:
-        - deviceDiscovery: module (delegate) registered for notifications
-        - error: the error if there's a problem, nil if the `DeviceDiscovery` has been stopped normally.
-     */
+    /// Gets called when the discovery is stopped by error or not. All the devices are removed.
+    ///
+    /// - Parameters:
+    ///   - deviceDiscovery: module (delegate) registered for notifications
+    ///   - error: the error if there's a problem, nil if the `DeviceDiscovery` has been stopped normally.
     func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, withError error: Error?)
 }
 
@@ -122,12 +120,11 @@ import CocoaAsyncSocket
         return Array(currentDevices.values)
     }
 
-    /**
-     Initializes a new deviceDiscovery class.
-     - Parameters:
-         - searchTargets: list of device targets to search for
-         - policy:  `Reliability` level for discovery process
-     */
+    /// Initializes a new deviceDiscovery class.
+    ///
+    /// - Parameters:
+    ///   - searchTargets: list of device targets to search for
+    ///   - policy: `Reliability` level for discovery process
     @objc public init(forTargets searchTargets: Array<String>, withPolicy policy: DeviceDiscovery.Reliability) {
         ssdpSocket = GCDAsyncUdpSocket()
         mSearchIdx = 0
@@ -150,24 +147,18 @@ import CocoaAsyncSocket
         ssdpSocket.setDelegate(self)
         ssdpSocket.setDelegateQueue(DispatchQueue.main)
     }
-
-    /**
-     Initializes a new deviceDiscovery class. The `Reliability` level is set to `.high` by default (a MSEARCH is sent every 3s. If no anwser after 6s, the device is considered as lost).
-     - Parameters:
-         - searchTargets: List of device targets to search for
-     */
+    
+    /// Initializes a new deviceDiscovery class. The `Reliability` level is set to `.high` by default (a MSEARCH is sent every 3s. If no anwser after 6s, the device is considered as lost).
+    ///
+    /// - Parameter searchTargets: List of device targets to search for
     public convenience init(forTargets searchTargets: Array<String>) {
         self.init(forTargets: searchTargets, withPolicy: DeviceDiscovery.Reliability.low)
     }
 
     // MARK: - DeviceDiscovery Interface
-
-    /**
-     Starts a discovery process.
-     - Returns:
-         - true if the discovery process could start.
-         - false if the discovery process could not be started.
-     */
+    /// Starts a discovery process.
+    ///
+    /// - Returns: true if the discovery process could start, false if the discovery process could not be started.
     @discardableResult
     @objc public func start() -> Bool {
         guard !ssdpSocket.isConnected() else {
@@ -191,15 +182,12 @@ import CocoaAsyncSocket
         return true
     }
 
-    /**
-     Stops a discovery process.
-     */
+    /// Stops a discovery process.
     @objc public func stop() {
         ssdpSocket.close()
     }
 
     // MARK: - UDP management
-
     /// :nodoc:
     public func udpSocket(_ udpSocket : GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext _: Any?) {
         guard let udpString = String(data: data, encoding: .utf8),
