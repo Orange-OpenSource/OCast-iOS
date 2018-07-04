@@ -41,19 +41,18 @@ s.source           = { :git => 'https://github.com/Orange-OpenSource/OCast-iOS.g
 
 s.ios.deployment_target = '8.0'
 s.swift_version = '4.1'
-s.source_files = 'OCast/**/*'
 
 s.subspec 'Core' do |core|
-    core.source_files   = 'OCast/Classes/Core/**/*'
+    core.source_files   = 'OCast/Core/**/*'
     core.dependency 'CocoaAsyncSocket', '7.6.3'
 end
 
 s.subspec 'ReferenceDriver' do |reference|
-    reference.source_files   = 'OCast/Classes/ReferenceDriver/**/*', 'Starscream/Sources/*.swift'
+    reference.source_files   = 'OCast/ReferenceDriver/**/*', 'OCast/Starscream/Sources/*.swift'
     reference.dependency 'OCast/Core'
     reference.libraries      = 'z'
-    reference.preserve_paths = 'Starscream/zlib/*'
-    reference.pod_target_xcconfig = { 'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/Starscream/zlib' }
+    reference.preserve_paths = 'OCast/Starscream/zlib/*'
+    reference.pod_target_xcconfig = { 'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/OCast/Starscream/zlib' }
 end
 
 end

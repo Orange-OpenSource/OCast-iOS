@@ -1,9 +1,4 @@
 .DS_Store
-Manifest.lock
-UserInterfaceState.xcuserstate
+xcuserdata
 Pods
-#Example/OpenCast.xcodeproj/xcuserdata/
-Example/OpenCast.xcodeproj/project.xcworkspace/xcuserdata/
-Breakpoints_v2.xcbkptlist
-Example/OpenCast.xcworkspace/xcuserdata/
-Example/OpenCast.xcworkspace/xcuserdata/phb.xcuserdatad/UserInterfaceState.xcuserstate
+*.xcscmblueprint
