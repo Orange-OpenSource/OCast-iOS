@@ -1,4 +1,4 @@
-osx_image: xcode9.3
+osx_image: xcode9.4
 language: swift
 
 branches:
@@ -6,12 +6,13 @@ branches:
     - master
 
 before_install:
-    - cd Example
-    - pod repo update
+    - gem install bundler
 install:
-    - pod install
+    - bundle install
+    - bundle exec pod install --repo-update
 
 script:
   - set -o pipefail
-  - xcodebuild build -workspace OCastExample.xcworkspace -scheme OCastExample-Swift -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 7,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
-  - xcodebuild build -workspace OCastExample.xcworkspace -scheme OCastExample-ObjC -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 7,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
+  - xcodebuild build -workspace OCast.xcworkspace -scheme OCast -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 7,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
+  - xcodebuild build -workspace OCast.xcworkspace -scheme OCastDemoSwift -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 7,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
+  - xcodebuild build -workspace OCast.xcworkspace -scheme OCastDemoObjC -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 7,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
