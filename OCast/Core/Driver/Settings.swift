@@ -70,6 +70,11 @@ extension PublicSettings {
     ///   - wifiStatus: The `WifiStatus` object containing Wifi information.
     func privateSettings(_ privateSettings: PrivateSettings, didReceiveWifiConnectionStatus wifiStatus: WifiStatus)
     
+    /// Tells the delegate that the privatesettings has received a power alert event.
+    ///
+    /// - Parameter privateSettings: The `PrivateSettings` instance.
+    func privateSettingsDidReceivePowerAlert(_ privateSettings: PrivateSettings)
+    
     /// Tells the delegate that the privatesettings has received a device info event.
     ///
     /// - Parameters:
