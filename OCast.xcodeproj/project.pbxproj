@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		9726F0BA20EFA6E400BAE3BC /* WifiSecurity.h in Headers */ = {isa = PBXBuildFile; fileRef = 9726F0B920EFA6E400BAE3BC /* WifiSecurity.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		97AF814220EA0EAD00C502D5 /* OCast.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97AF813820EA0EAD00C502D5 /* OCast.framework */; };
 		97AF814720EA0EAD00C502D5 /* OCastTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97AF814620EA0EAD00C502D5 /* OCastTests.swift */; };
 		97AF814920EA0EAD00C502D5 /* OCast.h in Headers */ = {isa = PBXBuildFile; fileRef = 97AF813B20EA0EAD00C502D5 /* OCast.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -66,6 +67,7 @@
 /* Begin PBXFileReference section */
 		075C825A936085344F863840 /* Pods-OCast.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast.release.xcconfig"; path = "Pods/Target Support Files/Pods-OCast/Pods-OCast.release.xcconfig"; sourceTree = "<group>"; };
 		7BC0E484F5024A7A1BA54D55 /* Pods-OCast.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OCast/Pods-OCast.debug.xcconfig"; sourceTree = "<group>"; };
+		9726F0B920EFA6E400BAE3BC /* WifiSecurity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WifiSecurity.h; sourceTree = "<group>"; };
 		97992A89EAE79D85ACFECE6F /* Pods_OCast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		97AF813820EA0EAD00C502D5 /* OCast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		97AF813B20EA0EAD00C502D5 /* OCast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCast.h; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 			children = (
 				97DC972F20EA229100DBB1B0 /* Private.swift */,
 				97DC973020EA229100DBB1B0 /* Public.swift */,
+				9726F0B920EFA6E400BAE3BC /* WifiSecurity.h */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -320,6 +323,7 @@
 				97DC97BB20EA302500DBB1B0 /* Starscream.h in Headers */,
 				97AF814920EA0EAD00C502D5 /* OCast.h in Headers */,
 				97DC97A520EA302500DBB1B0 /* include.h in Headers */,
+				9726F0BA20EFA6E400BAE3BC /* WifiSecurity.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

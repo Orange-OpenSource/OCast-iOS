@@ -14,7 +14,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 //
+
 #import <UIKit/UIKit.h>
+#import <OCast/WifiSecurity.h>
 
 //! Project version number for OCast.
 FOUNDATION_EXPORT double OCastVersionNumber;

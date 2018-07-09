@@ -97,12 +97,12 @@ public final class WifiInfo: NSObject {
     public let bssid: String?
     public let frequency: Float?
     public let rssi: Int?
-    public let security: Int?
+    public let security: WifiSecurity?
     public let ip: String?
     public let macAddress: String?
     public let mode: WifiMode
     
-    public init (ssid: String?, bssid: String?, frequency: Float?, rssi: Int?, security: Int?, ip: String?, macAddress: String?, mode: WifiMode) {
+    public init (ssid: String?, bssid: String?, frequency: Float?, rssi: Int?, security: WifiSecurity?, ip: String?, macAddress: String?, mode: WifiMode) {
         self.ssid = ssid
         self.bssid = bssid
         self.frequency = frequency
