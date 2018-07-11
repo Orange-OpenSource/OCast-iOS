@@ -50,7 +50,6 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     // MARK: - Internal
     let linkUUID = UUID().uuidString
     var commandSocket: SocketProvider?
-    var isDisconnecting: Bool = false
     var sequenceID: Int = 0
     var successCallbacks: [Int: (CommandReply) -> Void] = [:]
     var errorCallbacks: [Int: (NSError?) -> Void] = [:]
@@ -62,9 +61,6 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     }
 
     func connect() {
-
-        isDisconnecting = false
-        
         if let socket = SocketProvider(urlString: profile.app2appURL, sslConfiguration: profile.sslConfiguration) {
             commandSocket = socket
             commandSocket?.delegate = self
@@ -82,7 +78,6 @@ final class ReferenceLink: Link, SocketProviderDelegate {
         }
 
         OCastLog.debug(("WS: Disconnecting the Command socket"))
-        isDisconnecting = true
 
         commandSocket.disconnect()
     }
@@ -115,14 +110,14 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     func socketProvider(_ socketProvider: SocketProvider, didDisconnectWithError error: Error?) {
         if commandSocket == socketProvider {
             OCastLog.debug("WS: Command is disconnected with error : \(String(describing: error))")
-            isDisconnecting ? delegate?.didDisconnect(module: profile.module) : delegate?.didFail(module: profile.module)
+            delegate?.link(self, didDisconnectWith: error)
         }
     }
 
     func socketProvider(_ socketProvider: SocketProvider, didConnectToURL url: URL) {
         if commandSocket == socketProvider {
             OCastLog.debug("WS: Command is connected.")
-            delegate?.didConnect(module: profile.module)
+            delegate?.linkDidConnect(self)
         }
     }
 
@@ -157,7 +152,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
             case .command:
                 OCastLog.debug("WS: Ignoring the Command frame. This message Type is not implemented.")
             case .event:
-                delegate?.didReceive(event: Event(source: ocastData.source, message: message))
+                delegate?.link(self, didReceiveEvent: Event(source: ocastData.source, message: message))
             case .reply:
                 let status = ocastData.status ?? ""
             
