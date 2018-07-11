@@ -17,51 +17,92 @@
 
 import Foundation
 
-/**
- Provides the Reference driver implementation.
- The driver needs to be registered by the application as shonw below:
-
- */
+/// Provides the Reference driver implementation.
 @objcMembers
 @objc open class ReferenceDriver: NSObject, Driver, LinkDelegate {
     
-    // MARK: - Public interface
-
-    /*
-     Caps sensitive.
-     This value must match the manufacturer serach target (ST) present in the discovery response.
-     */
-
-    /// Read only. Target that matches with this driver.
+    /// Success and error callbacks
+    private struct Callback {
+        let success: () -> Void
+        let error: (NSError?) -> Void
+    }
+    
+    // MARK: - Public properties
+    
+    /// Target that matches with this driver.
     open static let searchTarget = "urn:cast-ocast-org:service:cast:1"
-
-    /*  
-     Caps sensitive.
-     This value must match the manufacturer name present in the device description.
-     */
-
-    /// Read only. Manufacturer'name that matches with this driver.
+    
+    /// Manufacturer name that matches with this driver.
     open static let manufacturer = "Orange SA"
     
-    public static let ReferenceDriverErrorDomain = "ReferenceDriverErrorDomain"
-
-    // MARK: - public
+    /// Reference driver error domain
+    public static let referenceDriverErrorDomain = "ReferenceDriverErrorDomain"
+    
+    /// Browser delegate to receive events.
     public weak var browserEventDelegate: EventDelegate?
+    
+    /// Public settings delegate to receive events.
     public weak var publicSettingsEventDelegate: PublicSettingsEventDelegate?
     
-
-    // MARK: - Private interface
+    /// Links by module
+    public private(set) var links: [DriverModule: Link] = [:]
+    
+    // MARK: - Private properties
+    
+    /// Device IP address.
     private var ipAddress: String
+    
+    /// SSL configuration.
     private var sslConfiguration: SSLConfiguration?
     
-    public private(set) var links: [DriverModule: Link] = [:]
+    /// Link states by module.
     private var linksState: [DriverModule: DriverState] = [:]
     
+    /// Delegates by module.
     private var delegates: [DriverModule : DriverDelegate] = [:]
-    private var successConnect: [DriverModule: () -> Void] = [:]
-    private var successDisconnect: [DriverModule: () -> Void] = [:]
     
-    // MARK: - Initialization
+    /// Connection callbacks by module.
+    private var connectCallbacks: [DriverModule: Callback] = [:]
+    
+    /// Disconnection callbacks by module.
+    private var disconnectCallbacks: [DriverModule: Callback] = [:]
+    
+    // MARK: Public methods
+    
+    open func buildLink(profile: LinkProfile) -> Link? {
+        return nil
+    }
+    
+    // MARK: Private methods
+    
+    /// Appends the callbacks in a given dictionary to call several completion handlers in one call
+    ///
+    /// - Parameters:
+    ///   - callbackDictionary: The dictionary to update.
+    ///   - module: The module to update.
+    ///   - newCallback: The new callback to append to the existing one.
+    private func appendCallBack(in callbackDictionary: inout [DriverModule: Callback], for module: DriverModule, with newCallback: Callback) {
+        let existingCallback = callbackDictionary[module]
+        let updatedCallback = Callback(success: {
+            existingCallback?.success()
+            newCallback.success()
+        }) { error in
+            existingCallback?.error(error)
+            newCallback.error(error)
+        }
+        callbackDictionary[module] = updatedCallback
+    }
+    
+    /// Modules used by a link
+    ///
+    /// - Parameter link: The link to check.
+    /// - Returns: An array of `DriverModule` to indicated in which module the link is used.
+    private func modulesUsedBy(_ link: Link) -> [DriverModule] {
+        return links.filter({ $0.value === link }).compactMap({ $0.key })
+    }
+    
+    // MARK: - Driver methods
+    
     public required init(ipAddress: String, with sslConfiguration: SSLConfiguration?) {
         self.ipAddress = ipAddress
         self.sslConfiguration = sslConfiguration
@@ -69,178 +110,166 @@ import Foundation
         linksState[.publicSettings] = .disconnected
         linksState[.privateSettings] = .disconnected
     }
-
+    
     open func privateSettingsAllowed() -> Bool {
         return false
     }
-
+    
     public func register(_ delegate: DriverDelegate, forModule module: DriverModule) {
         delegates[module] = delegate
     }
-
+    
     public func state(for module: DriverModule) -> DriverState {
         return linksState[module] ?? .disconnected
     }
-
+    
     open func connect(for module: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-
         if module == .privateSettings && !privateSettingsAllowed() {
-            OCastLog.error(("Reference Driver: Private Settings are not implemented in reference driver"))
-            let error = NSError(domain: "Reference driver", code: 1, userInfo: ["Reference driver": "Private Settings are not implemented in reference driver"])
+            let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.privateSettingsNotAllowed.rawValue, userInfo: nil)
             onError(error)
+            return
         }
-
-        switch state(for: module) {
-            case .connected:
-                onSuccess()
         
-            case .connecting:
-                OCastLog.debug("Link is already connecting.")
-                let otherCallback = successConnect[module]
-                successConnect[module] = { () in
-                    otherCallback?()
-                    onSuccess()
+        switch state(for: module) {
+        case .connected:
+            onSuccess()
+        case .connecting:
+            appendCallBack(in: &connectCallbacks, for: module, with: Callback(success: onSuccess, error: onError))
+            return
+        case .disconnected, .disconnecting:
+            var link = links[module]
+            if link == nil {
+                var app2appURL:String?
+                // Settings ou Cavium
+                if info?.app2appURL == nil {
+                    app2appURL = "wss://\(ipAddress):4433/ocast"
+                } else {
+                    app2appURL = info?.app2appURL
                 }
-                return
-            case .disconnected, .disconnecting:
-                var link = links[module]
-                if link == nil {
-                    var app2appURL:String?
-                    // Settings ou Cavium
-                    if info?.app2appURL == nil {
-                        app2appURL = "wss://\(ipAddress):4433/ocast"
-                    } else {
-                        app2appURL = info?.app2appURL
-                    }
-                    let linkProfile = LinkProfile(
-                        module: module,
-                        app2appURL: app2appURL ?? "",
-                        sslConfiguration: sslConfiguration)
+                let linkProfile = LinkProfile(app2appURL: app2appURL ?? "", sslConfiguration: sslConfiguration)
+                
+                // Check if the same link is already existing in another module
+                if let otherLink = links.first(where: { (_, l) -> Bool in
+                    return l.profile.app2appURL == linkProfile.app2appURL
+                }) {
                     
-                    // Check if the same link is already existing in another module
-                    if let otherLink = links.first(where: { (_, l) -> Bool in
-                        return l.profile.app2appURL == linkProfile.app2appURL
-                    }) {
-                        
-                        links[module] = otherLink.value
-                        switch state(for: otherLink.key) {
-                        case .connected:
-                            // do nothing, call onSuccess
-                            linksState[module] = .connected
-                            onSuccess()
-                            return
-                        case .connecting:
-                            // override the other callbacks
-                            linksState[module] = .connecting
-                            let otherSuccessCallback = successConnect[otherLink.key]
-                            successConnect[otherLink.key] = { () in
-                                otherSuccessCallback?()
-                                onSuccess()
-                            }
-                            return
-                        default:
-                            // reconnect the link
-                            link = otherLink.value
-                        }
-                    } else {
-                        // Build a new link
-                        link = buildLink(profile: linkProfile)
-                        if link == nil {
-                            link = ReferenceLink(withDelegate: self, andProfile: linkProfile)
-                        }
+                    links[module] = otherLink.value
+                    switch state(for: otherLink.key) {
+                    case .connected:
+                        linksState[module] = .connected
+                        onSuccess()
+                        return
+                    case .connecting:
+                        linksState[module] = .connecting
+                        connectCallbacks[module] = Callback(success: onSuccess, error: onError)
+                        return
+                    default:
+                        link = otherLink.value
                     }
-                    
+                } else {
+                    // Build a new link
+                    link = buildLink(profile: linkProfile)
+                    if link == nil {
+                        link = ReferenceLink(withDelegate: self, andProfile: linkProfile)
+                    }
                 }
-                links[module] = link
-                successConnect[module] = onSuccess
-                linksState[module] = .connecting
-                link?.connect()
+            }
+            links[module] = link
+            connectCallbacks[module] = Callback(success: onSuccess, error: onError)
+            linksState[module] = .connecting
+            link?.connect()
         }
     }
-
+    
     open func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        
         guard let link = links[module] else {
-            let error = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: 0, userInfo: ["Error": "Could not get the link."])
+            let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.moduleNotConnected.rawValue, userInfo: nil)
             onError(error)
             return
         }
         
         if linksState[module] == .disconnecting {
-            // add the onSuccess callback to the existing callback
-            let otherSuccessCallback = successDisconnect[module]
-            successDisconnect[module] = { () in
-                otherSuccessCallback?()
-                onSuccess()
-            }
+            appendCallBack(in: &disconnectCallbacks, for: module, with: Callback(success: onSuccess, error: onError))
             return
         }
-
+        
         if !links.contains(where: { (entry) -> Bool in
             return entry.key != module && entry.value.profile.app2appURL == link.profile.app2appURL
         }) {
             linksState[module] = .disconnecting
-            successDisconnect[module] = onSuccess
+            disconnectCallbacks[module] = Callback(success: onSuccess, error: onError)
             link.disconnect()
         } else {
             // We don't close the link
             linksState[module] = .disconnected
             links.removeValue(forKey: module)
-            // FIXME : onError or onSuccess ?
             onSuccess()
         }
     }
     
-    // MARK: Internal methods
-    open func buildLink(profile: LinkProfile) -> Link? {
-        return nil
+    // MARK: - LinkDelegate methods
+    
+    open func linkDidConnect(_ link: Link) {
+        let modules = modulesUsedBy(link)
+        
+        for module in modules {
+            linksState[module] = .connected
+            connectCallbacks[module]?.success()
+            connectCallbacks.removeValue(forKey: module)
+        }
     }
-
-    // MARK: - Link Protocol
-    open func didConnect(module: DriverModule) {
-        linksState[module] = .connected
-        successConnect[module]?()
-        successConnect.removeValue(forKey: module)
+    
+    open func link(_ link: Link, didDisconnectWith error: Error?) {
+        let modules = modulesUsedBy(link)
+        
+        for module in modules {
+            linksState[module] = .disconnected
+            links.removeValue(forKey: module)
+            
+            // Connection error
+            if let connectCallback = connectCallbacks[module] {
+                connectCallback.error(error as NSError?)
+                connectCallbacks.removeValue(forKey: module)
+                continue
+            }
+            
+            // Disconnection error
+            if let disconnectCallback = disconnectCallbacks[module] {
+                if error == nil {
+                    disconnectCallback.success()
+                } else {
+                    disconnectCallback.error(error as NSError?)
+                }
+                disconnectCallbacks.removeValue(forKey: module)
+                continue
+            }
+            
+            // Connection lost during the session
+            let newError = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.linkConnectionLost.rawValue, userInfo: nil)
+            delegates[module]?.driver(self, didDisconnectModule: module, withError: newError)
+        }
     }
-
-    open func didDisconnect(module: DriverModule) {
-        linksState[module] = .disconnected
-        links.removeValue(forKey: module)
-        successDisconnect[module]?()
-        successDisconnect.removeValue(forKey: module)
-    }
-
-    open func didFail(module: DriverModule) {
-        successConnect.removeValue(forKey: module)
-        successDisconnect.removeValue(forKey: module)
-        linksState[module] = .disconnected
-        links[module]?.disconnect()
-        links.removeValue(forKey: module)
-        let newError = NSError(domain: "Reference driver", code: 0, userInfo: ["Error": "Unexpected link disconnection"])
-        delegates[module]?.driver(self, didDisconnectModule: module, withError: newError)
-    }
-
-    open func didReceive(event: Event) {
+    
+    open func link(_ link: Link, didReceiveEvent event: Event) {
         if event.source == ReferenceDomainName.browser.rawValue {
             browserEventDelegate?.didReceiveEvent(withMessage: event.message)
         } else if event.source == ReferenceDomainName.settings.rawValue {
-            
             if let service = event.message["service"] as? String,
                 service == PublicSettingsConstants.SERVICE_SETTINGS_DEVICE {
-                    didReceivePublicSettingsEvent(withMessage: event.message)
+                didReceivePublicSettingsEvent(withMessage: event.message)
             } else if
                 privateSettingsAllowed(),
                 let privateSettings = self as? PrivateSettings {
-                    privateSettings.didReceivePrivateSettingsEvent(withMessage: event.message)
+                privateSettings.didReceivePrivateSettingsEvent(withMessage: event.message)
             }
         }
     }
     
     // MARK: BrowserDelegate methods
+    
     open func send(data: [String: Any], onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
-        
         guard let link = links[.application] else {
-            let error = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: 0, userInfo: ["Error": "Link doesn't exists."])
+            let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.moduleNotConnected.rawValue, userInfo: nil)
             onError(error)
             return
         }
@@ -250,17 +279,10 @@ import Foundation
         link.send(
             payload: payload,
             forDomain: ReferenceDomainName.browser.rawValue,
-            onSuccess: {
-                commandReply in
-                    onSuccess(commandReply.message)
-            },
-            onError: {
-                error in
-                    if let error = error {
-                        OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[ReferenceDriver.ReferenceDriverErrorDomain]))")
-                        onError(error)
-                    }
-            })
+            onSuccess: { commandReply in
+                onSuccess(commandReply.message)
+        },
+            onError: onError)
     }
     
     public func register(for browser: EventDelegate) {
