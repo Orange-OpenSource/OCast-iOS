@@ -78,30 +78,32 @@ import Foundation
 
 /// Link's delegate
 @objc public protocol LinkDelegate {
-    /// Called when an event has been received
+    
+    /// Tells the delegate that the link has been connected.
     ///
-    /// - Parameter event: event
-    func didReceive(event: Event)
-    /// Called when the link is connected
+    /// - Parameters:
+    ///   - link: The link.
+    func linkDidConnect(_ link: Link)
+    
+    /// Tells the delegate that the link has been disconnected.
     ///
-    /// - Parameter module: module which is connected
-    func didConnect(module: DriverModule)
-    /// Called when a module is disconnected
+    /// - Parameters:
+    ///   - link: The link.
+    ///   - error: The error.
+    func link(_ link: Link, didDisconnectWith error: Error?)
+    
+    /// Tells the delegate that the link has received an event.
     ///
-    /// - Parameter module: module which is disconnected
-    func didDisconnect(module: DriverModule)
-    /// Called the link has failed
-    ///
-    /// - Parameter module: module which is failed
-    func didFail(module: DriverModule)
+    /// - Parameters:
+    ///   - link: The link.
+    ///   - event: The event received.
+    func link(_ link: Link, didReceiveEvent event: Event)
 }
 
 @objc public class LinkProfile: NSObject {
-    public let module: DriverModule
     public let app2appURL: String
     public let sslConfiguration: SSLConfiguration?
-    public init(module: DriverModule, app2appURL: String, sslConfiguration: SSLConfiguration?) {
-        self.module = module
+    public init(app2appURL: String, sslConfiguration: SSLConfiguration?) {
         self.app2appURL = app2appURL
         self.sslConfiguration = sslConfiguration
     }
@@ -117,7 +119,7 @@ import Foundation
     ///   - profile: link's profile
     init(withDelegate delegate: LinkDelegate?, andProfile profile: LinkProfile)
     /// Connect the link
-    func connect()
+    func connect() -> Bool
     /// Disconnect the link
     func disconnect()
     /// Send a command

@@ -33,8 +33,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     }
     
     enum DriverError: Int {
-        case wrongDomain = 0
-        case commandWSNil
+        case commandWSNil = 0
         case commandWSKO
         case wrongPayload
         case remoteError
@@ -47,7 +46,6 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     // MARK: - Internal
     let linkUUID = UUID().uuidString
     var commandSocket: SocketProvider?
-    var isDisconnecting: Bool = false
     var sequenceID: Int = 0
     var successCallbacks: [Int: (CommandReply) -> Void] = [:]
     var errorCallbacks: [Int: (NSError?) -> Void] = [:]
@@ -58,37 +56,37 @@ final class ReferenceLink: Link, SocketProviderDelegate {
         self.profile = profile
     }
 
-    func connect() {
-        isDisconnecting = false
+    func connect() -> Bool {
         // if socket already exists
         commandSocket?.delegate = nil
         commandSocket?.disconnect()
+
         if let socket = SocketProvider(urlString: profile.app2appURL, sslConfiguration: profile.sslConfiguration) {
             commandSocket = socket
             commandSocket?.delegate = self
             commandSocket?.connect()
+            return true
         } else {
-            OCastLog.debug(("WS: Cannot create the socket provider."))
-            delegate?.didFail(module: profile.module)
+            OCastLog.error(("WS: Cannot create the socket provider."))
+            return false
         }
     }
 
     func disconnect() {
         OCastLog.debug(("WS: Disconnecting the Command socket"))
-        isDisconnecting = true
         commandSocket?.disconnect()
     }
     
     func send(payload: Command, forDomain domain: String, onSuccess: @escaping (CommandReply) -> Void, onError: @escaping (NSError?) -> Void) {
 
         guard let commandSocket = commandSocket else {
-            let error = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: DriverError.commandWSNil.rawValue, userInfo: [ReferenceDriver.ReferenceDriverErrorDomain: "Payload could not be sent because link is not connected."])
+            let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: DriverError.commandWSNil.rawValue, userInfo: [ReferenceDriver.referenceDriverErrorDomain: "Payload could not be sent because link is not connected."])
             onError(error)
             return
         }
 
-        guard let message = encapsulateMessage(forDomain: domain, with: payload) else {
-            let error = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: DriverError.wrongPayload.rawValue, userInfo: [ReferenceDriver.ReferenceDriverErrorDomain: "Payload could not be formatted properly."])
+        guard let message = buildMessage(forDomain: domain, with: payload) else {
+            let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: DriverError.wrongPayload.rawValue, userInfo: [ReferenceDriver.referenceDriverErrorDomain: "Payload could not be formatted properly."])
             onError(error)
             return
         }
@@ -97,7 +95,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
         errorCallbacks[message.sequenceId] = onError
 
         if !commandSocket.sendMessage(message: message.message) {
-            let error = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: DriverError.wrongPayload.rawValue, userInfo: [ReferenceDriver.ReferenceDriverErrorDomain: "Payload exceeded 4096 bytes. Message not sent."])
+            let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: DriverError.commandWSKO.rawValue, userInfo: [ReferenceDriver.referenceDriverErrorDomain: "Message not sent."])
             onError(error)
             resetCallbacks(for: message.sequenceId)
         }
@@ -106,15 +104,15 @@ final class ReferenceLink: Link, SocketProviderDelegate {
     // MARK: - SocketProviderDelegate methods
     func socketProvider(_ socketProvider: SocketProvider, didDisconnectWithError error: Error?) {
         OCastLog.debug("WS: Command is disconnected with error : \(String(describing: error))")
-        isDisconnecting ? delegate?.didDisconnect(module: profile.module) : delegate?.didFail(module: profile.module)
-        // release commandSocket
         commandSocket?.delegate = nil
         commandSocket = nil
+        delegate?.link(self, didDisconnectWith: error)
     }
 
+
     func socketProvider(_ socketProvider: SocketProvider, didConnectToURL url: URL) {
-        OCastLog.debug("WS: Command is connected to \(url).")
-        delegate?.didConnect(module: profile.module)
+        OCastLog.debug("WS: Command is connected.")
+        delegate?.linkDidConnect(self)
     }
 
     func socketProvider(_ socketProvider: SocketProvider, didReceiveMessage message: String) {
@@ -133,7 +131,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
             case .command:
                 OCastLog.debug("WS: Ignoring the Command frame. This message Type is not implemented.")
             case .event:
-                delegate?.didReceive(event: Event(source: ocastData.source, message: oCastMessage))
+                delegate?.link(self, didReceiveEvent: Event(source: ocastData.source, message: oCastMessage))
             case .reply:
                 if ocastData.status?.uppercased() == "OK" {
                     if let successCallback = successCallbacks[ocastData.identifier] {
@@ -141,7 +139,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
                         successCallback(reply)
                     }
                 } else if let errorCallback = errorCallbacks[ocastData.identifier] {
-                    let error = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: DriverError.remoteError.rawValue, userInfo: [ReferenceDriver.ReferenceDriverErrorDomain: "\(ocastData.status ?? "")"])
+                    let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: DriverError.remoteError.rawValue, userInfo: [ReferenceDriver.referenceDriverErrorDomain: "\(ocastData.status ?? "")"])
                     errorCallback(error)
                 }
                 
@@ -164,7 +162,7 @@ final class ReferenceLink: Link, SocketProviderDelegate {
         errorCallbacks.removeValue(forKey: id)
     }
     
-    private func encapsulateMessage(forDomain domain: String, with payload: Command) -> (message: String, sequenceId: Int)? {
+    private func buildMessage(forDomain domain: String, with payload: Command) -> (message: String, sequenceId: Int)? {
         
         let sequenceId = getSequenceId()
         

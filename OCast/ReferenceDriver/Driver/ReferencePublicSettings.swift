@@ -47,7 +47,7 @@ extension ReferenceDriver: PublicSettings {
                     onSuccess(statusInfo)
         }) { (error) in
             if let error = error {
-                OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[ReferenceDriver.ReferenceDriverErrorDomain]))")
+                OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[ReferenceDriver.referenceDriverErrorDomain]))")
             }
             onError (error)
         }
@@ -80,7 +80,7 @@ extension ReferenceDriver: PublicSettings {
                 onSuccess(id)
         }) { (error) in
             if let error = error {
-                OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[ReferenceDriver.ReferenceDriverErrorDomain]))")
+                OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[ReferenceDriver.referenceDriverErrorDomain]))")
             }
             onError (error)
         }
