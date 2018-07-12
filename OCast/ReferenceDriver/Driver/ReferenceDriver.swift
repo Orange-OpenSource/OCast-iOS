@@ -135,7 +135,6 @@ import Foundation
             onSuccess()
         case .connecting:
             appendCallBack(in: &connectCallbacks, for: module, with: Callback(success: onSuccess, error: onError))
-            return
         case .disconnected, .disconnecting:
             var link = links[module]
             if link == nil {
@@ -177,7 +176,14 @@ import Foundation
             links[module] = link
             connectCallbacks[module] = Callback(success: onSuccess, error: onError)
             linksState[module] = .connecting
-            link?.connect()
+            guard link?.connect() ?? false else {
+                links.removeValue(forKey: module)
+                connectCallbacks.removeValue(forKey: module)
+                linksState[module] = .disconnected
+                let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.moduleNotConnected.rawValue, userInfo: nil)
+                onError(error)
+                return
+            }
         }
     }
     

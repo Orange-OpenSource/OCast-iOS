@@ -63,9 +63,8 @@ final class ReferenceLink: Link, SocketProviderDelegate {
 
         if let socket = SocketProvider(urlString: profile.app2appURL, sslConfiguration: profile.sslConfiguration) {
             commandSocket = socket
-            commandSocket?.delegate = self
-            commandSocket?.connect()
-            return true
+            socket.delegate = self
+            return socket.connect()
         } else {
             OCastLog.error(("WS: Cannot create the socket provider."))
             return false
