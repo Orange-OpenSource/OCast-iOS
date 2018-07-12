@@ -176,13 +176,12 @@ import Foundation
             links[module] = link
             connectCallbacks[module] = Callback(success: onSuccess, error: onError)
             linksState[module] = .connecting
-            guard link?.connect() ?? false else {
+            if !(link?.connect() ?? false) {
                 links.removeValue(forKey: module)
                 connectCallbacks.removeValue(forKey: module)
                 linksState[module] = .disconnected
-                let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.moduleNotConnected.rawValue, userInfo: nil)
+                let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.invalidApplicationURL.rawValue, userInfo: nil)
                 onError(error)
-                return
             }
         }
     }
