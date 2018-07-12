@@ -64,7 +64,6 @@ extension ReferenceDriver: PublicSettings {
     }
     
     open func gamepadEvent(axes: [GamepadAxes], buttons: Int, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {
-        
         let axesJSON = axes.map { axe -> [String:Any] in
             ["num": axe.num, "x": axe.x, "y": axe.y]
         }
@@ -107,7 +106,7 @@ extension ReferenceDriver: PublicSettings {
                             onError: @escaping (NSError?) -> ()) {
         
         guard let link = links[.publicSettings] else {
-            let linkNotConnectedError = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain, code: 0, userInfo: ["Error": "Driver is not connected for public settings"])
+            let linkNotConnectedError = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: 0, userInfo: ["Error": "Driver is not connected for public settings"])
             onError(linkNotConnectedError)
             return
         }
@@ -116,7 +115,7 @@ extension ReferenceDriver: PublicSettings {
                 forDomain: domain,
                 onSuccess: { commandReply in
                     
-                    let invalidMessageError = NSError(domain: ReferenceDriver.ReferenceDriverErrorDomain,
+                    let invalidMessageError = NSError(domain: ReferenceDriver.referenceDriverErrorDomain,
                                                       code: 0,
                                                       userInfo: ["Error": "No valid message received \(commandReply)"])
                     

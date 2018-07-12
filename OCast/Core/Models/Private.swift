@@ -143,11 +143,13 @@ public final class VersionInfo: NSObject {
     public let name: String?
     public let softwareVersion: String?
     public let hardwareVersion: String?
+    public let powerAlert: Bool
     
-    @objc public init(name: String?, softwareVersion: String?, hardwareVersion: String?) {
+    @objc public init(name: String?, softwareVersion: String?, hardwareVersion: String?, powerAlert: Bool) {
         self.name = name
         self.softwareVersion = softwareVersion
         self.hardwareVersion = hardwareVersion
+        self.powerAlert = powerAlert
     }
 }
 
