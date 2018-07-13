@@ -37,15 +37,52 @@ public protocol PublicSettings {
     var publicSettingsEventDelegate:PublicSettingsEventDelegate? { get set }
     // Receive event settings
     func didReceivePublicSettingsEvent(withMessage message: [String: Any])
-    // Device settings
+    /// Return information about update status of stick.
+    ///
+    /// - Parameters:
+    ///   - onSuccess: called when request is success.
+    ///   - onError: called when an error occured.
     func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void)
+    /// Return the device's id.
+    ///
+    /// - Parameters:
+    ///   - onSuccess: called when request success.
+    ///   - onError: called when an error occured.
     func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ())
+    /// Send virtual key pressed
+    ///
+    /// - Parameters:
+    ///   - key: key value
+    ///   - onSuccess: called when request success.
+    ///   - onError: called when an error occured.
+    func keyPressed(key: KeyValue, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ())
+    /// Send a mouse event
+    ///
+    /// - Parameters:
+    ///   - x: x
+    ///   - y: y
+    ///   - buttons: buttons
+    ///   - onSuccess: called when request success.
+    ///   - onError: called when an error occured.
+    func mouseEvent(x: Int, y: Int, buttons: Int, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ())
+    /// Send a gamepad event
+    ///
+    /// - Parameters:
+    ///   - axes: list of axes
+    ///   - buttons: buttons
+    ///   - onSuccess: called when request success.
+    ///   - onError: called when an error occured.
+    func gamepadEvent(axes: [GamepadAxes], buttons: Int, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ())
 }
 
 public struct PublicSettingsConstants {
     public static let COMMAND_STATUS = "getUpdateStatus"
     public static let COMMAND_DEVICE_ID = "getDeviceID"
+    public static let COMMAND_KEY_PRESSED = "keyPressed"
+    public static let COMMAND_MOUSE_EVENT = "mouseEvent"
+    public static let COMMAND_GAMEPAD_EVENT = "gamepadEvent"
     public static let SERVICE_SETTINGS_DEVICE = "org.ocast.settings.device"
+    public static let SERVICE_SETTINGS_INPUT = "org.ocast.settings.input"
     public static let EVENT_STATUS = "updateStatus"
 }
 
@@ -54,6 +91,15 @@ extension PublicSettings {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     public func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func keyPressed(key: KeyValue, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func mouseEvent(x: Int, y: Int, buttons: Int, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
+    }
+    public func gamepadEvent(axes: [GamepadAxes], buttons: Int, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
 }

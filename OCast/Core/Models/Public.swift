@@ -33,6 +33,38 @@ public struct StreamData {
     public let options: [String: Any]?
 }
 
+@objcMembers
+public final class KeyValue: NSObject {
+    public let key: String
+    public let code: String
+    public let ctrl: Bool
+    public let alt: Bool
+    public let shift: Bool
+    public let meta: Bool
+    public let location: Int
+    public init(key: String, code: String, ctrl: Bool, alt: Bool, shift: Bool, meta: Bool, location: Int) {
+        self.key = key
+        self.code = code
+        self.ctrl = ctrl
+        self.alt = alt
+        self.shift = shift
+        self.meta = meta
+        self.location = location
+    }
+}
+
+@objcMembers
+public final class GamepadAxes: NSObject {
+    public let x: Float
+    public let y: Float
+    public let num : Int
+    public init(x: Float, y: Float, num: Int) {
+        self.x = x
+        self.y = y
+        self.num = num
+    }
+}
+
 public struct DataMapper {
     
     public init() {

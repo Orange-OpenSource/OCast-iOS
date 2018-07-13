@@ -21,69 +21,59 @@ extension ReferenceDriver: PublicSettings {
     
     // MARK: - Public settings
     open func getUpdateStatus(onSuccess: @escaping (StatusInfo) -> Void, onError: @escaping (NSError?) -> Void) {
-        guard let link = links[.publicSettings] else {
-            OCastLog.error("Reference Driver: Could not get the secured link.")
-            // FIXME: create error
-            onError(nil)
-            return
-        }
-        
-        let payload = Command(
-            command: PublicSettingsConstants.COMMAND_STATUS,
-            params: ["service" : PublicSettingsConstants.SERVICE_SETTINGS_DEVICE, "data": ["name": PublicSettingsConstants.COMMAND_STATUS, "params": [:], "options": [:]]])
-        
-        link.send(
-            payload: payload,
-            forDomain: ReferenceDomainName.settings.rawValue,
-            onSuccess: {
-                commandReply in
-                guard let data = commandReply.message["data"] as? [String: Any],
-                    let streamData = DataMapper().streamData(with: data),
-                    let statusInfo = DataMapper().statusInfo(with: streamData) else {
-                            // FIXME: create error
-                            onError(nil)
-                            return
-                    }
-                    onSuccess(statusInfo)
-        }) { (error) in
-            if let error = error {
-                OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[ReferenceDriver.referenceDriverErrorDomain]))")
-            }
-            onError (error)
-        }
+        let payload = command(name: PublicSettingsConstants.COMMAND_STATUS,
+                              service: PublicSettingsConstants.SERVICE_SETTINGS_DEVICE,
+                              params: [:])
+        execute(command: payload, onDomain: ReferenceDomainName.settings.rawValue, wrapper: { (reply) -> StatusInfo? in
+            return DataMapper().statusInfo(with: reply)
+        }, onSuccess: onSuccess, onError: onError)
     }
     
     open func getDeviceID(onSuccess: @escaping (String) -> (), onError: @escaping (NSError?) -> ()) {
-        guard let link = links[.publicSettings] else {
-            OCastLog.error("Reference Driver: Could not get the secured link.")
-            // FIXME: create error
-            onError(nil)
-            return
+        let payload = command(name: PublicSettingsConstants.COMMAND_DEVICE_ID,
+                              service: PublicSettingsConstants.SERVICE_SETTINGS_DEVICE,
+                              params: [:])
+        execute(command: payload, onDomain: ReferenceDomainName.settings.rawValue, wrapper: { (reply) -> String? in
+            return reply.params["id"] as? String
+        }, onSuccess: onSuccess, onError: onError)
+    }
+    
+    open func keyPressed(key: KeyValue, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        let payload = command(name: PublicSettingsConstants.COMMAND_KEY_PRESSED,
+                              service: PublicSettingsConstants.SERVICE_SETTINGS_INPUT,
+                              params: [
+                                "key":key.key,
+                                "code":key.code,
+                                "ctrl":key.ctrl,
+                                "alt": key.alt,
+                                "shift": key.shift,
+                                "meta": key.meta,
+                                "location": key.location])
+
+        execute(command: payload, onDomain: ReferenceDomainName.settings.rawValue, onSuccess: onSuccess, onError: onError)
+    }
+    
+    open func mouseEvent(x: Int, y: Int, buttons: Int, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        let payload = command(name: PublicSettingsConstants.COMMAND_MOUSE_EVENT,
+                              service: PublicSettingsConstants.SERVICE_SETTINGS_INPUT,
+                              params: [
+                                "x": x,
+                                "y": y,
+                                "buttons": buttons])
+        execute(command: payload, onDomain: ReferenceDomainName.settings.rawValue, onSuccess: onSuccess, onError: onError)
+    }
+    
+    open func gamepadEvent(axes: [GamepadAxes], buttons: Int, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ()) {
+        let axesJSON = axes.map { axe -> [String:Any] in
+            ["num": axe.num, "x": axe.x, "y": axe.y]
         }
-        
-        let payload = Command(
-            command: PublicSettingsConstants.COMMAND_DEVICE_ID,
-            params: ["service" : PublicSettingsConstants.SERVICE_SETTINGS_DEVICE, "data": ["name": PublicSettingsConstants.COMMAND_DEVICE_ID, "params": [:], "options": [:]]])
-        
-        link.send(
-            payload: payload,
-            forDomain: ReferenceDomainName.settings.rawValue,
-            onSuccess: {
-                commandReply in
-                guard let data = commandReply.message["data"] as? [String: Any],
-                    let streamData = DataMapper().streamData(with: data),
-                    let id = streamData.params["id"] as? String else {
-                        // FIXME: create error
-                        onError(nil)
-                        return
-                }
-                onSuccess(id)
-        }) { (error) in
-            if let error = error {
-                OCastLog.error("Reference Driver: Payload could not be sent: \(String(describing: error.userInfo[ReferenceDriver.referenceDriverErrorDomain]))")
-            }
-            onError (error)
-        }
+        let payload = command(name: PublicSettingsConstants.COMMAND_GAMEPAD_EVENT,
+                              service: PublicSettingsConstants.SERVICE_SETTINGS_INPUT,
+                              params: [
+                                "axes":axesJSON,
+                                "buttons": buttons])
+
+        execute(command: payload, onDomain: ReferenceDomainName.settings.rawValue, onSuccess: onSuccess, onError: onError)
     }
     
     open func didReceivePublicSettingsEvent(withMessage message: [String: Any]) {
@@ -98,5 +88,55 @@ extension ReferenceDriver: PublicSettings {
             
             publicSettingsEventDelegate?.publicSettings(self, didReceiveUpdateStatus: statusInfo)
         }
+    }
+    
+    // MARK: private methods
+    private func execute(command: Command, onDomain domain: String, onSuccess: @escaping () -> (), onError: @escaping (NSError?) -> ()) {
+        return execute(command: command,
+                       onDomain: domain,
+                       wrapper: { commandReply in return Void() },
+                       onSuccess: onSuccess,
+                       onError: onError)
+    }
+    
+    private func execute<T>(command: Command,
+                            onDomain domain: String,
+                            wrapper:@escaping (StreamData) -> T?,
+                            onSuccess: @escaping (T) -> (),
+                            onError: @escaping (NSError?) -> ()) {
+        
+        guard let link = links[.publicSettings] else {
+            let linkNotConnectedError = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: 0, userInfo: ["Error": "Driver is not connected for public settings"])
+            onError(linkNotConnectedError)
+            return
+        }
+        
+        link.send(payload: command,
+                forDomain: domain,
+                onSuccess: { commandReply in
+                    
+                    let invalidMessageError = NSError(domain: ReferenceDriver.referenceDriverErrorDomain,
+                                                      code: 0,
+                                                      userInfo: ["Error": "No valid message received \(commandReply)"])
+                    
+                    guard let _ = commandReply.message["service"] as? String,
+                        let data = commandReply.message["data"] as? [String: Any],
+                        let streamData = DataMapper().streamData(with: data) else {
+                            onError(invalidMessageError)
+                            return
+                    }
+                    
+                    if let result = wrapper(streamData) {
+                        onSuccess(result)
+                    } else {
+                        onError(invalidMessageError)
+                    }
+                },
+                onError: onError)
+    }
+    
+    private func command(name: String, service: String, params: [String: Any] = [:], options: [String: Any] = [:]) -> Command {
+        return Command(command: name,
+                       params: ["service" : service, "data": ["name": name, "params": params, "options": options]])
     }
 }
