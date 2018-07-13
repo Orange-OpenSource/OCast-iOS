@@ -49,14 +49,14 @@ public protocol PublicSettings {
     ///   - onSuccess: called when request success.
     ///   - onError: called when an error occured.
     func getDeviceID(onSuccess:@escaping (String) -> (), onError:@escaping (NSError?) -> ())
-    /// Virtual key pressed
+    /// Send virtual key pressed
     ///
     /// - Parameters:
     ///   - key: key value
     ///   - onSuccess: called when request success.
     ///   - onError: called when an error occured.
     func keyPressed(key: KeyValue, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ())
-    /// send a mouse event
+    /// Send a mouse event
     ///
     /// - Parameters:
     ///   - x: x
@@ -65,7 +65,7 @@ public protocol PublicSettings {
     ///   - onSuccess: called when request success.
     ///   - onError: called when an error occured.
     func mouseEvent(x: Int, y: Int, buttons: Int, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ())
-    /// send a gamepad event
+    /// Send a gamepad event
     ///
     /// - Parameters:
     ///   - axes: list of axes

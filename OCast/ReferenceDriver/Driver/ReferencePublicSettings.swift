@@ -131,7 +131,6 @@ extension ReferenceDriver: PublicSettings {
                     } else {
                         onError(invalidMessageError)
                     }
-                       
                 },
                 onError: onError)
     }
