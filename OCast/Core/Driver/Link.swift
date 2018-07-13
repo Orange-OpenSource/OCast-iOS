@@ -119,7 +119,7 @@ import Foundation
     ///   - profile: link's profile
     init(withDelegate delegate: LinkDelegate?, andProfile profile: LinkProfile)
     /// Connect the link
-    func connect()
+    func connect() -> Bool
     /// Disconnect the link
     func disconnect()
     /// Send a command

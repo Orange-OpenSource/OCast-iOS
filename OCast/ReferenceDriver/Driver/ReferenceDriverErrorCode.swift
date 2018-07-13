@@ -26,4 +26,5 @@ import Foundation
     case privateSettingsNotAllowed = 8000
     case moduleNotConnected = 8001
     case linkConnectionLost = 8002
+    case invalidApplicationURL = 8003
 }
