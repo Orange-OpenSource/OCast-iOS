@@ -178,7 +178,9 @@ import Foundation
         applicationData(
             applicationName: applicationName,
             target: target,
-            onSuccess: { (description) in
+            onSuccess: { [weak self] (description) in
+                guard let `self` = self else { return }
+                
                 let newController = ApplicationController(for: self.device, with: description, target: target, driver: self.driver)
                 self.driver.register(self, forModule: .application)
                 self.applicationController = newController
@@ -216,7 +218,7 @@ import Foundation
 
     private func applicationData(applicationName: String, target: String, onSuccess: @escaping (_ applicationDescription: ApplicationDescription) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         
-        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: { (response, data) in
+        initiateHttpRequest(with: .get, to: target, onSuccess: { (response, data) in
             guard let data = data else {
                 OCastLog.error("ApplicationMgr: No content to parse.")
                 onError(NSError(domain: "ErrorDomain", code: 0, userInfo: ["Error": "No content to parse"]))

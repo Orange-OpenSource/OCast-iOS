@@ -59,7 +59,7 @@ import Foundation
     private var linksState: [DriverModule: DriverState] = [:]
     
     /// Delegates by module.
-    private var delegates: [DriverModule : DriverDelegate] = [:]
+    private var delegates = NSMapTable<NSNumber, DriverDelegate>(keyOptions: .strongMemory, valueOptions: .weakMemory)
     
     /// Connection callbacks by module.
     private var connectCallbacks: [DriverModule: Callback] = [:]
@@ -116,7 +116,7 @@ import Foundation
     }
     
     public func register(_ delegate: DriverDelegate, forModule module: DriverModule) {
-        delegates[module] = delegate
+        delegates.setObject(delegate, forKey: NSNumber(integerLiteral: module.rawValue))
     }
     
     public func state(for module: DriverModule) -> DriverState {
@@ -251,7 +251,7 @@ import Foundation
             
             // Connection lost during the session
             let newError = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.linkConnectionLost.rawValue, userInfo: nil)
-            delegates[module]?.driver(self, didDisconnectModule: module, withError: newError)
+            delegates.object(forKey: NSNumber(integerLiteral: module.rawValue))?.driver(self, didDisconnectModule: module, withError: newError)
         }
     }
     

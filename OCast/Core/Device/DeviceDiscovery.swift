@@ -198,7 +198,7 @@ import CocoaAsyncSocket
                 return
         }
 
-        initiateHttpRequest(from: self, with: .get, to: location, onSuccess: didReceiveHttpResponse(response:with:), onError: { _ in })
+        initiateHttpRequest(with: .get, to: location, onSuccess: didReceiveHttpResponse(response:with:), onError: { _ in })
     }
 
     /// :nodoc:
