@@ -203,7 +203,11 @@ public final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDel
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         OCastLog.debug("Socket: Disconnected")
         stopPingPongTimer()
-        delegate?.socketProvider(self, didDisconnectWithError: error)
+        var socketError = error
+        if let error = error as? WSError, error.code == CloseCode.normal.rawValue {
+            socketError = nil
+        }
+        delegate?.socketProvider(self, didDisconnectWithError: socketError)
     }
     
     // MARK: - WebSocketPongDelegate methods
