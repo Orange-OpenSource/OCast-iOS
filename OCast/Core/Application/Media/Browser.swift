@@ -34,7 +34,7 @@ import Foundation
 
 final class Browser: NSObject, EventDelegate {
     
-    var streams: [String: DataStream] = [:]
+    var streams = NSMapTable<NSString, DataStream>(keyOptions: .strongMemory, valueOptions: .weakMemory)
     
     weak var delegate: BrowserDelegate? {
         didSet {
@@ -43,7 +43,7 @@ final class Browser: NSObject, EventDelegate {
     }
 
     func register(stream: DataStream) {
-        streams[stream.serviceId] = stream
+        streams.setObject(stream, forKey: stream.serviceId as NSString)
     }
 
     func send(data: [String: Any], for service: String, onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
@@ -76,6 +76,6 @@ final class Browser: NSObject, EventDelegate {
             return
         }
 
-        streams[service]?.onMessage(data: data)
+        streams.object(forKey: service as NSString)?.onMessage(data: data)
     }
 }

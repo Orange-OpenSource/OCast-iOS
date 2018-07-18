@@ -107,8 +107,12 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         manage(stream: self)
         if driver?.state(for: .application) != .connected {
             driver?.connect(for: .application, with: applicationData,
-                            onSuccess: {
-                                self.applicationStatus(onSuccess: {
+                            onSuccess: { [weak self] in
+                                guard let `self` = self else { return }
+                                
+                                self.applicationStatus(onSuccess: { [weak self] in
+                                    guard let `self` = self else { return }
+                                    
                                     if self.currentState == .running {
                                         onSuccess()
                                     } else {
@@ -118,7 +122,9 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
             }
                 , onError: onError)
         } else {
-            self.applicationStatus(onSuccess: {
+            self.applicationStatus(onSuccess: { [weak self] in
+                guard let `self` = self else { return }
+
                 if self.currentState == .running {
                     onSuccess()
                 } else {
@@ -134,9 +140,13 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     ///   - onSuccess: the closure to be called in case of success.
     ///   - onError: the closure to be called in case of error.
     public func stop(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        applicationStatus(onSuccess: {
+        applicationStatus(onSuccess: { [weak self] in
+            guard let `self` = self else { return }
+
             if self.currentState == .running {
-                self.stopApplication(onSuccess: {
+                self.stopApplication(onSuccess: { [weak self] in
+                    guard let `self` = self else { return }
+
                     self.driver?.disconnect(for: .application, onSuccess: onSuccess, onError: onError)
                 }, onError: onError)
             } else {
@@ -169,9 +179,13 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
 
     // MARK: private methods
     private func startApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        initiateHttpRequest(from: self, with: .post, to: target, onSuccess: { (response, _) in
+        initiateHttpRequest(with: .post, to: target, onSuccess: { [weak self] (response, _) in
+            guard let `self` = self else { return }
+
             if response.statusCode == 201 {
-                self.applicationStatus(onSuccess: {
+                self.applicationStatus(onSuccess: { [weak self] in
+                    guard let `self` = self else { return }
+                    
                     self.isConnectedEvent = false
                     let _ = self.semaphore?.wait(timeout: .now() + 60)
                     if self.isConnectedEvent {
@@ -207,7 +221,9 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
             return
         }
 
-        initiateHttpRequest(from: self, with: .delete, to: stopLink, onSuccess: { (_, _) in
+        initiateHttpRequest(with: .delete, to: stopLink, onSuccess: { [weak self] (_, _) in
+            guard let `self` = self else { return }
+            
             self.applicationStatus(onSuccess: {
                 if self.currentState == .stopped {
                     onSuccess()
@@ -224,14 +240,16 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     }
     
     private func applicationStatus(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
-        initiateHttpRequest(from: self, with: .get, to: target, onSuccess: { (_, data) in
+        initiateHttpRequest(with: .get, to: target, onSuccess: { (_, data) in
             guard let data = data else {
                 OCastLog.error("ApplicationMgr: No content to parse.")
                 let error = NSError(domain: "ApplicationController", code: 0, userInfo: ["Error": "No content for status dial page"])
                 onError(error)
                 return
             }
-            self.xmlParser.completionHandler = { (error, result, attributes) -> Void in
+            self.xmlParser.completionHandler = { [weak self] (error, result, attributes) -> Void in
+                guard let `self` = self else { return }
+                
                 if error == nil {
                     guard let state = result?["state"],
                         let _ = result?["name"],
