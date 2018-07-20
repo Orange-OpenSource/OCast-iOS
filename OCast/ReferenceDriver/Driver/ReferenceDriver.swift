@@ -67,6 +67,16 @@ import Foundation
     /// Disconnection callbacks by module.
     private var disconnectCallbacks: [DriverModule: Callback] = [:]
     
+    /// Settings web socket URL
+    private var settingsWebSocketURL: String {
+        let defaultSettingsWebSocketURL = "wss://\(ipAddress):4433/ocast"
+        #if TEST
+        return ProcessInfo.processInfo.environment["SETTINGSWEBSOCKET"] ?? defaultSettingsWebSocketURL
+        #else
+        return defaultSettingsWebSocketURL
+        #endif
+    }
+    
     // MARK: Public methods
     
     open func buildLink(profile: LinkProfile) -> Link? {
@@ -141,7 +151,7 @@ import Foundation
                 var app2appURL:String?
                 // Settings ou Cavium
                 if info?.app2appURL == nil {
-                    app2appURL = "wss://\(ipAddress):4433/ocast"
+                    app2appURL = settingsWebSocketURL
                 } else {
                     app2appURL = info?.app2appURL
                 }
