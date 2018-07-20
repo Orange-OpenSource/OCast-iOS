@@ -31,6 +31,9 @@ import XCTest
 /// Tests the OCast ApplicationController
 class OCastApplicationControllerTests: OCastTestCase {
     
+    /// The device manager to keep to manage the application controller
+    var deviceManager: DeviceManager?
+    
     override func setUp() {
         super.setUp()
         
@@ -319,7 +322,8 @@ class OCastApplicationControllerTests: OCastTestCase {
         let discovery = DeviceDiscovery(forTargets: [OCastApplicationControllerTests.defaultSearchTarget])
         var delegate: DiscoveryDelegate? = DiscoveryDelegate()
         delegate!.addDevice = { device in
-            DeviceManager(with: device)?.applicationController(for: app, onSuccess: { controller in
+            self.deviceManager = DeviceManager(with: device)
+            self.deviceManager?.applicationController(for: app, onSuccess: { controller in
                 on(controller)
             }, onError: { error in
                 XCTFail("ApplicationController error: \(error?.debugDescription ?? "nil")")
