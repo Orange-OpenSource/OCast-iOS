@@ -85,9 +85,22 @@ import Foundation
     ///   - onSuccess: the closure to be called in case of success. Returns a reference to the publicSettingController.
     ///   - onError: the closure to be called in case of error
     public func publicSettingsController(onSuccess: @escaping (_: PublicSettings) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+        
         if driver.state(for: .publicSettings) == .connected, let driver = driver as? PublicSettings {
             onSuccess(driver)
             return
+        }
+        
+        // Closures executed on main thread
+        let successOnMainThread = { (settings: PublicSettings) in
+            DispatchQueue.main.async {
+                onSuccess(settings)
+            }
+        }
+        let errorOnMainThread = { (error:NSError?) in
+            DispatchQueue.main.async {
+                onError(error)
+            }
         }
 
         driver.register(self, forModule: .publicSettings)
@@ -95,13 +108,13 @@ import Foundation
         driver.connect(for: .publicSettings, with: nil,
                        onSuccess: {
                             if let publicSettingsCtrl = self.driver as? PublicSettings {
-                                onSuccess(publicSettingsCtrl)
+                                successOnMainThread(publicSettingsCtrl)
                             } else {
-                                // TODO: create error
-                                onError(nil)
+                                let newError = NSError(domain: "DeviceManager", code: 0, userInfo: ["Error": "Unable to connect  to public settings"])
+                                errorOnMainThread(newError)
                             }
                        },
-                       onError: onError
+                       onError: errorOnMainThread
         )
     }
 
@@ -132,14 +145,26 @@ import Foundation
             onSuccess(driver)
             return
         }
+        
+        // Closures executed on main thread
+        let successOnMainThread = { (settings: PrivateSettings) in
+            DispatchQueue.main.async {
+                onSuccess(settings)
+            }
+        }
+        let errorOnMainThread = { (error:NSError?) in
+            DispatchQueue.main.async {
+                onError(error)
+            }
+        }
 
         driver.connect(for: .privateSettings, with: nil,
                        onSuccess: {
                             if let privateSettingsCtrl = self.driver as? PrivateSettings {
-                                onSuccess(privateSettingsCtrl)
+                                successOnMainThread(privateSettingsCtrl)
                             }  else {
-                                // TODO: create error
-                                onError(nil)
+                                let newError = NSError(domain: "DeviceManager", code: 0, userInfo: ["Error": "Unable to connect  to private settings"])
+                                errorOnMainThread(newError)
                             }
                        },
                        onError: onError
@@ -174,6 +199,18 @@ import Foundation
             onError(NSError(domain: "ErrorDomain", code: 0, userInfo: ["Error": "Bad target URL"]))
             return
         }
+        
+        // Closures executed on main thread
+        let successOnMainThread = { (application: ApplicationController) in
+            DispatchQueue.main.async {
+                onSuccess(application)
+            }
+        }
+        let errorOnMainThread = { (error:NSError?) in
+            DispatchQueue.main.async {
+                onError(error)
+            }
+        }
 
         applicationData(
             applicationName: applicationName,
@@ -184,11 +221,11 @@ import Foundation
                 let newController = ApplicationController(for: self.device, with: description, target: target, driver: self.driver)
                 self.driver.register(self, forModule: .application)
                 self.applicationController = newController
-                onSuccess(newController)
+                successOnMainThread(newController)
         },
             onError: {
                 self.applicationController = nil
-                onError($0)
+                errorOnMainThread($0)
             }
         )
     }
