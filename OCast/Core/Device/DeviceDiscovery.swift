@@ -294,13 +294,17 @@ import CocoaAsyncSocket
                 let ipAddress = baseURL.host,
                 let ipPort = baseURL.port else { return }
             
+            let majorVersion = keys["major"]
+            let minorVersion = keys["minor"]
             let device = Device(baseURL: baseURL,
                                 ipAddress: ipAddress,
                                 servicePort: UInt16(ipPort),
                                 deviceID: deviceID,
                                 friendlyName: friendlyName,
                                 manufacturer: manufacturer,
-                                modelName: modelName)
+                                modelName: modelName,
+                                majorSpecVersion: majorVersion,
+                                minorSpecVersion: minorVersion)
             
             currentDevices[device.deviceID] = device
             delegate?.deviceDiscovery(self, didAddDevice: device)

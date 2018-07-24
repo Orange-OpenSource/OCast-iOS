@@ -240,6 +240,10 @@ public struct DataMapper {
     public let manufacturer: String
     /// model name
     public let modelName: String
+    // major spec version
+    public let majorSpecVersion: String?
+    // minor spec version
+    public let minorSpecVersion: String?
 
     
     /// Create a Device
@@ -252,7 +256,7 @@ public struct DataMapper {
     ///   - friendlyName: friendly name
     ///   - manufacturer: manufacturer's name
     ///   - modelName: model name
-    init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String) {
+    init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String, majorSpecVersion: String?, minorSpecVersion: String?) {
         self.baseURL = baseURL
         self.ipAddress = ipAddress
         self.servicePort = servicePort
@@ -260,6 +264,8 @@ public struct DataMapper {
         self.friendlyName = friendlyName
         self.manufacturer = manufacturer
         self.modelName = modelName
+        self.majorSpecVersion = majorSpecVersion
+        self.minorSpecVersion = minorSpecVersion
     }
 }
 

@@ -58,7 +58,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     var applicationData: ApplicationDescription
     // browser
     var browser: Browser?
-    
+
     enum State: String {
         case running
         case stopped
@@ -71,6 +71,8 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         
         return mediaController
     }()
+    // Application OCast version
+    public var oCastVersion:String { return self.applicationData.version }
     
     // XML Parser
     private let xmlParser = XMLHelper()
@@ -112,8 +114,10 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
                 onSuccess()
             }
         }
-        let errorOnMainThread = { (error:NSError?) in
+        let errorOnMainThread = { [weak self] (error:NSError?) in
             DispatchQueue.main.async {
+                guard let `self` = self else { return }
+                self.driver?.disconnect(for: .application, onSuccess: {}, onError: {(_) in })
                 onError(error)
             }
         }
@@ -311,6 +315,9 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
             if params?["status"] == "connected" {
                 isConnectedEvent = true
                 semaphore?.signal()
+            } else if params?["status"] == "disconnected" {
+                // Websocket has been closed
+                
             }
         }
     }
