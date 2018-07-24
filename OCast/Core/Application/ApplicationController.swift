@@ -105,6 +105,19 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     ///   - onError: the closure to be called in case of error.
     public func start(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
         manage(stream: self)
+        
+        // Closures executed on main thread
+        let successOnMainThread = { () in
+            DispatchQueue.main.async {
+                onSuccess()
+            }
+        }
+        let errorOnMainThread = { (error:NSError?) in
+            DispatchQueue.main.async {
+                onError(error)
+            }
+        }
+        
         if driver?.state(for: .application) != .connected {
             driver?.connect(for: .application, with: applicationData,
                             onSuccess: { [weak self] in
@@ -114,23 +127,23 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
                                     guard let `self` = self else { return }
                                     
                                     if self.currentState == .running {
-                                        onSuccess()
+                                        successOnMainThread()
                                     } else {
-                                        self.startApplication(onSuccess: onSuccess, onError: onError)
+                                        self.startApplication(onSuccess: successOnMainThread, onError: errorOnMainThread)
                                     }
-                                }, onError: onError)
+                                }, onError: errorOnMainThread)
             }
-                , onError: onError)
+                , onError: errorOnMainThread)
         } else {
             self.applicationStatus(onSuccess: { [weak self] in
                 guard let `self` = self else { return }
 
                 if self.currentState == .running {
-                    onSuccess()
+                    successOnMainThread()
                 } else {
-                    self.startApplication(onSuccess: onSuccess, onError: onError)
+                    self.startApplication(onSuccess: successOnMainThread, onError: errorOnMainThread)
                 }
-            }, onError: onError)
+            }, onError: errorOnMainThread)
         }
     }
 
@@ -140,6 +153,19 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     ///   - onSuccess: the closure to be called in case of success.
     ///   - onError: the closure to be called in case of error.
     public func stop(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+        
+        // Closures executed on main thread
+        let successOnMainThread = { () in
+            DispatchQueue.main.async {
+                onSuccess()
+            }
+        }
+        let errorOnMainThread = { (error:NSError?) in
+            DispatchQueue.main.async {
+                onError(error)
+            }
+        }
+        
         applicationStatus(onSuccess: { [weak self] in
             guard let `self` = self else { return }
 
@@ -147,12 +173,12 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
                 self.stopApplication(onSuccess: { [weak self] in
                     guard let `self` = self else { return }
 
-                    self.driver?.disconnect(for: .application, onSuccess: onSuccess, onError: onError)
-                }, onError: onError)
+                    self.driver?.disconnect(for: .application, onSuccess: successOnMainThread, onError: errorOnMainThread)
+                }, onError: errorOnMainThread)
             } else {
-                onSuccess()
+                successOnMainThread()
             }
-        }, onError: onError)
+        }, onError: errorOnMainThread)
     }
 
 
