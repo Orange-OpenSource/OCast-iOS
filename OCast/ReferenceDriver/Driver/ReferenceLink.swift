@@ -105,6 +105,12 @@ final class ReferenceLink: Link, SocketProviderDelegate {
         OCastLog.debug("WS: Command is disconnected with error : \(String(describing: error))")
         commandSocket?.delegate = nil
         commandSocket = nil
+        // Close pending commands
+        errorCallbacks.values.forEach { (callback) in
+            callback(error as NSError?)
+        }
+        errorCallbacks.removeAll()
+        successCallbacks.removeAll()
         delegate?.link(self, didDisconnectWith: error)
     }
 
