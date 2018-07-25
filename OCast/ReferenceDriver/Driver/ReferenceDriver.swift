@@ -125,28 +125,28 @@ import Foundation
         return false
     }
     
-    public func register(_ delegate: DriverDelegate, forModule module: DriverModule) {
-        delegates.setObject(delegate, forKey: NSNumber(integerLiteral: module.rawValue))
+    public func register(_ delegate: DriverDelegate, forModule driverModule: DriverModule) {
+        delegates.setObject(delegate, forKey: NSNumber(integerLiteral: driverModule.rawValue))
     }
     
-    public func state(for module: DriverModule) -> DriverState {
-        return linksState[module] ?? .disconnected
+    public func state(for driverModule: DriverModule) -> DriverState {
+        return linksState[driverModule] ?? .disconnected
     }
     
-    open func connect(for module: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        if module == .privateSettings && !privateSettingsAllowed() {
+    open func connect(for driverModule: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+        if driverModule == .privateSettings && !privateSettingsAllowed() {
             let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.privateSettingsNotAllowed.rawValue, userInfo: nil)
             onError(error)
             return
         }
         
-        switch state(for: module) {
+        switch state(for: driverModule) {
         case .connected:
             onSuccess()
         case .connecting:
-            appendCallBack(in: &connectCallbacks, for: module, with: Callback(success: onSuccess, error: onError))
+            appendCallBack(in: &connectCallbacks, for: driverModule, with: Callback(success: onSuccess, error: onError))
         case .disconnected, .disconnecting:
-            var link = links[module]
+            var link = links[driverModule]
             if link == nil {
                 var app2appURL:String?
                 // Settings ou Cavium
@@ -162,15 +162,15 @@ import Foundation
                     return l.profile.app2appURL == linkProfile.app2appURL
                 }) {
                     
-                    links[module] = otherLink.value
+                    links[driverModule] = otherLink.value
                     switch state(for: otherLink.key) {
                     case .connected:
-                        linksState[module] = .connected
+                        linksState[driverModule] = .connected
                         onSuccess()
                         return
                     case .connecting:
-                        linksState[module] = .connecting
-                        connectCallbacks[module] = Callback(success: onSuccess, error: onError)
+                        linksState[driverModule] = .connecting
+                        connectCallbacks[driverModule] = Callback(success: onSuccess, error: onError)
                         return
                     default:
                         link = otherLink.value
@@ -183,41 +183,41 @@ import Foundation
                     }
                 }
             }
-            links[module] = link
-            connectCallbacks[module] = Callback(success: onSuccess, error: onError)
-            linksState[module] = .connecting
+            links[driverModule] = link
+            connectCallbacks[driverModule] = Callback(success: onSuccess, error: onError)
+            linksState[driverModule] = .connecting
             if !(link?.connect() ?? false) {
-                links.removeValue(forKey: module)
-                connectCallbacks.removeValue(forKey: module)
-                linksState[module] = .disconnected
+                links.removeValue(forKey: driverModule)
+                connectCallbacks.removeValue(forKey: driverModule)
+                linksState[driverModule] = .disconnected
                 let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.invalidApplicationURL.rawValue, userInfo: nil)
                 onError(error)
             }
         }
     }
     
-    open func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
-        guard let link = links[module] else {
+    open func disconnect(for driverModule: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void) {
+        guard let link = links[driverModule] else {
             let error = NSError(domain: ReferenceDriver.referenceDriverErrorDomain, code: ReferenceDriverErrorCode.moduleNotConnected.rawValue, userInfo: nil)
             onError(error)
             return
         }
         
-        if linksState[module] == .disconnecting {
-            appendCallBack(in: &disconnectCallbacks, for: module, with: Callback(success: onSuccess, error: onError))
+        if linksState[driverModule] == .disconnecting {
+            appendCallBack(in: &disconnectCallbacks, for: driverModule, with: Callback(success: onSuccess, error: onError))
             return
         }
         
         if !links.contains(where: { (entry) -> Bool in
-            return entry.key != module && entry.value.profile.app2appURL == link.profile.app2appURL
+            return entry.key != driverModule && entry.value.profile.app2appURL == link.profile.app2appURL
         }) {
-            linksState[module] = .disconnecting
-            disconnectCallbacks[module] = Callback(success: onSuccess, error: onError)
+            linksState[driverModule] = .disconnecting
+            disconnectCallbacks[driverModule] = Callback(success: onSuccess, error: onError)
             link.disconnect()
         } else {
             // We don't close the link
-            linksState[module] = .disconnected
-            links.removeValue(forKey: module)
+            linksState[driverModule] = .disconnected
+            links.removeValue(forKey: driverModule)
             onSuccess()
         }
     }
