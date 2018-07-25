@@ -23,7 +23,7 @@
 
  - WifiSecurityWPS: WPS supported
  - WifiSecurityWPAPSK: WPA PSK
- - WifiSecurityWPAPEAP: WPA EAP
+ - WifiSecurityWPAEAP: WPA EAP
  - WifiSecurityWPA2PSK: WPA2 PSK
  - WifiSecurityWPA2EAP: WPA2 EAP
  - WifiSecurityWEP: WEP
@@ -32,7 +32,7 @@
 typedef NS_OPTIONS(NSInteger, WifiSecurity) {
     WifiSecurityWPS = 1 << 0,
     WifiSecurityWPAPSK = 1 << 1,
-    WifiSecurityWPAPEAP = 1 << 2,
+    WifiSecurityWPAEAP = 1 << 2,
     WifiSecurityWPA2PSK = 1 << 3,
     WifiSecurityWPA2EAP = 1 << 4,
     WifiSecurityWEP = 1 << 5,
