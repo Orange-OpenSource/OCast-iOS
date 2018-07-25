@@ -283,8 +283,8 @@ import Foundation
     }
 
     // MARK: DriverDelegate methods
-    public func driver(_ driver: Driver, didDisconnectModule module: DriverModule, withError error: NSError) {
-        switch module {
+    public func driver(_ driver: Driver, didDisconnectModule driverModule: DriverModule, withError error: NSError) {
+        switch driverModule {
         case .application:
             applicationController = nil
             delegate?.deviceManager(self, applicationDidDisconnectWithError: error)

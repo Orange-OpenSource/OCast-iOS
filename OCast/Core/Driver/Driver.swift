@@ -38,9 +38,9 @@ import Foundation
     ///
     /// - Parameters:
     ///   - driver: driver
-    ///   - module: module
+    ///   - driverModule: module
     ///   - error: error which implies the disconnection
-    func driver(_ driver: Driver, didDisconnectModule module: DriverModule, withError error: NSError)
+    func driver(_ driver: Driver, didDisconnectModule driverModule: DriverModule, withError error: NSError)
 }
 
 @objc public protocol EventDelegate {
@@ -67,29 +67,29 @@ import Foundation
     /// Connect the driver the specified module with application's description
     ///
     /// - Parameters:
-    ///   - module: module to connect
+    ///   - driverModule: module to connect
     ///   - info: application's description
     ///   - onSuccess: handler called if connect is a success
     ///   - onError: handler called if there is an error
-    func connect(for module: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
+    func connect(for driverModule: DriverModule, with info: ApplicationDescription?, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
     /// Disconnect the specified module
     ///
     /// - Parameters:
-    ///   - module: module to disconnect
+    ///   - driverModule: module to disconnect
     ///   - onSuccess: handler called if connect is a success
     ///   - onError: handler called if there is an error
-    func disconnect(for module: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
+    func disconnect(for driverModule: DriverModule, onSuccess: @escaping () -> Void, onError: @escaping (NSError?) -> Void)
     /// Returns the connection's state of the specified module
     ///
-    /// - Parameter module: module
+    /// - Parameter driverModule: module
     /// - Returns: state
-    func state(for module: DriverModule) -> DriverState
+    func state(for driverModule: DriverModule) -> DriverState
     /// Register a delegate for the specified module
     ///
     /// - Parameters:
     ///   - delegate: delegate
-    ///   - module: module
-    func register(_ delegate: DriverDelegate, forModule module: DriverModule)
+    ///   - driverModule: module
+    func register(_ delegate: DriverDelegate, forModule driverModule: DriverModule)
 }
 
 
