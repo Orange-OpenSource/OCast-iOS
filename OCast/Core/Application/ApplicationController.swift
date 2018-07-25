@@ -58,7 +58,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
     var applicationData: ApplicationDescription
     // browser
     var browser: Browser?
-
+    
     enum State: String {
         case running
         case stopped
@@ -114,10 +114,8 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
                 onSuccess()
             }
         }
-        let errorOnMainThread = { [weak self] (error:NSError?) in
+        let errorOnMainThread = { (error:NSError?) in
             DispatchQueue.main.async {
-                guard let `self` = self else { return }
-                self.driver?.disconnect(for: .application, onSuccess: {}, onError: {(_) in })
                 onError(error)
             }
         }
@@ -315,9 +313,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
             if params?["status"] == "connected" {
                 isConnectedEvent = true
                 semaphore?.signal()
-            } else if params?["status"] == "disconnected" {
-                // Websocket has been closed
-                
             }
         }
     }
