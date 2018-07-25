@@ -3,6 +3,16 @@ OCast Release notes
 Version x.y.z, In progress
 ============================
 ============================
+Version 1.2.1, July 2018
+============================
+- project migration to generate a framework
+- add tests using a stick mock
+- add public settings events
+- refactoring
+- remove memory leaks
+- fix bugs
+
+============================
 Version 1.2.0, June 2018
 ============================
 - refactoring
