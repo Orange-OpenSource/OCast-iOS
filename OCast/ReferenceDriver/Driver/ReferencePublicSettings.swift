@@ -86,7 +86,7 @@ extension ReferenceDriver: PublicSettings {
         if streamData.name == PublicSettingsConstants.EVENT_STATUS,
             let statusInfo = DataMapper().statusInfo(with: streamData) {
             
-            publicSettingsEventDelegate?.publicSettings(self, didReceiveUpdateStatus: statusInfo)
+            publicSettingsEventDelegate?.publicSettings?(self, didReceiveUpdateStatus: statusInfo)
         }
     }
     

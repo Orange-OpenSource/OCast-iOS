@@ -28,7 +28,7 @@ import Foundation
     /// - Parameters:
     ///   - publicSettings: The `PublicSettings` instance.
     ///   - updateStatus: The `StatusInfo`object containing status information.
-    func publicSettings(_ publicSettings: PublicSettings, didReceiveUpdateStatus updateStatus: StatusInfo)
+    @objc optional func publicSettings(_ publicSettings: PublicSettings, didReceiveUpdateStatus updateStatus: StatusInfo)
 }
 
 /// :nodoc:
@@ -114,26 +114,26 @@ extension PublicSettings {
     /// - Parameters:
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - wifiStatus: The `WifiStatus` object containing Wifi information.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveWifiConnectionStatus wifiStatus: WifiStatus)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveWifiConnectionStatus wifiStatus: WifiStatus)
     
     /// Tells the delegate that the privatesettings has received a power alert event.
     ///
     /// - Parameter privateSettings: The `PrivateSettings` instance.
-    func privateSettingsDidReceivePowerAlert(_ privateSettings: PrivateSettings)
+    @objc optional func privateSettingsDidReceivePowerAlert(_ privateSettings: PrivateSettings)
     
     /// Tells the delegate that the privatesettings has received a device info event.
     ///
     /// - Parameters:
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - bluetoothDevice: The `BluetoothDevice` object containing device information.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothDeviceInfo bluetoothDevice: BluetoothDevice)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothDeviceInfo bluetoothDevice: BluetoothDevice)
     
     /// Tells the delegate that the privatesettings has received a bluetooth keyboard event.
     ///
     /// - Parameters:
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - key: The key typed by the user.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothKeyPressed key: String)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothKeyPressed key: String)
     
     /// Tells the delegate that the privatesettings has received a bluetooth mouse position event.
     ///
@@ -141,14 +141,14 @@ extension PublicSettings {
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - x: The mouse x position.
     ///   - y: The mouse y position.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothMouseMovedToX x: Int, Y y: Int)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothMouseMovedToX x: Int, Y y: Int)
     
     /// Tells the delegate that the privatesettings has received a bluetooth mouse click event.
     ///
     /// - Parameters:
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - key: The button clicked by the user.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBlueetoothMouseClicked key: String)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBlueetoothMouseClicked key: String)
 }
 
 @objc
