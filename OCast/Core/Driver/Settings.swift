@@ -28,7 +28,7 @@ import Foundation
     /// - Parameters:
     ///   - publicSettings: The `PublicSettings` instance.
     ///   - updateStatus: The `StatusInfo`object containing status information.
-    func publicSettings(_ publicSettings: PublicSettings, didReceiveUpdateStatus updateStatus: StatusInfo)
+    @objc optional func publicSettings(_ publicSettings: PublicSettings, didReceiveUpdateStatus updateStatus: StatusInfo)
 }
 
 /// :nodoc:
@@ -114,26 +114,26 @@ extension PublicSettings {
     /// - Parameters:
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - wifiStatus: The `WifiStatus` object containing Wifi information.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveWifiConnectionStatus wifiStatus: WifiStatus)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveWifiConnectionStatus wifiStatus: WifiStatus)
     
     /// Tells the delegate that the privatesettings has received a power alert event.
     ///
     /// - Parameter privateSettings: The `PrivateSettings` instance.
-    func privateSettingsDidReceivePowerAlert(_ privateSettings: PrivateSettings)
+    @objc optional func privateSettingsDidReceivePowerAlert(_ privateSettings: PrivateSettings)
     
     /// Tells the delegate that the privatesettings has received a device info event.
     ///
     /// - Parameters:
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - bluetoothDevice: The `BluetoothDevice` object containing device information.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothDeviceInfo bluetoothDevice: BluetoothDevice)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothDeviceInfo bluetoothDevice: BluetoothDevice)
     
     /// Tells the delegate that the privatesettings has received a bluetooth keyboard event.
     ///
     /// - Parameters:
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - key: The key typed by the user.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothKeyPressed key: String)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothKeyPressed key: String)
     
     /// Tells the delegate that the privatesettings has received a bluetooth mouse position event.
     ///
@@ -141,14 +141,14 @@ extension PublicSettings {
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - x: The mouse x position.
     ///   - y: The mouse y position.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothMouseMovedToX x: Int, Y y: Int)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothMouseMovedToX x: Int, Y y: Int)
     
     /// Tells the delegate that the privatesettings has received a bluetooth mouse click event.
     ///
     /// - Parameters:
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - key: The button clicked by the user.
-    func privateSettings(_ privateSettings: PrivateSettings, didReceiveBlueetoothMouseClicked key: String)
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBlueetoothMouseClicked key: String)
 }
 
 @objc
@@ -159,7 +159,7 @@ public protocol PrivateSettings {
     // Network
     func scanAPs(pinCode: Int, onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
     func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ())
-    func setAP(pinCode: Int, ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func setAP(pinCode: Int, ssid: String, bssid: String?, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func pbWPS(pinCode: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func getWifiInfo(onSuccess:@escaping (WifiInfo) -> (), onError:@escaping (NSError?) -> ())
@@ -173,9 +173,9 @@ public protocol PrivateSettings {
     func reset(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func checkStick(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     // bluetooth
-    func startDiscovery(profiles: [String], timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
+    func startDiscovery(profiles: [String]?, timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
     func stopDiscovery(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ())
-    func getDevices(profiles: [String], onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ())
+    func getDevices(profiles: [String]?, onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ())
     func sendCommand(type: BluetoothCommandType, macAddress: String, onSuccess:@escaping (BluetoothDeviceState) -> (), onError:@escaping (NSError?) -> ())
     func sendPinCode(code: String, onSuccess:@escaping () -> (), onError:@escaping (NSError?) -> ())
 }
@@ -188,7 +188,7 @@ extension PrivateSettings {
     public func getAPList(onSuccess:@escaping ([WifiInfo]) -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
-    public func setAP(pinCode: Int, ssid: String, bssid: String, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+    public func setAP(pinCode: Int, ssid: String, bssid: String?, security: Int, password: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     public func remAP(ssid: String, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
@@ -226,13 +226,13 @@ extension PrivateSettings {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     // bluetooth
-    public func startDiscovery(profiles: [String], timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
+    public func startDiscovery(profiles: [String]?, timeout: Int, onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     public func stopDiscovery(onSuccess: @escaping () -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
-    public func getDevices(profiles: [String], onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ()) {
+    public func getDevices(profiles: [String]?, onSuccess:@escaping ([BluetoothDevice]) -> (), onError:@escaping (NSError?) -> ()) {
         onError(NSError(domain: "OCast", code: 0, userInfo: ["Error": "Not implemented"]))
     }
     public func sendCommand(type: BluetoothCommandType, macAddress: String, onSuccess:@escaping (BluetoothDeviceState) -> (), onError:@escaping (NSError?) -> ()) {
