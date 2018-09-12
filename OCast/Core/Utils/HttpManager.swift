@@ -27,8 +27,12 @@ enum HttpCommand: String {
 }
 
 extension HttpProtocol {
-
-    func initiateHttpRequest(with command: HttpCommand, to target: String, onSuccess: @escaping (_ response: HTTPURLResponse, _ data: Data?) -> Void, onError: @escaping (_ error: NSError?) -> Void) {
+    
+    func initiateHttpRequest(with command: HttpCommand,
+                             to target: String,
+                             headers httpHeaders: [String : String]? = nil,
+                             onSuccess: @escaping (_ response: HTTPURLResponse, _ data: Data?) -> Void,
+                             onError: @escaping (_ error: NSError?) -> Void) {
 
         guard let url = URL(string: target) else {
             OCastLog.error("Cannot create URL \(target)")
@@ -40,6 +44,7 @@ extension HttpProtocol {
 
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = command.rawValue
+        urlRequest.allHTTPHeaderFields = httpHeaders
 
         let task = URLSession.shared.dataTask(with: urlRequest) {
             data, response, error in

@@ -197,8 +197,11 @@ import CocoaAsyncSocket
                 OCastLog.error("Bad SSDP response")
                 return
         }
-
-        initiateHttpRequest(with: .get, to: location, onSuccess: didReceiveHttpResponse(response:with:), onError: { _ in })
+        
+        initiateHttpRequest(with: .get,
+                            to: location,
+                            headers: ["Date": dateFormatter.string(from: Date())],
+                            onSuccess: didReceiveHttpResponse(response:with:), onError: { _ in })
     }
 
     /// :nodoc:
@@ -310,6 +313,17 @@ import CocoaAsyncSocket
     }
 
     // MARK: - Private Helpers
+    
+    /// The dateformatter to send the date header (RFC 7231)
+    private lazy var dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss z"
+        dateFormatter.calendar = Calendar(identifier: .iso8601)
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        return dateFormatter
+    }()
+    
     func resetContext() {
         currentDevices.removeAll()
         currentDevicesIdx.removeAll()
