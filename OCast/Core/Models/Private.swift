@@ -121,6 +121,7 @@ public final class WifiInfo: NSObject {
     case associationError
     case wpsError
     case accessPointError
+    case accessPointPasswordError
 }
 
 /// :nodoc:
