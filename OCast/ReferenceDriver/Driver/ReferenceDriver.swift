@@ -30,10 +30,10 @@ import Foundation
     // MARK: - Public properties
     
     /// Target that matches with this driver.
-    open static let searchTarget = "urn:cast-ocast-org:service:cast:1"
+    public static let searchTarget = "urn:cast-ocast-org:service:cast:1"
     
     /// Manufacturer name that matches with this driver.
-    open static let manufacturer = "Orange SA"
+    public static let manufacturer = "Orange SA"
     
     /// Reference driver error domain
     public static let referenceDriverErrorDomain = "ReferenceDriverErrorDomain"
