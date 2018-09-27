@@ -40,15 +40,15 @@ s.author           = { 'Orange Labs' => ['philippe.besombe@orange.com', 'christo
 s.source           = { :git => 'https://github.com/Orange-OpenSource/OCast-iOS.git', :tag => s.version.to_s, :submodules => true }
 
 s.ios.deployment_target = '8.0'
-s.swift_version = '4.1'
+s.swift_version = '4.2'
 
 s.subspec 'Core' do |core|
-    core.source_files   = 'OCast/Core/**/*'
+    core.source_files   = 'OCast/Core/**/*.{swift,m,h}', 'OCast/OCast.h'
     core.dependency 'CocoaAsyncSocket', '7.6.3'
 end
 
 s.subspec 'ReferenceDriver' do |reference|
-    reference.source_files   = 'OCast/ReferenceDriver/**/*', 'OCast/Starscream/Sources/*.swift'
+    reference.source_files   = 'OCast/ReferenceDriver/**/*.{swift,m,h}', 'OCast/Starscream/Sources/*.swift'
     reference.dependency 'OCast/Core'
     reference.libraries      = 'z'
     reference.preserve_paths = 'OCast/Starscream/zlib/*'

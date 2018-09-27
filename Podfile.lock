@@ -1,18 +1,18 @@
 PODS:
   - CocoaAsyncSocket (7.6.3)
-  - OCast (1.2.1):
-    - OCast/Core (= 1.2.1)
-    - OCast/ReferenceDriver (= 1.2.1)
-  - OCast/Core (1.2.1):
+  - OCast (1.3.0):
+    - OCast/Core (= 1.3.0)
+    - OCast/ReferenceDriver (= 1.3.0)
+  - OCast/Core (1.3.0):
     - CocoaAsyncSocket (= 7.6.3)
-  - OCast/ReferenceDriver (1.2.1):
+  - OCast/ReferenceDriver (1.3.0):
     - OCast/Core
   - Swifter (1.4.1)
 
 DEPENDENCIES:
   - CocoaAsyncSocket (= 7.6.3)
   - OCast (from `./`)
-  - Swifter (from `https://github.com/marcc-orange/swifter.git`, branch `wsConnect`)
+  - Swifter (from `https://github.com/marcc-orange/swifter.git`, branch `stable`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -22,19 +22,19 @@ EXTERNAL SOURCES:
   OCast:
     :path: "./"
   Swifter:
-    :branch: wsConnect
+    :branch: stable
     :git: https://github.com/marcc-orange/swifter.git
 
 CHECKOUT OPTIONS:
   Swifter:
-    :commit: 919ba13f390b5338f074fb5aaf327f591e7f128a
+    :commit: e1210bc24071d23533033cee94f95ba630de332e
     :git: https://github.com/marcc-orange/swifter.git
 
 SPEC CHECKSUMS:
   CocoaAsyncSocket: eafaa68a7e0ec99ead0a7b35015e0bf25d2c8987
-  OCast: e53a993b7cfdfc87d831fbaf155c02878300eeaf
+  OCast: 572339d7ce5f5b940174a5dd6b0acc83aeba5a98
   Swifter: 62d14781d34600ffb6be99d350cf271be500600f
 
-PODFILE CHECKSUM: 999d7f55730a06bbeb386201b1c30da0f75dac13
+PODFILE CHECKSUM: a802031d5c938076042ae8fd28af776322dfd580
 
 COCOAPODS: 1.5.3
