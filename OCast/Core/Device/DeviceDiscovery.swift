@@ -102,7 +102,11 @@ import CocoaAsyncSocket
 
     public weak var delegate: DeviceDiscoveryDelegate?
     private let ssdpAddress = "239.255.255.250"
+    #if TEST
+    private let ssdpPort = UInt16(ProcessInfo.processInfo.environment["SSDPPORT"] ?? "") ?? 1900
+    #else
     private let ssdpPort: UInt16 = 1900
+    #endif
     private var ssdpSocket: GCDAsyncUdpSocket
     private var error: NSError?
     
