@@ -46,7 +46,8 @@ extension HttpProtocol {
         urlRequest.httpMethod = command.rawValue
         urlRequest.allHTTPHeaderFields = httpHeaders
 
-        let task = URLSession.shared.dataTask(with: urlRequest) {
+        let urlSession = URLSession(configuration: .default)
+        let task = urlSession.dataTask(with: urlRequest) {
             data, response, error in
 
             if let error = error {
@@ -75,5 +76,6 @@ extension HttpProtocol {
         }
 
         task.resume()
+        urlSession.finishTasksAndInvalidate()
     }
 }
