@@ -72,9 +72,6 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
         return mediaController
     }()
     
-    // XML Parser
-    private let xmlParser = XMLHelper()
-    
     // Timer
     private var semaphore: DispatchSemaphore?
     private var isConnectedEvent = false
@@ -273,7 +270,8 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
                 onError(error)
                 return
             }
-            self.xmlParser.completionHandler = { [weak self] (error, result, attributes) -> Void in
+            let xmlParser = XMLHelper()
+            xmlParser.completionHandler = { [weak self] (error, result, attributes) -> Void in
                 guard let `self` = self else { return }
                 
                 if error == nil {
@@ -291,7 +289,7 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
                     onError(newError)
                 }
             }
-            self.xmlParser.parseDocument(data: data)
+            xmlParser.parseDocument(data: data)
         }) { (error) in
             onError(error)
         }
