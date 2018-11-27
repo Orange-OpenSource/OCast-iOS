@@ -149,6 +149,16 @@ extension PublicSettings {
     ///   - privateSettings: The `PrivateSettings` instance.
     ///   - key: The button clicked by the user.
     @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBlueetoothMouseClicked key: String)
+    
+    
+    /// Tells the delegate that the privatesettings has received a bluetooth deviceAgent event.
+    ///
+    /// - Parameters:
+    ///   - privateSettings: The `PrivateSettings` instance.
+    ///   - mac: mac address
+    ///   - type: type of message
+    ///   - value: value of message
+    @objc optional func privateSettings(_ privateSettings: PrivateSettings, didReceiveBluetoothDeviceAgent mac: String, type: String, value: String)
 }
 
 @objc
