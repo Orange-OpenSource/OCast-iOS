@@ -199,6 +199,18 @@ public class ApplicationController: NSObject, DataStream, HttpProtocol {
             OCastLog.error("Unable to manage stream (\(stream.serviceId) because browser is nil")
         }
     }
+    
+    /// Used to release control over a user's specific stream.
+    ///
+    /// - Parameter stream: custom stream to be unmanaged
+    public func unmanage(stream: DataStream) {
+        if let browser = browser {
+            stream.dataSender = nil
+            browser.unregister(stream: stream)
+        } else {
+            OCastLog.error("Unable to unmanage stream (\(stream.serviceId) because browser is nil")
+        }
+    }
 
     // MARK: private methods
     private func startApplication(onSuccess: @escaping () -> Void, onError: @escaping (_ error: NSError?) -> Void) {

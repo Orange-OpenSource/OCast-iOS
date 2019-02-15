@@ -20,7 +20,7 @@ import Foundation
 /// Provides the Reference driver implementation.
 @objcMembers
 @objc open class ReferenceDriver: NSObject, Driver, LinkDelegate {
-    
+
     /// Success and error callbacks
     private struct Callback {
         let success: () -> Void
@@ -302,5 +302,9 @@ import Foundation
     
     public func register(for browser: EventDelegate) {
         self.browserEventDelegate = browser
+    }
+    
+    public func unregister(for delegate: EventDelegate) {
+        browserEventDelegate = nil
     }
 }

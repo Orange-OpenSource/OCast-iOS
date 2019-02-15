@@ -30,6 +30,10 @@ import Foundation
     ///
     /// - Parameter delegate: delegate
     func register(for delegate: EventDelegate)
+    /// unregister an event delegate
+    ///
+    /// - Parameter delegate: delegate
+    func unregister(for delegate: EventDelegate)
 }
 
 final class Browser: NSObject, EventDelegate {
@@ -44,6 +48,10 @@ final class Browser: NSObject, EventDelegate {
 
     func register(stream: DataStream) {
         streams.setObject(stream, forKey: stream.serviceId as NSString)
+    }
+    
+    func unregister(stream: DataStream) {
+        streams.removeObject(forKey: stream.serviceId as NSString)
     }
 
     func send(data: [String: Any], for service: String, onSuccess: @escaping ([String: Any]?) -> Void, onError: @escaping (NSError?) -> Void) {
