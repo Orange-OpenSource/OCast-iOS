@@ -1,11 +1,11 @@
 PODS:
   - CocoaAsyncSocket (7.6.3)
-  - OCast (1.4.1):
-    - OCast/Core (= 1.4.1)
-    - OCast/ReferenceDriver (= 1.4.1)
-  - OCast/Core (1.4.1):
+  - OCast (1.4.2):
+    - OCast/Core (= 1.4.2)
+    - OCast/ReferenceDriver (= 1.4.2)
+  - OCast/Core (1.4.2):
     - CocoaAsyncSocket (= 7.6.3)
-  - OCast/ReferenceDriver (1.4.1):
+  - OCast/ReferenceDriver (1.4.2):
     - OCast/Core
   - Swifter (1.4.1)
 
@@ -32,7 +32,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   CocoaAsyncSocket: eafaa68a7e0ec99ead0a7b35015e0bf25d2c8987
-  OCast: f79be2a54a9bb76236eedef6fa991672b68b30c2
+  OCast: 0bf11762cd12a040ad0ac8069380a2223007224c
   Swifter: 62d14781d34600ffb6be99d350cf271be500600f
 
 PODFILE CHECKSUM: a802031d5c938076042ae8fd28af776322dfd580

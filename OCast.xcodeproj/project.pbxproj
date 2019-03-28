@@ -21,6 +21,12 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		85CBAB46224D44F100BE04DC /* OCastWifiSecurity.h in Headers */ = {isa = PBXBuildFile; fileRef = 85CBAB40224D44F100BE04DC /* OCastWifiSecurity.h */; };
+		85CBAB47224D44F100BE04DC /* OCastDomainWebApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CBAB41224D44F100BE04DC /* OCastDomainWebApp.swift */; };
+		85CBAB48224D44F100BE04DC /* OCastDomainMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CBAB42224D44F100BE04DC /* OCastDomainMedia.swift */; };
+		85CBAB49224D44F100BE04DC /* OCastDomainGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CBAB43224D44F100BE04DC /* OCastDomainGeneral.swift */; };
+		85CBAB4A224D44F100BE04DC /* OCastDiagnosticReason.h in Headers */ = {isa = PBXBuildFile; fileRef = 85CBAB44224D44F100BE04DC /* OCastDiagnosticReason.h */; };
+		85CBAB4B224D44F100BE04DC /* OCastDomainSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CBAB45224D44F100BE04DC /* OCastDomainSettings.swift */; };
 		9726F0BA20EFA6E400BAE3BC /* WifiSecurity.h in Headers */ = {isa = PBXBuildFile; fileRef = 9726F0B920EFA6E400BAE3BC /* WifiSecurity.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9751ADC420F655C200815600 /* ReferenceDriverErrorCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9751ADC320F655C200815600 /* ReferenceDriverErrorCode.swift */; };
 		9751ADCA20FDD40200815600 /* OCastDiscoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9751ADC620FDD40200815600 /* OCastDiscoveryTests.swift */; };
@@ -74,6 +80,12 @@
 		55997461E6B225FD51BD3D75 /* Pods-OCastTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OCastTests/Pods-OCastTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6F9D010C25D3F8143329984C /* Pods_OCastTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCastTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		72FBC7B997F2E02A32F442DE /* Pods-OCast.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast.release.xcconfig"; path = "Pods/Target Support Files/Pods-OCast/Pods-OCast.release.xcconfig"; sourceTree = "<group>"; };
+		85CBAB40224D44F100BE04DC /* OCastWifiSecurity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCastWifiSecurity.h; sourceTree = "<group>"; };
+		85CBAB41224D44F100BE04DC /* OCastDomainWebApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastDomainWebApp.swift; sourceTree = "<group>"; };
+		85CBAB42224D44F100BE04DC /* OCastDomainMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastDomainMedia.swift; sourceTree = "<group>"; };
+		85CBAB43224D44F100BE04DC /* OCastDomainGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastDomainGeneral.swift; sourceTree = "<group>"; };
+		85CBAB44224D44F100BE04DC /* OCastDiagnosticReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCastDiagnosticReason.h; sourceTree = "<group>"; };
+		85CBAB45224D44F100BE04DC /* OCastDomainSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastDomainSettings.swift; sourceTree = "<group>"; };
 		94033FF71A7BA57C853AF46A /* Pods_OCast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9726F0B920EFA6E400BAE3BC /* WifiSecurity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WifiSecurity.h; sourceTree = "<group>"; };
 		9751ADC320F655C200815600 /* ReferenceDriverErrorCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceDriverErrorCode.swift; sourceTree = "<group>"; };
@@ -149,6 +161,19 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		85CBAB3F224D44A700BE04DC /* 2.0 */ = {
+			isa = PBXGroup;
+			children = (
+				85CBAB44224D44F100BE04DC /* OCastDiagnosticReason.h */,
+				85CBAB43224D44F100BE04DC /* OCastDomainGeneral.swift */,
+				85CBAB42224D44F100BE04DC /* OCastDomainMedia.swift */,
+				85CBAB45224D44F100BE04DC /* OCastDomainSettings.swift */,
+				85CBAB41224D44F100BE04DC /* OCastDomainWebApp.swift */,
+				85CBAB40224D44F100BE04DC /* OCastWifiSecurity.h */,
+			);
+			path = 2.0;
+			sourceTree = "<group>";
+		};
 		97AF812E20EA0EAD00C502D5 = {
 			isa = PBXGroup;
 			children = (
@@ -196,6 +221,7 @@
 		97DC972520EA229100DBB1B0 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				85CBAB3F224D44A700BE04DC /* 2.0 */,
 				97DC972620EA229100DBB1B0 /* Driver */,
 				97DC972A20EA229100DBB1B0 /* Utils */,
 				97DC972E20EA229100DBB1B0 /* Models */,
@@ -342,9 +368,11 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85CBAB46224D44F100BE04DC /* OCastWifiSecurity.h in Headers */,
 				97DC97BB20EA302500DBB1B0 /* Starscream.h in Headers */,
 				97AF814920EA0EAD00C502D5 /* OCast.h in Headers */,
 				97DC97A520EA302500DBB1B0 /* include.h in Headers */,
+				85CBAB4A224D44F100BE04DC /* OCastDiagnosticReason.h in Headers */,
 				9726F0BA20EFA6E400BAE3BC /* WifiSecurity.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -528,8 +556,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				97DC974420EA229100DBB1B0 /* Settings.swift in Sources */,
+				85CBAB49224D44F100BE04DC /* OCastDomainGeneral.swift in Sources */,
 				97DC974C20EA229100DBB1B0 /* ApplicationController.swift in Sources */,
 				97DC97BD20EA302500DBB1B0 /* SSLSecurity.swift in Sources */,
+				85CBAB47224D44F100BE04DC /* OCastDomainWebApp.swift in Sources */,
+				85CBAB4B224D44F100BE04DC /* OCastDomainSettings.swift in Sources */,
 				97DC974220EA229100DBB1B0 /* Link.swift in Sources */,
 				97DC974820EA229100DBB1B0 /* Private.swift in Sources */,
 				97DC975220EA229100DBB1B0 /* ReferenceDriver.swift in Sources */,
@@ -544,6 +575,7 @@
 				97DC97BC20EA302500DBB1B0 /* Compression.swift in Sources */,
 				97DC974720EA229100DBB1B0 /* HttpManager.swift in Sources */,
 				97DC97BA20EA302500DBB1B0 /* SSLClientCertificate.swift in Sources */,
+				85CBAB48224D44F100BE04DC /* OCastDomainMedia.swift in Sources */,
 				97DC974620EA229100DBB1B0 /* OCastLog.swift in Sources */,
 				97DC974E20EA229100DBB1B0 /* MediaController.swift in Sources */,
 				97DC975020EA229100DBB1B0 /* ReferenceLink.swift in Sources */,
