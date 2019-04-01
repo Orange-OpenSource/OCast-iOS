@@ -4,6 +4,12 @@ Version x.y.z, In progress
 ============================
 
 ============================
+Version 1.4.2, February 2019
+============================
+- add bluetooth device agent to manager bluetooth accessory
+- add unmanage stream on ApplicationController
+
+============================
 Version 1.4.1, October 2018
 ============================
 - Fix bug when the connectedStatus event is not received
