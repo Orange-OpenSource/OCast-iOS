@@ -403,10 +403,11 @@
 				TargetAttributes = {
 					97AF813720EA0EAD00C502D5 = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1020;
 					};
 					97AF814020EA0EAD00C502D5 = {
 						CreatedOnToolsVersion = 9.4.1;
-						LastSwiftMigration = 0940;
+						LastSwiftMigration = 1020;
 					};
 					97F35BF620EBC1D600798238 = {
 						CreatedOnToolsVersion = 9.4.1;
@@ -475,7 +476,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-OCastTests/Pods-OCastTests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-OCastTests/Pods-OCastTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Swifter/Swifter.framework",
 				"${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework",
 			);
@@ -486,7 +487,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-OCastTests/Pods-OCastTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-OCastTests/Pods-OCastTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		974F450D76AAE48BA45CB94E /* [CP] Check Pods Manifest.lock */ = {
@@ -720,6 +721,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.orange.OCast;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -744,6 +746,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.orange.OCast;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -763,6 +766,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.orange..OCastTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -781,6 +785,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.orange..OCastTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

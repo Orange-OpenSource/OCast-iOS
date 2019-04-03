@@ -40,7 +40,7 @@ s.author           = { 'Orange Labs' => ['philippe.besombe@orange.com', 'christo
 s.source           = { :git => 'https://github.com/Orange-OpenSource/OCast-iOS.git', :tag => s.version.to_s, :submodules => true }
 
 s.ios.deployment_target = '8.0'
-s.swift_version = '4.2'
+s.swift_version = '5.0'
 
 s.subspec 'Core' do |core|
     core.source_files   = 'OCast/Core/**/*.{swift,m,h}', 'OCast/OCast.h'
