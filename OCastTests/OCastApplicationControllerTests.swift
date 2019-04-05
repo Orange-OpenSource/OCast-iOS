@@ -163,8 +163,8 @@ class OCastApplicationControllerTests: OCastTestCase {
                     return .ok(name: name, state: .running)
                 }
                 
-                // Wait 1s before sending connected event
-                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 1.0, execute: {
+                // Wait 2s before sending connected event
+                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2.0, execute: {
                     send(OCastMockServer.webAppConnectedEventMessage)
                 })
                 
@@ -279,8 +279,8 @@ class OCastApplicationControllerTests: OCastTestCase {
                     XCTAssertEqual(name, "App1")
                     return .ok(name: name, state: .running)
                 }
-                // Wait 1s before sending connected event
-                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 1.0, execute: {
+                // Wait 2s before sending connected event
+                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2.0, execute: {
                     send(OCastMockServer.webAppConnectedEventMessage)
                 })
                 return .ok

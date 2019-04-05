@@ -11,6 +11,8 @@ s.name             = 'OCast'
 s.version          = '2.0.0'
 s.summary          = 'OCast SDK provides an implementation of OCast protocol.'
 
+# This description is used to generate tags and improve search results.
+
 s.description      = <<-DESC
 
 SDK provides all required API to use a TV stick compatible with OCast.
@@ -25,7 +27,7 @@ s.author           = { 'Orange' => ['christophe.azemar@orange.com', 'francois.su
 s.source           = { :git => 'https://github.com/Orange-OpenSource/OCast-iOS.git', :tag => s.version.to_s, :submodules => true }
 
 s.ios.deployment_target = '8.0'
-s.swift_version = '4.2'
+s.swift_version = '5.0'
 
 s.subspec 'Core' do |core|
     core.source_files   = 'OCast/Core/**/*.{swift,m,h}', 'OCast/OCast.h'

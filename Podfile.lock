@@ -1,40 +1,38 @@
 PODS:
   - CocoaAsyncSocket (7.6.3)
-  - OCast (1.4.2):
-    - OCast/Core (= 1.4.2)
-    - OCast/ReferenceDriver (= 1.4.2)
-  - OCast/Core (1.4.2):
+  - DynamicCodable (1.0)
+  - OCast (2.0.0):
+    - OCast/Core (= 2.0.0)
+    - OCast/ReferenceDriver (= 2.0.0)
+  - OCast/Core (2.0.0):
     - CocoaAsyncSocket (= 7.6.3)
-  - OCast/ReferenceDriver (1.4.2):
+    - DynamicCodable (= 1.0)
+  - OCast/ReferenceDriver (2.0.0):
     - OCast/Core
-  - Swifter (1.4.1)
+  - Swifter (1.4.6)
 
 DEPENDENCIES:
   - CocoaAsyncSocket (= 7.6.3)
+  - DynamicCodable (= 1.0)
   - OCast (from `./`)
-  - Swifter (from `https://github.com/marcc-orange/swifter.git`, branch `stable`)
+  - Swifter (= 1.4.6)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - CocoaAsyncSocket
+    - DynamicCodable
+    - Swifter
 
 EXTERNAL SOURCES:
   OCast:
     :path: "./"
-  Swifter:
-    :branch: stable
-    :git: https://github.com/marcc-orange/swifter.git
-
-CHECKOUT OPTIONS:
-  Swifter:
-    :commit: e1210bc24071d23533033cee94f95ba630de332e
-    :git: https://github.com/marcc-orange/swifter.git
 
 SPEC CHECKSUMS:
   CocoaAsyncSocket: eafaa68a7e0ec99ead0a7b35015e0bf25d2c8987
-  OCast: 0bf11762cd12a040ad0ac8069380a2223007224c
-  Swifter: 62d14781d34600ffb6be99d350cf271be500600f
+  DynamicCodable: 2cf558d057b3e6540552943254e1c9eeb706dde2
+  OCast: 233949a354972cfccfc3e9d353939a050f6ac52d
+  Swifter: 2ed278fbf7b16cbe97269eb56d8e8749b1ec4042
 
-PODFILE CHECKSUM: a802031d5c938076042ae8fd28af776322dfd580
+PODFILE CHECKSUM: 7ef807ece4406a1bfd42277f083dc3a3677d2821
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.1
