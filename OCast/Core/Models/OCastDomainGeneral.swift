@@ -49,31 +49,7 @@ public enum OCastDomainName: String {
     case all = "*"
 }
 
-public protocol OCastDeviceLayer {
-    associatedtype OCastDeviceMessageType: OCastApplicationLayer
-    var id: Int { get }
-    var source: String { get }
-    var destination: String { get }
-    var status: String? { get }
-    var type: String { get }
-    var message: OCastDeviceMessageType { get }
-}
-
-public protocol OCastApplicationLayer {
-    associatedtype OCastApplicationDataType: OCastDataLayer
-    var service: String { get }
-    var data: OCastApplicationDataType { get }
-}
-
-public protocol OCastDataLayer {
-    associatedtype OCastDataParamsType
-    var name: String? { get }
-    var params: OCastDataParamsType { get }
-    var options: [String: Any]? { get }
-}
-
-public class OCastGenericDeviceLayer<T: Codable>: OCastMessage, OCastDeviceLayer {
-    public typealias OCastDeviceMessageType = OCastGenericApplicationLayer<T>
+public class OCastGenericDeviceLayer<T: Codable>: OCastMessage {
     public let id: Int
     public let source: String
     public let destination: String
@@ -105,8 +81,7 @@ public class OCastGenericDeviceLayer<T: Codable>: OCastMessage, OCastDeviceLayer
     }
 }
 
-public class OCastGenericApplicationLayer<T: Codable>: OCastMessage, OCastApplicationLayer {
-    public typealias OCastApplicationDataType = OCastGenericDataLayer
+public class OCastGenericApplicationLayer<T: Codable>: OCastMessage {
     public let service: String
     public let data: OCastGenericDataLayer<T>
     
@@ -116,8 +91,7 @@ public class OCastGenericApplicationLayer<T: Codable>: OCastMessage, OCastApplic
     }
 }
 
-public class OCastGenericDataLayer<T: Codable>: OCastMessage, OCastDataLayer {
-    public typealias OCastDataParamsType = T
+public class OCastGenericDataLayer<T: Codable>: OCastMessage {
     public let name: String?
     public let params: T
     public let options: [String: Any]?
@@ -150,71 +124,4 @@ public class OCastGenericDataLayer<T: Codable>: OCastMessage, OCastDataLayer {
 @objc
 public class OCastDefaultDataParams: OCastMessage {
     public let code: Int?
-}
-
-public class OCastCustomDeviceLayer: OCastMessage, OCastDeviceLayer {
-    public typealias OCastDeviceMessageType = OCastCustomApplicationLayer
-    public let source: String
-    public let destination: String
-    public let id: Int
-    public let status: String?
-    public let type: String
-    public let message: OCastCustomApplicationLayer
-    
-    private enum CodingKeys : String, CodingKey {
-        case source = "src", destination = "dst", id, status, type, message
-    }
-    
-    public init(source: String, destination: String, id: Int, status: String?, type: String, message: OCastCustomApplicationLayer) {
-        self.source = source
-        self.destination = destination
-        self.id = id
-        self.status = status
-        self.type = type
-        self.message = message
-    }
-}
-
-public class OCastCustomApplicationLayer: OCastMessage, OCastApplicationLayer {
-    public typealias OCastApplicationDataType = OCastCustomDataLayer
-    public let service: String
-    public let data: OCastCustomDataLayer
-    
-    public init(service: String, data: OCastCustomDataLayer) {
-        self.service = service
-        self.data = data
-    }
-}
-
-@objc
-@objcMembers
-public class OCastCustomDataLayer: OCastMessage, OCastDataLayer {
-    public typealias OCastDataParamsType = [String: Any]
-    public let name: String?
-    public let params: [String: Any]
-    public let options: [String: Any]?
-    
-    enum CodingKeys: String, CodingKey {
-        case name, params, options
-    }
-
-    public init(name: String, params: [String: Any], options: [String: Any]?) {
-        self.name = name
-        self.params = params
-        self.options = options
-    }
-    
-    required public init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        name = try values.decodeIfPresent(String.self, forKey: .name)
-        params = try values.decode([String: Any].self, forKey: .params)
-        options = try values.decodeIfPresent([String: Any].self, forKey: .options)
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(name, forKey: .name)
-        try container.encode(params, forKey: .params)
-        try container.encodeIfPresent(options, forKey: .options)
-    }
 }
