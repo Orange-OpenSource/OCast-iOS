@@ -1,22 +1,26 @@
 PODS:
   - CocoaAsyncSocket (7.6.3)
-  - OCast (1.5.0):
-    - OCast/Core (= 1.5.0)
-    - OCast/ReferenceDriver (= 1.5.0)
-  - OCast/Core (1.5.0):
+  - DynamicCodable (1.0)
+  - OCast (2.0.0):
+    - OCast/Core (= 2.0.0)
+    - OCast/ReferenceDriver (= 2.0.0)
+  - OCast/Core (2.0.0):
     - CocoaAsyncSocket (= 7.6.3)
-  - OCast/ReferenceDriver (1.5.0):
+    - DynamicCodable (= 1.0)
+  - OCast/ReferenceDriver (2.0.0):
     - OCast/Core
   - Swifter (1.4.6)
 
 DEPENDENCIES:
   - CocoaAsyncSocket (= 7.6.3)
+  - DynamicCodable (= 1.0)
   - OCast (from `./`)
   - Swifter (= 1.4.6)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - CocoaAsyncSocket
+    - DynamicCodable
     - Swifter
 
 EXTERNAL SOURCES:
@@ -25,9 +29,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   CocoaAsyncSocket: eafaa68a7e0ec99ead0a7b35015e0bf25d2c8987
-  OCast: c204629a1f154330f10d6a2fe32b3cf6381ea555
+  DynamicCodable: 2cf558d057b3e6540552943254e1c9eeb706dde2
+  OCast: 233949a354972cfccfc3e9d353939a050f6ac52d
   Swifter: 2ed278fbf7b16cbe97269eb56d8e8749b1ec4042
 
-PODFILE CHECKSUM: 3611bb3cf86424ddaaab3266b3832d9f2b514ff1
+PODFILE CHECKSUM: 7ef807ece4406a1bfd42277f083dc3a3677d2821
 
 COCOAPODS: 1.6.1

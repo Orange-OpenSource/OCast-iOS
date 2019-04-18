@@ -11,6 +11,7 @@ target :OCast do
     platform :ios, '8.0'
     project 'OCast.xcodeproj'
     pod 'CocoaAsyncSocket', '7.6.3'
+    pod 'DynamicCodable', '1.0'
 end
 
 target :OCastTests do
