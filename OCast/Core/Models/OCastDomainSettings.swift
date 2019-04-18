@@ -21,9 +21,49 @@ import Foundation
 
 // MARK: - Settings Objects
 @objc
+public enum UpdateStatusState: Int, RawRepresentable, Codable {
+    
+    public typealias RawValue = String
+    
+    case notChecked
+    case upToDate
+    case newVersionFound
+    case newVersionReady
+    case downloading
+    case error
+    case success
+    
+    public var rawValue: RawValue {
+        switch (self) {
+        case .notChecked: return "notChecked"
+        case .upToDate: return "upToDate"
+        case .newVersionFound: return "newVersionFound"
+        case .newVersionReady: return "newVersionReady"
+        case .downloading: return "downloading"
+        case .error: return "error"
+        case .success: return "success"
+        }
+    }
+    
+    public init?(rawValue: RawValue) {
+        switch (rawValue) {
+        case "notChecked": self = .notChecked
+        case "upToDate": self = .upToDate
+        case "newVersionFound": self = .newVersionFound
+        case "newVersionReady": self = .newVersionReady
+        case "downloading": self = .downloading
+        case "error": self = .error
+        case "success": self = .success
+        default: return nil
+        }
+    }
+}
+
+@objc
 public class SettingsUpdateStatus: OCastMessage {
-    public let state: String
-    public let version: String
+    public let state: UpdateStatusState
+    // TODO: check if optional
+    public let version: String?
     public let progress: Int
 }
 
@@ -44,6 +84,16 @@ public class InputGamepadAxes: OCastMessage {
 @objc public class SettingsGetDeviceIDCommand: OCastMessage {}
 
 @objc
+public enum DOMKeyLocation: Int, Codable {
+    case standard = 0
+    case left = 1
+    case right = 2
+    case numpad = 3
+    case mobile = 4
+    case joystick = 5
+}
+
+@objc
 public class SettingsKeyPressedCommand: OCastMessage {
     public let key: String
     public let code: String
@@ -51,7 +101,7 @@ public class SettingsKeyPressedCommand: OCastMessage {
     public let alt: Bool
     public let shift: Bool
     public let meta: Bool
-    public let location: Int
+    public let location: DOMKeyLocation
 }
 
 @objc

@@ -18,8 +18,8 @@
 //  Copyright © 2018 Orange. All rights reserved.
 //
 
-import Foundation
 import DynamicCodable
+import Foundation
 
 public let OCastErrorDomain = "OCastError"
 
@@ -49,19 +49,19 @@ public enum OCastDomainName: String {
     case all = "*"
 }
 
-public class OCastGenericDeviceLayer<T: Codable>: OCastMessage {
+public class OCastDeviceLayer<T: Codable>: OCastMessage {
     public let id: Int
     public let source: String
     public let destination: String
     public let status: String?
     public let type: String
-    public let message: OCastGenericApplicationLayer<T>
+    public let message: OCastApplicationLayer<T>
     
     private enum CodingKeys : String, CodingKey {
         case source = "src", destination = "dst", id, status, type, message
     }
     
-    public init(source: String, destination: String, id: Int, status: String?, type: String, message: OCastGenericApplicationLayer<T>) {
+    public init(source: String, destination: String, id: Int, status: String?, type: String, message: OCastApplicationLayer<T>) {
         self.source = source
         self.destination = destination
         self.id = id
@@ -75,23 +75,23 @@ public class OCastGenericDeviceLayer<T: Codable>: OCastMessage {
     }
     
     public convenience init(source: String, destination: String, id: Int, status: String?, type: String, service: String, name: String, params: T, options: [String: Any]?) {
-        let reference = OCastGenericDataLayer(name: name, params: params, options: options)
-        let application = OCastGenericApplicationLayer(service: service, data: reference)
+        let reference = OCastDataLayer(name: name, params: params, options: options)
+        let application = OCastApplicationLayer(service: service, data: reference)
         self.init(source: source, destination: destination, id: id, status: status, type: type, message: application)
     }
 }
 
-public class OCastGenericApplicationLayer<T: Codable>: OCastMessage {
+public class OCastApplicationLayer<T: Codable>: OCastMessage {
     public let service: String
-    public let data: OCastGenericDataLayer<T>
+    public let data: OCastDataLayer<T>
     
-    public init(service: String, data: OCastGenericDataLayer<T>) {
+    public init(service: String, data: OCastDataLayer<T>) {
         self.service = service
         self.data = data
     }
 }
 
-public class OCastGenericDataLayer<T: Codable>: OCastMessage {
+public class OCastDataLayer<T: Codable>: OCastMessage {
     public let name: String?
     public let params: T
     public let options: [String: Any]?
@@ -121,7 +121,8 @@ public class OCastGenericDataLayer<T: Codable>: OCastMessage {
     }
 }
 
+// Default Response is containing code property for every command.
 @objc
-public class OCastDefaultDataParams: OCastMessage {
+public class OCastDefaultResponseDataLayer: OCastMessage {
     public let code: Int?
 }

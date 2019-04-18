@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import DynamicCodable
 
 // MARK: - Media objects
 
@@ -28,14 +27,14 @@ import DynamicCodable
  - `.image`: image type
  - `.video`: viedo type
  */
-@objc public enum OCastMediaType: Int {
+@objc public enum OCastMediaType: Int, RawRepresentable, Codable {
     case audio
     case image
     case video
-}
-
-extension OCastMediaType {
-    func toString() -> String {
+    
+    public typealias RawValue = String
+    
+    public var rawValue: RawValue {
         switch self {
         case .audio: return "audio"
         case .image: return "image"
@@ -43,30 +42,39 @@ extension OCastMediaType {
         }
     }
     
-    init(type : String) {
-        switch (type) {
+    public init?(rawValue: RawValue) {
+        switch (rawValue) {
         case "audio": self = .audio
         case "video": self = .video
         case "image": self = .image
-        default: self = .audio
+        default: return nil
         }
     }
 }
 
-@objc public enum OCastMediaTrackType: Int {
+@objc public enum OCastMediaTrackType: Int, RawRepresentable, Codable {
     case audio = 0
     case text
     case video
     case undefined
-}
+    
+    public typealias RawValue = String
 
-extension OCastMediaTrackType {
-    func toString() -> String {
+    public var rawValue: RawValue {
         switch self {
         case .audio: return "audio"
         case .video: return "video"
         case .text: return "text"
         case .undefined: return "undefined"
+        }
+    }
+    
+    public init?(rawValue: RawValue) {
+        switch (rawValue) {
+        case "audio": self = .audio
+        case "video": self = .video
+        case "text": self = .text
+        default: return nil
         }
     }
 }
@@ -77,16 +85,24 @@ extension OCastMediaTrackType {
  - `.streamed`: streamed type
  */
 
-@objc public enum OCastMediaTransferMode: Int {
+@objc public enum OCastMediaTransferMode: Int, RawRepresentable, Codable {
     case buffered
     case streamed
-}
-
-extension OCastMediaTransferMode {
-    func toString() -> String {
+    
+    public typealias RawValue = String
+    
+    public var rawValue: RawValue {
         switch self {
         case .buffered: return "buffered"
         case .streamed: return "streamed"
+        }
+    }
+    
+    public init?(rawValue: RawValue) {
+        switch (rawValue) {
+        case "buffered": self = .buffered
+        case "streamed": self = .streamed
+        default: return nil
         }
     }
 }
@@ -116,18 +132,17 @@ public enum MediaPlaybackStatusState: Int, Codable {
 public class MediaPlaybackStatus: OCastMessage {
     public var volume: Float { return _volume ?? 0.0 }
     public var mute: Bool { return _mute ?? false }
-    public var state: MediaPlaybackStatusState { return _state ?? .unknown }
+    public let state: MediaPlaybackStatusState
     public var position: Double { return _position ?? 0.0 }
     public var duration: Double { return _duration ?? 0.0 }
     
     private let _volume: Float?
     private let _mute: Bool?
-    private let _state: MediaPlaybackStatusState?
     private let _position: Double?
     private let _duration: Double?
     
     enum CodingKeys : String, CodingKey {
-        case _volume = "volume", _mute = "mute", _state = "state", _position = "position", _duration = "duration"
+        case _volume = "volume", _mute = "mute", state = "state", _position = "position", _duration = "duration"
     }
     
 }
@@ -137,7 +152,7 @@ public class MediaMetadataChanged: OCastMessage {
     public let title: String
     public let subtitle: String
     public let logo: String
-    public var mediaType: OCastMediaType { return OCastMediaType(type: _mediaType) }
+    public var mediaType: OCastMediaType { return OCastMediaType(rawValue: _mediaType) ?? .audio }
     private let _mediaType: String
     public let textTracks: [MediaTrack]
     public let audioTracks: [MediaTrack]
@@ -151,8 +166,13 @@ public class MediaMetadataChanged: OCastMessage {
 @objc
 public class MediaTrack: OCastMessage {
     public let language: String
-    public let enable: Bool
+    public let label: String
+    public let enabled: Bool
     public let trackId: String
+    
+    enum CodingKeys: String, CodingKey {
+        case language, label, enabled = "enable", trackId
+    }
 }
 
 // MARK: - Media Error Codes
@@ -172,6 +192,7 @@ public class MediaTrack: OCastMessage {
  */
 
 @objc public enum OCastMediaErrorCode: Int {
+    
     case noError = 0
     case invalidService = 2404
     case noImplementation = 2400
@@ -186,10 +207,9 @@ public class MediaTrack: OCastMessage {
     case invalidMetadata = 9997
     case invalidPlaybackStatus = 9998
     case invalidErrorCode = 9999
-}
+    
 
-extension OCastMediaErrorCode {
-    func toString() -> String {
+    public var stringValue: String {
         switch self {
         case .invalidService: return "invalidService"
         case .noImplementation: return "noImplementation"
@@ -203,7 +223,9 @@ extension OCastMediaErrorCode {
         default: return "Unvalid error code"
         }
     }
+    
 }
+
 
 // MARK: - Media Commands
 @objc
@@ -213,8 +235,8 @@ public class MediaPrepareCommand: OCastMessage {
     public let title: String
     public let subtitle: String
     public let logo: String
-    public let mediaType: String
-    public let transferMode: String
+    public let mediaType: OCastMediaType
+    public let transferMode: OCastMediaTransferMode
     public let autoplay: Bool
     
     @objc
@@ -224,8 +246,8 @@ public class MediaPrepareCommand: OCastMessage {
         self.title = title
         self.subtitle = subtitle
         self.logo = logo
-        self.mediaType = mediaType.toString()
-        self.transferMode = transferMode.toString()
+        self.mediaType = mediaType
+        self.transferMode = transferMode
         self.autoplay = autoPlay
     }
 }
@@ -276,7 +298,6 @@ public class MediaSeekCommand: OCastMessage {
 }
 
 @objc public class MediaGetPlaybackStatusCommand: OCastMessage {}
-@objc public class MediaGetDeviceIDCommand: OCastMessage {}
 @objc public class MediaGetMetadataCommand: OCastMessage {}
 
 @objc
