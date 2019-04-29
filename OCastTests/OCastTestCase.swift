@@ -21,6 +21,8 @@ import XCTest
 /// Base class to factorize code
 class OCastTestCase: XCTestCase {
     
+    let defaultTimeout = 10.0
+    
     /// The default search target (diffrent from the read OCast service to prevent having real devices responding)
     static let defaultSearchTarget: String = {
         let uuid = UUID().uuidString

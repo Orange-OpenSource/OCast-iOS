@@ -72,7 +72,7 @@ class OCastDiscoveryTests: OCastTestCase {
         discovery.start()
         defer { discovery.stop() }
         
-        wait(for: [dialSearchExpectation, dialLocationExpectation, addDeviceExpectation], timeout: 5, enforceOrder: true)
+        wait(for: [dialSearchExpectation, dialLocationExpectation, addDeviceExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
     
     /// Tests that a discovered device that is lost is removed
@@ -92,12 +92,12 @@ class OCastDiscoveryTests: OCastTestCase {
         discovery.start()
         defer { discovery.stop() }
         
-        wait(for: [addDeviceExpectation], timeout: 5)
+        wait(for: [addDeviceExpectation], timeout: defaultTimeout)
 
         // next M-SEARCH will not respond and should trigger timeout from DeviceDiscovery
         mockServer.stop()
         
-        wait(for: [removeDeviceExpectation], timeout: 10)
+        wait(for: [removeDeviceExpectation], timeout: defaultTimeout)
     }
     
     /// Asserts the device ID

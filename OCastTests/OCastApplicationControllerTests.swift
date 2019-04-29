@@ -77,7 +77,7 @@ class OCastApplicationControllerTests: OCastTestCase {
         discovery.start()
         defer { discovery.stop() }
         
-        wait(for: [dialAppExpectation, applicationControllerExpectation], timeout: 5, enforceOrder: true)
+        wait(for: [dialAppExpectation, applicationControllerExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
     
     /// Test that an application controller cannot be optained for an unknown application
@@ -108,7 +108,7 @@ class OCastApplicationControllerTests: OCastTestCase {
         discovery.start()
         defer { discovery.stop() }
         
-        wait(for: [dialAppExpectation, applicationControllerExpectation], timeout: 5, enforceOrder: true)
+        wait(for: [dialAppExpectation, applicationControllerExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
     
     /// Tests that an application controller can start with running app
@@ -135,7 +135,7 @@ class OCastApplicationControllerTests: OCastTestCase {
         }
         
         wait(for: [webSocketConnectedExpectation, applicationControllerStartedExpectation],
-             timeout: 5,
+             timeout: defaultTimeout,
              enforceOrder: true)
     }
     
@@ -163,8 +163,8 @@ class OCastApplicationControllerTests: OCastTestCase {
                     return .ok(name: name, state: .running)
                 }
                 
-                // Wait 2s before sending connected event
-                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2.0, execute: {
+                // Wait 5s before sending connected event
+                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 5.0, execute: {
                     send(OCastMockServer.webAppConnectedEventMessage)
                 })
                 
@@ -185,7 +185,7 @@ class OCastApplicationControllerTests: OCastTestCase {
         }
         
         wait(for: [webSocketConnectedExpectation, appStartingExpectation, appRunningExpectation, applicationControllerStartedExpectation],
-             timeout: 5,
+             timeout: defaultTimeout,
              enforceOrder: true)
     }
     
@@ -221,7 +221,7 @@ class OCastApplicationControllerTests: OCastTestCase {
         }
         
         wait(for: [webSocketConnectedExpectation, appStartingExpectation, applicationControllerStartErrorExpectation, applicationControllerStartedExpectation],
-             timeout: 5,
+             timeout: defaultTimeout,
              enforceOrder: true)
     }
     
@@ -256,7 +256,7 @@ class OCastApplicationControllerTests: OCastTestCase {
             })
         }
         
-        wait(for: [webSocketConnectedExpectation, appStartingExpectation], timeout: 5, enforceOrder: true)
+        wait(for: [webSocketConnectedExpectation, appStartingExpectation], timeout: defaultTimeout, enforceOrder: true)
         
         // Wait at least 60s as the SDK has an internal timer waiting for the appConnected event
         wait(for: [applicationControllerStartErrorExpectation, applicationControllerStartedExpectation], timeout: 65, enforceOrder: true)
@@ -279,8 +279,8 @@ class OCastApplicationControllerTests: OCastTestCase {
                     XCTAssertEqual(name, "App1")
                     return .ok(name: name, state: .running)
                 }
-                // Wait 2s before sending connected event
-                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2.0, execute: {
+                // Wait 5s before sending connected event
+                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 5.0, execute: {
                     send(OCastMockServer.webAppConnectedEventMessage)
                 })
                 return .ok
