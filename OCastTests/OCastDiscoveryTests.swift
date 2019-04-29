@@ -59,7 +59,7 @@ class OCastDiscoveryTests: OCastTestCase {
         let discovery = DeviceDiscovery(forTargets: [OCastDiscoveryTests.defaultSearchTarget])
         let delegate = DiscoveryDelegate(addDevice: { device in
             XCTAssertEqual(device.baseURL.absoluteString, self.mockServer.appsURL(forKey: "OCAST"))
-            XCTAssertEqual(device.deviceID, OCastDiscoveryTests.defaultDeviceID)
+            self.assert(deviceID: device.deviceID)
             XCTAssertEqual(device.friendlyName, OCastDiscoveryTests.defaultFriendlyName)
             XCTAssertEqual(device.manufacturer, OCastDiscoveryTests.defaultManufacturer)
             XCTAssertEqual(device.modelName, OCastDiscoveryTests.defaultModelName)
@@ -83,7 +83,7 @@ class OCastDiscoveryTests: OCastTestCase {
         let delegate = DiscoveryDelegate(addDevice: { device in
             addDeviceExpectation.fulfill()
         }, removeDevice: { device in
-            XCTAssertEqual(device.deviceID, OCastDiscoveryTests.defaultDeviceID)
+            self.assert(deviceID: device.deviceID)
             removeDeviceExpectation.fulfill()
         })
         
@@ -99,4 +99,11 @@ class OCastDiscoveryTests: OCastTestCase {
         
         wait(for: [removeDeviceExpectation], timeout: 10)
     }
+    
+    /// Asserts the device ID
+    private func assert(deviceID: String) {
+        // Remove uuid: at the beginning
+        XCTAssertEqual(deviceID, String(OCastDiscoveryTests.defaultDeviceID.dropFirst(5)))
+    }
 }
+

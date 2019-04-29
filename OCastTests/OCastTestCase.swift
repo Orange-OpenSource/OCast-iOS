@@ -47,7 +47,7 @@ class OCastTestCase: XCTestCase {
     static let defaultModelName = "Opencast"
     
     /// The default device identifier used by for the DIAL responses
-    static let defaultDeviceID = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+    static let defaultDeviceID = "uuid:6ba7b810-9dad-11d1-80b4-00c04fd430c8"
     
     /// The default DIAL location response
     static let defaultLocationResponse: OCastMockServer.LocationResponse = .ok(friendlyName: defaultFriendlyName, manufacturer: defaultManufacturer, modelName: defaultModelName, uuid: defaultDeviceID)
