@@ -288,21 +288,24 @@ import CocoaAsyncSocket
     ///
     /// - Parameter UDN: The UDN key to parse.
     /// - Returns: The device unique ID.
-    private func deviceID(from UDN: String) -> String? {
+    private func deviceID(from UDN: String) -> String {
         guard let result = regularExpression?.firstMatch(in: UDN, options: [], range: NSRange(location: 0, length: UDN.count)),
             result.numberOfRanges == 2,
-            let range = Range(result.range(at: 1), in: UDN) else { return nil }
+            let range = Range(result.range(at: 1), in: UDN) else {
+                OCastLog.error("Invalid device identifier : the UDN value must begin with uuid:")
+                return UDN
+        }
         
         return String(UDN[range])
     }
     
     private func createDevice(fromXMLKeys keys: [String: String], for applicationURL: String?) {
         guard let UDN = keys["UDN"],
-            let deviceID = deviceID(from: UDN),
             let friendlyName = keys["friendlyName"],
             let manufacturer = keys["manufacturer"],
             let modelName = keys["modelName"] else { return }
-                
+        
+        let deviceID = self.deviceID(from: UDN)
         let deviceAlreadyDiscovered = currentDevices.contains(where: { (id, _) -> Bool in return id == deviceID })
         
         if !deviceAlreadyDiscovered {
