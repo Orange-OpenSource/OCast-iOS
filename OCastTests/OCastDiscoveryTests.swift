@@ -59,7 +59,7 @@ class OCastDiscoveryTests: OCastTestCase {
         let discovery = DeviceDiscovery(forTargets: [OCastDiscoveryTests.defaultSearchTarget])
         let delegate = DiscoveryDelegate(addDevice: { device in
             XCTAssertEqual(device.baseURL.absoluteString, self.mockServer.appsURL(forKey: "OCAST"))
-            XCTAssertEqual(device.deviceID, OCastDiscoveryTests.defaultDeviceID)
+            self.assert(deviceID: device.deviceID)
             XCTAssertEqual(device.friendlyName, OCastDiscoveryTests.defaultFriendlyName)
             XCTAssertEqual(device.manufacturer, OCastDiscoveryTests.defaultManufacturer)
             XCTAssertEqual(device.modelName, OCastDiscoveryTests.defaultModelName)
@@ -72,7 +72,7 @@ class OCastDiscoveryTests: OCastTestCase {
         discovery.start()
         defer { discovery.stop() }
         
-        wait(for: [dialSearchExpectation, dialLocationExpectation, addDeviceExpectation], timeout: 5, enforceOrder: true)
+        wait(for: [dialSearchExpectation, dialLocationExpectation, addDeviceExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
     
     /// Tests that a discovered device that is lost is removed
@@ -83,7 +83,7 @@ class OCastDiscoveryTests: OCastTestCase {
         let delegate = DiscoveryDelegate(addDevice: { device in
             addDeviceExpectation.fulfill()
         }, removeDevice: { device in
-            XCTAssertEqual(device.deviceID, OCastDiscoveryTests.defaultDeviceID)
+            self.assert(deviceID: device.deviceID)
             removeDeviceExpectation.fulfill()
         })
         
@@ -92,11 +92,18 @@ class OCastDiscoveryTests: OCastTestCase {
         discovery.start()
         defer { discovery.stop() }
         
-        wait(for: [addDeviceExpectation], timeout: 5)
+        wait(for: [addDeviceExpectation], timeout: defaultTimeout)
 
         // next M-SEARCH will not respond and should trigger timeout from DeviceDiscovery
         mockServer.stop()
         
-        wait(for: [removeDeviceExpectation], timeout: 10)
+        wait(for: [removeDeviceExpectation], timeout: defaultTimeout)
+    }
+    
+    /// Asserts the device ID
+    private func assert(deviceID: String) {
+        // Remove uuid: at the beginning
+        XCTAssertEqual(deviceID, String(OCastDiscoveryTests.defaultDeviceID.dropFirst(5)))
     }
 }
+
