@@ -4,6 +4,8 @@ language: swift
 branches:
   only:
     - master
+    - 2.0
+    - /^2.0_.*$
 
 before_install:
     - gem install bundler
