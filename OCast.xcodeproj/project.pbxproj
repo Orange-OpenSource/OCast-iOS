@@ -21,6 +21,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		85225F822278ABC200FDAFC3 /* DIALService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85225F812278ABC200FDAFC3 /* DIALService.swift */; };
+		85225F842278ABCE00FDAFC3 /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85225F832278ABCE00FDAFC3 /* HTTPRequest.swift */; };
 		8532EC052264B74A0080062F /* OCastDomainGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC012264B74A0080062F /* OCastDomainGeneral.swift */; };
 		8532EC062264B74A0080062F /* OCastDomainWebApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC022264B74A0080062F /* OCastDomainWebApp.swift */; };
 		8532EC072264B74A0080062F /* OCastDomainSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC032264B74A0080062F /* OCastDomainSettings.swift */; };
@@ -75,6 +77,8 @@
 		55997461E6B225FD51BD3D75 /* Pods-OCastTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OCastTests/Pods-OCastTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6F9D010C25D3F8143329984C /* Pods_OCastTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCastTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		72FBC7B997F2E02A32F442DE /* Pods-OCast.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast.release.xcconfig"; path = "Pods/Target Support Files/Pods-OCast/Pods-OCast.release.xcconfig"; sourceTree = "<group>"; };
+		85225F812278ABC200FDAFC3 /* DIALService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DIALService.swift; path = Utils/DIALService.swift; sourceTree = "<group>"; };
+		85225F832278ABCE00FDAFC3 /* HTTPRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
 		8532EC012264B74A0080062F /* OCastDomainGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainGeneral.swift; path = Models/OCastDomainGeneral.swift; sourceTree = "<group>"; };
 		8532EC022264B74A0080062F /* OCastDomainWebApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainWebApp.swift; path = Models/OCastDomainWebApp.swift; sourceTree = "<group>"; };
 		8532EC032264B74A0080062F /* OCastDomainSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainSettings.swift; path = Models/OCastDomainSettings.swift; sourceTree = "<group>"; };
@@ -158,6 +162,7 @@
 				8532EC042264B74A0080062F /* OCastDomainMedia.swift */,
 				8532EC032264B74A0080062F /* OCastDomainSettings.swift */,
 				8532EC022264B74A0080062F /* OCastDomainWebApp.swift */,
+				85225F812278ABC200FDAFC3 /* DIALService.swift */,
 			);
 			name = 2.0;
 			sourceTree = "<group>";
@@ -232,6 +237,7 @@
 				97DC972C20EA229100DBB1B0 /* OCastLog.swift */,
 				97E3D9D6227891A7006D8D50 /* OCastXMLParser.swift */,
 				97DC972D20EA229100DBB1B0 /* HttpManager.swift */,
+				85225F832278ABCE00FDAFC3 /* HTTPRequest.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -554,6 +560,7 @@
 				97DC974320EA229100DBB1B0 /* Driver.swift in Sources */,
 				97DC974F20EA229100DBB1B0 /* Browser.swift in Sources */,
 				97DC975120EA229100DBB1B0 /* ReferencePublicSettings.swift in Sources */,
+				85225F822278ABC200FDAFC3 /* DIALService.swift in Sources */,
 				97DC974A20EA229100DBB1B0 /* DeviceDiscovery.swift in Sources */,
 				97DC974D20EA229100DBB1B0 /* Stream.swift in Sources */,
 				8532EC072264B74A0080062F /* OCastDomainSettings.swift in Sources */,
@@ -567,6 +574,7 @@
 				8532EC052264B74A0080062F /* OCastDomainGeneral.swift in Sources */,
 				97DC975020EA229100DBB1B0 /* ReferenceLink.swift in Sources */,
 				9751ADC420F655C200815600 /* ReferenceDriverErrorCode.swift in Sources */,
+				85225F842278ABCE00FDAFC3 /* HTTPRequest.swift in Sources */,
 				97DC974920EA229100DBB1B0 /* Public.swift in Sources */,
 				97DC974520EA229100DBB1B0 /* XMLHelper.swift in Sources */,
 			);
