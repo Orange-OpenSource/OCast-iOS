@@ -45,7 +45,7 @@
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super initWithCoder:aDecoder]) {
-        _deviceDiscovery = [[DeviceDiscovery alloc] initForTargets:@[ReferenceDriver.searchTarget]];
+        _deviceDiscovery = [[DeviceDiscovery alloc] init:@[ReferenceDriver.searchTarget]];
         self.playerState = PlayerStateUnknown;
     }
     
@@ -62,7 +62,7 @@
     
     // Launch the discovery process
     self.deviceDiscovery.delegate = self;
-    [self.deviceDiscovery start];
+    [self.deviceDiscovery resume];
 }
 
 // MARK: Private methods
@@ -133,8 +133,9 @@
 
 // MARK: DeviceDiscoveryDelegate methods
 
-- (void)deviceDiscovery:(DeviceDiscovery *)deviceDiscovery didAddDevice:(Device *)device {
-    if (self.deviceManager == nil) {
+- (void)deviceDiscovery:(DeviceDiscovery * _Nonnull)deviceDiscovery didAddDevices:(NSArray<Device *> * _Nonnull)devices {
+    if (self.deviceManager == nil && devices.count > 0) {
+        Device * device = devices[0];
         // Create the device manager
         _deviceManager = [[DeviceManager alloc] initWith:device sslConfiguration:nil];
         self.deviceManager.delegate = self;
@@ -151,8 +152,8 @@
     }
 }
 
-- (void)deviceDiscovery:(DeviceDiscovery *)deviceDiscovery didRemoveDevice:(Device *)device {
-    if (self.deviceManager.device == device) {
+- (void)deviceDiscovery:(DeviceDiscovery * _Nonnull)deviceDiscovery didRemoveDevices:(NSArray<Device *> * _Nonnull)devices {
+    if (devices.count > 0 && self.deviceManager.device == devices[0]) {
         self.deviceManager = nil;
         [self resetUI];
     }

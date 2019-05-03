@@ -20,23 +20,48 @@
 
 import Foundation
 
-public enum HTTPRequestError : Error {
+/// Protocol to represent an URLSession.
+protocol URLSessionProtocol {
+    
+    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol
+    func finishTasksAndInvalidate()
+}
+
+/// Protocol to represent an URLSessionDataTask.
+protocol URLSessionDataTaskProtocol {
+    
+    func resume()
+}
+
+/// Extends URLSession to adopt URLSesionProtocol.
+extension URLSession: URLSessionProtocol {
+    
+    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
+        return (dataTask(with: request, completionHandler: completionHandler) as URLSessionDataTask) as URLSessionDataTaskProtocol
+    }
+}
+
+/// Extends URLSessionDataTask to adopt URLSessionDataTaskProtocol
+extension URLSessionDataTask: URLSessionDataTaskProtocol {}
+
+enum HTTPRequestError : Error {
     case badURL
     case failed(String)
     case badCode(Int)
 }
 
-public enum HTTPMethod: String {
+enum HTTPMethod: String {
     case GET, POST, DELETE
 }
 
-public class HTTPRequest {
+class HTTPRequest {
     
-    public static func launch(method: HTTPMethod = .GET,
+    public static func launch(urlSession: URLSessionProtocol = URLSession(configuration: .default),
+                              method: HTTPMethod = .GET,
                               url urlString: String,
                               httpHeaders: [String : String]? = nil,
                               body: String? = nil,
-                              completion: ((Result<Data?, HTTPRequestError>) -> ())?) {
+                              completion: ((Result<(Data?, [AnyHashable: Any]), HTTPRequestError>) -> ())?) {
         
         guard let url = URL(string: urlString) else {
             completion?(.failure(HTTPRequestError.badURL))
@@ -48,23 +73,19 @@ public class HTTPRequest {
         urlRequest.allHTTPHeaderFields = httpHeaders
         urlRequest.httpBody = body?.data(using: .utf8)
         
-        let urlSession = URLSession(configuration: .default)
-        let task = urlSession.dataTask(with: urlRequest) {
-            data, response, error in
-            
+        let task = urlSession.dataTask(with: urlRequest) { data, response, error in
             if let error = error {
                 completion?(.failure(.failed(error.localizedDescription)))
+                return
             }
             
             if let httpResponse = response as? HTTPURLResponse {
                 switch httpResponse.statusCode {
                 case 200 ..< 300:
-                    break
+                    completion?(.success((data, httpResponse.allHeaderFields)))
                 default:
                     completion?(.failure(.badCode(httpResponse.statusCode)))
                 }
-                
-                completion?(.success(data))
             }
         }
         
