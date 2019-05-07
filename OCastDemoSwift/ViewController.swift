@@ -117,7 +117,7 @@ class ViewController: UIViewController, DeviceDiscoveryDelegate, DeviceManagerDe
     
     // MARK: DeviceDiscoveryDelegate methods
     
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevices devices: [Device]) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [Device]) {
         // Only one device (the first found)
         guard deviceManager == nil, let device = devices.first else { return }
         
@@ -137,7 +137,7 @@ class ViewController: UIViewController, DeviceDiscoveryDelegate, DeviceManagerDe
                                              onError: { _ in })
     }
     
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevices devices: [Device]) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [Device]) {
         guard let device = devices.first else { return }
         
         if deviceManager?.device == device {
@@ -146,7 +146,7 @@ class ViewController: UIViewController, DeviceDiscoveryDelegate, DeviceManagerDe
         }
     }
     
-    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, withError error: Error?) {}
+    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, with error: Error?) {}
     
     // MARK: DeviceManagerDelegate methods
     

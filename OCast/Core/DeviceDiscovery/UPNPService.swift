@@ -66,7 +66,7 @@ class UPNPService: UPNPServiceProtocol {
     ///   - location: The location from the SSDP response.
     ///   - completionHandler: The completion handler called at the end containing the new device.
     func device(fromLocation location: String, completionHandler: @escaping UPNPServiceProtocolCompletionHandler) {
-        let headers = ["Date": UPNPService.dateFormatter().string(from: Date())]
+        let headers = ["Date": dateFormatter.string(from: Date())]
         HTTPRequest.launch(urlSession: self.urlSession, url: location, httpHeaders: headers, completion: {
             result in
             
@@ -90,14 +90,14 @@ class UPNPService: UPNPServiceProtocol {
     // MARK: Private methods
     
     /// The dateformatter to send the date header (RFC 7231).
-    private static func dateFormatter() -> DateFormatter {
+    private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss z"
         dateFormatter.calendar = Calendar(identifier: .iso8601)
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         return dateFormatter
-    }
+    }()
     
     /// Creates a new device from the location end point response.
     ///
@@ -107,7 +107,7 @@ class UPNPService: UPNPServiceProtocol {
     /// - Returns: The new device or `nil` if an error occurs.
     private func device(from data: Data?, httpHeaders: [AnyHashable: Any]) -> Device? {
         guard let data = data,
-            let applicationURLString = applicationURL(from: httpHeaders),
+            let applicationURLString = applicationURL(fromHttpHeaders: httpHeaders),
             let applicationURL = URL(string: applicationURLString),
             let ipAddress = applicationURL.host,
             let xmlRootElement = OCastXMLParser().parse(data: data),
@@ -130,7 +130,7 @@ class UPNPService: UPNPServiceProtocol {
     ///
     /// - Parameter httpHeaders: The HTTP response headers.
     /// - Returns: The application URL or `nil`if an error occurs.
-    private func applicationURL(from httpHeaders: [AnyHashable: Any]) -> String? {
+    private func applicationURL(fromHttpHeaders httpHeaders: [AnyHashable: Any]) -> String? {
         let applicationDIALURL = httpHeaders["Application-DIAL-URL"] as? String
         let applicationURL = httpHeaders["Application-URL"] as? String
         

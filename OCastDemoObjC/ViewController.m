@@ -133,7 +133,7 @@
 
 // MARK: DeviceDiscoveryDelegate methods
 
-- (void)deviceDiscovery:(DeviceDiscovery * _Nonnull)deviceDiscovery didAddDevices:(NSArray<Device *> * _Nonnull)devices {
+- (void)deviceDiscovery:(DeviceDiscovery * _Nonnull)deviceDiscovery didAdd:(NSArray<Device *> * _Nonnull)devices {
     if (self.deviceManager == nil && devices.count > 0) {
         Device * device = devices[0];
         // Create the device manager
@@ -152,14 +152,14 @@
     }
 }
 
-- (void)deviceDiscovery:(DeviceDiscovery * _Nonnull)deviceDiscovery didRemoveDevices:(NSArray<Device *> * _Nonnull)devices {
+- (void)deviceDiscovery:(DeviceDiscovery * _Nonnull)deviceDiscovery didRemove:(NSArray<Device *> * _Nonnull)devices {
     if (devices.count > 0 && self.deviceManager.device == devices[0]) {
         self.deviceManager = nil;
         [self resetUI];
     }
 }
 
-- (void)deviceDiscoveryDidStop:(DeviceDiscovery *)deviceDiscovery withError:(NSError *)error {}
+- (void)deviceDiscoveryDidStop:(DeviceDiscovery *)deviceDiscovery with:(NSError *)error {}
 
 // MARK: DeviceManagerDelegate methods
 

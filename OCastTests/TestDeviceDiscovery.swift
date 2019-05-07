@@ -32,15 +32,15 @@ class TestDeviceDiscoveryDelegate: DeviceDiscoveryDelegate {
         self.discoveryStopped = { _ in }
     }
     
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevices devices: [Device]) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [Device]) {
         devicesAdded(devices)
     }
     
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevices devices: [Device]) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [Device]) {
         devicesRemoved(devices)
     }
     
-    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, withError error: Error?) {
+    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, with error: Error?) {
         discoveryStopped(error)
     }
 }

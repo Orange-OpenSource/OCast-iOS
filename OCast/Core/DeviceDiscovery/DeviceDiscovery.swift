@@ -26,21 +26,21 @@ import Foundation
     /// - Parameters:
     ///   - deviceDiscovery: The device discovery informing the delegate.
     ///   - devices: The new devices found.
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevices devices: [Device])
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [Device])
     
     /// Tells the delegate that devices are lost.
     ///
     /// - Parameters:
     ///   - deviceDiscovery: The device discovery informing the delegate.
     ///   - devices: The devices lost.
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevices devices: [Device])
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [Device])
     
     /// Tells the delegate that the discovery is stopped. All the devices are removed.
     ///
     /// - Parameters:
     ///   - deviceDiscovery: The device discovery informing the delegate.
     ///   - error: The error if there's an issue, `nil` if the device discovery has been stopped normally.
-    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, withError error: Error?)
+    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, with error: Error?)
 }
 
 /// Class to manage the device discovery using the SSDP protocol.
@@ -63,7 +63,7 @@ import Foundation
     private let ssdpMulticastPort: UInt16 = 1900
     
     /// The max time value used in a M-SEARCH request.
-    private let maxtime = 3
+    private let maxTime = 3
     
     /// The dictionary (device ID/ Date) to save the date of the last response received.
     private var ssdpLastSeenDevices = [String: Date]()
@@ -78,14 +78,14 @@ import Foundation
     private var removeDevicesTasks = [DispatchWorkItem]()
     
     /// `true` if the discovery is paused, otherwise `false`
-    private var paused = false
+    private var isPaused = false
     
     /// `true` if the discovery is stopped, otherwise `false`
-    private var stopped = true
+    private var isStopped = true
     
     /// `true` if the discovery is running, otherwise `false`
     private var isRunning: Bool {
-        return !stopped && !paused
+        return !isStopped && !isPaused
     }
     
     // The delegate to receive the device discovery events.
@@ -110,13 +110,13 @@ import Foundation
     /// Newly-initialized discovery begin in a suspended state, so you need to call `resume` method to start the discovery.
     ///
     /// - Parameter searchTargets: The search targets used to discover the devices.
-    @objc convenience public init(_ searchTargets: [String]) {
+    @objc public convenience init(_ searchTargets: [String]) {
         self.init(searchTargets, udpSocket: UDPSocket(delegateQueue: DispatchQueue(label: "org.ocast.udpsocket")))
     }
     
     /// Initializes the device discovery with the OCast search target.
     /// Newly-initialized discovery begin in a suspended state, so you need to call `resume` method to start the discovery.
-    @objc convenience override init() {
+    @objc public convenience override init() {
         self.init(["urn:cast-ocast-org:service:cast:1"])
     }
     
@@ -148,8 +148,8 @@ import Foundation
         
         do {
             try udpSocket.open(port: 0)
-            paused = false
-            stopped = false
+            isPaused = false
+            isStopped = false
             refresh()
             
             return true
@@ -164,10 +164,10 @@ import Foundation
     /// - Returns: `true` if the discovery is correctly stopped, otherwise `false`.
     @discardableResult
     @objc public func stop() -> Bool {
-        guard !stopped else { return false }
+        guard !isStopped else { return false }
         
-        paused = false
-        stopped = true
+        isPaused = false
+        isStopped = true
         close()
         
         return true
@@ -180,8 +180,8 @@ import Foundation
     @objc public func pause() -> Bool {
         guard isRunning else { return false }
         
-        paused = true
-        stopped = false
+        isPaused = true
+        isStopped = false
         close()
         
         return true
@@ -219,14 +219,14 @@ import Foundation
         cancelAllTasks()
         
         // Don't remove the devices when the discovery is paused
-        guard !paused else { return }
+        guard !isPaused else { return }
         
-        delegate?.deviceDiscovery(self, didRemoveDevices: devices)
+        delegate?.deviceDiscovery(self, didRemove: devices)
         
         discoveredDevices.removeAll()
         ssdpLastSeenDevices.removeAll()
         
-        delegate?.deviceDiscoveryDidStop(self, withError: error)
+        delegate?.deviceDiscoveryDidStop(self, with: error)
     }
     
     /// Sends a M-SEARCH request for each `searchTargets`.
@@ -234,7 +234,7 @@ import Foundation
         let sentDate = Date()
         for searchTarget in searchTargets {
             let host = ssdpMulticastAddress + ":" + String(ssdpMulticastPort)
-            guard let payload = SSDPMSearchRequest(host: host, maxTime: maxtime, searchTarget: searchTarget).data else { continue }
+            guard let payload = SSDPMSearchRequest(host: host, maxTime: maxTime, searchTarget: searchTarget).data else { continue }
             for _ in 1...2 {
                 udpSocket.send(payload: payload, toHost: ssdpMulticastAddress, onPort: ssdpMulticastPort)
             }
@@ -243,7 +243,7 @@ import Foundation
         let task = DispatchWorkItem { self.removeDevices(notSeenAfter: sentDate) }
         removeDevicesTasks.append(task)
         // Add 1 second for the network round-trip time.
-        DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(maxtime) + TimeInterval(1.0), execute: task)
+        DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(maxTime) + TimeInterval(1.0), execute: task)
     }
     
     /// Removes devices that not been seen after the `sentDate`.
@@ -259,7 +259,7 @@ import Foundation
         })
         
         if outdatedDevices.count > 0 {
-            self.delegate?.deviceDiscovery(self, didRemoveDevices: Array(outdatedDevices.values))
+            self.delegate?.deviceDiscovery(self, didRemove: Array(outdatedDevices.values))
             outdatedDevices.forEach { discoveredDevices.removeValue(forKey: $0.key) }
         }
     }
@@ -280,7 +280,7 @@ import Foundation
                     // and if the discovery has been stopped.
                     if self.discoveredDevices[UUID] == nil && self.isRunning {
                         self.discoveredDevices[UUID] = device
-                        self.delegate?.deviceDiscovery(self, didAddDevices: [device])
+                        self.delegate?.deviceDiscovery(self, didAdd: [device])
                     }
                 case .failure(_): break
                 }

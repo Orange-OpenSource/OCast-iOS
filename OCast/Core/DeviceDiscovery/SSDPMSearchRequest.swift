@@ -38,13 +38,13 @@ struct SSDPMSearchRequest {
     
     /// The data which represents a M-SEARCH request given structure properties.
     var data: Data? {
-        
-        var requestString = requestLine + "\r\n"
-        requestString.append("\(SSDPHeader.host.rawValue): \(host)\r\n")
-        requestString.append("\(SSDPHeader.man.rawValue): \(man)\r\n")
-        requestString.append("\(SSDPHeader.maxTime.rawValue): \(maxTime)\r\n")
-        requestString.append("\(SSDPHeader.searchTarget.rawValue): \(searchTarget)\r\n")
-        
-        return requestString.data(using: .utf8)
+        // Multiline adds the LF to obtain CRLF sequence
+        return """
+        \(requestLine)\r
+        \(SSDPHeader.host.rawValue): \(host)\r
+        \(SSDPHeader.man.rawValue): \(man)\r
+        \(SSDPHeader.maxTime.rawValue): \(maxTime)\r
+        \(SSDPHeader.searchTarget.rawValue): \(searchTarget)\r\n
+        """.data(using: .utf8)
     }
 }
