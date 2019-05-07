@@ -16,6 +16,7 @@
 //
 
 import Foundation
+import Starscream
 
 /// The delegate of a SocketProvider object must adopt the SocketProviderDelegate protocol.
 public protocol SocketProviderDelegate: class {
@@ -138,7 +139,7 @@ public final class SocketProvider: NSObject, WebSocketDelegate, WebSocketPongDel
             }
             socket.disableSSLCertValidation = sslConfiguration.disablesSSLCertificateValidation
             if let clientCertificate = sslConfiguration.clientCertificate {
-                socket.sslClientCertificate = try? SSLClientCertificate(pkcs12Data: clientCertificate.certificate,
+                socket.sslClientCertificate = try? SSLClientCertificate(pkcs12Url: clientCertificate.certificate,
                                                                         password: clientCertificate.password)
             }
         }

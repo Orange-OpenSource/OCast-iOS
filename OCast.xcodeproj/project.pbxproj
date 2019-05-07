@@ -63,12 +63,6 @@
 		97DC975120EA229100DBB1B0 /* ReferencePublicSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC973E20EA229100DBB1B0 /* ReferencePublicSettings.swift */; };
 		97DC975220EA229100DBB1B0 /* ReferenceDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC973F20EA229100DBB1B0 /* ReferenceDriver.swift */; };
 		97DC975320EA229100DBB1B0 /* SocketProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC974120EA229100DBB1B0 /* SocketProvider.swift */; };
-		97DC97A520EA302500DBB1B0 /* include.h in Headers */ = {isa = PBXBuildFile; fileRef = 97DC976120EA302400DBB1B0 /* include.h */; };
-		97DC97BA20EA302500DBB1B0 /* SSLClientCertificate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC978920EA302400DBB1B0 /* SSLClientCertificate.swift */; };
-		97DC97BB20EA302500DBB1B0 /* Starscream.h in Headers */ = {isa = PBXBuildFile; fileRef = 97DC978A20EA302400DBB1B0 /* Starscream.h */; };
-		97DC97BC20EA302500DBB1B0 /* Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC978B20EA302400DBB1B0 /* Compression.swift */; };
-		97DC97BD20EA302500DBB1B0 /* SSLSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC978C20EA302400DBB1B0 /* SSLSecurity.swift */; };
-		97DC97BE20EA302500DBB1B0 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC978D20EA302400DBB1B0 /* WebSocket.swift */; };
 		97DC97C220EA313800DBB1B0 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97DC97C120EA313800DBB1B0 /* libz.tbd */; };
 		97E3D9D7227891A7006D8D50 /* OCastXMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E3D9D6227891A7006D8D50 /* OCastXMLParser.swift */; };
 		CE64FD5651D1713F9E59186E /* Pods_OCastTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F9D010C25D3F8143329984C /* Pods_OCastTests.framework */; };
@@ -136,14 +130,6 @@
 		97DC973E20EA229100DBB1B0 /* ReferencePublicSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferencePublicSettings.swift; sourceTree = "<group>"; };
 		97DC973F20EA229100DBB1B0 /* ReferenceDriver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferenceDriver.swift; sourceTree = "<group>"; };
 		97DC974120EA229100DBB1B0 /* SocketProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketProvider.swift; sourceTree = "<group>"; };
-		97DC976120EA302400DBB1B0 /* include.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = include.h; sourceTree = "<group>"; };
-		97DC976220EA302400DBB1B0 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
-		97DC978920EA302400DBB1B0 /* SSLClientCertificate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSLClientCertificate.swift; sourceTree = "<group>"; };
-		97DC978A20EA302400DBB1B0 /* Starscream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Starscream.h; sourceTree = "<group>"; };
-		97DC978B20EA302400DBB1B0 /* Compression.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Compression.swift; sourceTree = "<group>"; };
-		97DC978C20EA302400DBB1B0 /* SSLSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSLSecurity.swift; sourceTree = "<group>"; };
-		97DC978D20EA302400DBB1B0 /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
-		97DC978E20EA302400DBB1B0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		97DC97C120EA313800DBB1B0 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		97E3D9D6227891A7006D8D50 /* OCastXMLParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastXMLParser.swift; sourceTree = "<group>"; };
 		B8FF8FE0EA17292D67A6ED01 /* Pods-OCastTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-OCastTests/Pods-OCastTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -332,7 +318,6 @@
 			children = (
 				97DC973C20EA229100DBB1B0 /* Driver */,
 				97DC974020EA229100DBB1B0 /* Network */,
-				97DC975420EA302400DBB1B0 /* Starscream */,
 			);
 			path = ReferenceDriver;
 			sourceTree = "<group>";
@@ -356,38 +341,6 @@
 			path = Network;
 			sourceTree = "<group>";
 		};
-		97DC975420EA302400DBB1B0 /* Starscream */ = {
-			isa = PBXGroup;
-			children = (
-				97DC978820EA302400DBB1B0 /* Sources */,
-				97DC976020EA302400DBB1B0 /* zlib */,
-			);
-			name = Starscream;
-			path = OCast/Starscream;
-			sourceTree = SOURCE_ROOT;
-		};
-		97DC976020EA302400DBB1B0 /* zlib */ = {
-			isa = PBXGroup;
-			children = (
-				97DC976120EA302400DBB1B0 /* include.h */,
-				97DC976220EA302400DBB1B0 /* module.modulemap */,
-			);
-			path = zlib;
-			sourceTree = "<group>";
-		};
-		97DC978820EA302400DBB1B0 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				97DC978920EA302400DBB1B0 /* SSLClientCertificate.swift */,
-				97DC978A20EA302400DBB1B0 /* Starscream.h */,
-				97DC978B20EA302400DBB1B0 /* Compression.swift */,
-				97DC978C20EA302400DBB1B0 /* SSLSecurity.swift */,
-				97DC978D20EA302400DBB1B0 /* WebSocket.swift */,
-				97DC978E20EA302400DBB1B0 /* Info.plist */,
-			);
-			path = Sources;
-			sourceTree = "<group>";
-		};
 		C5C01EFD019F57267C63563B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -406,9 +359,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				97DC97BB20EA302500DBB1B0 /* Starscream.h in Headers */,
 				97AF814920EA0EAD00C502D5 /* OCast.h in Headers */,
-				97DC97A520EA302500DBB1B0 /* include.h in Headers */,
 				9726F0BA20EFA6E400BAE3BC /* WifiSecurity.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -541,15 +492,15 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-OCastTests/Pods-OCastTests-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Swifter/Swifter.framework",
 				"${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework",
 				"${BUILT_PRODUCTS_DIR}/DynamicCodable/DynamicCodable.framework",
+				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swifter.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CocoaAsyncSocket.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DynamicCodable.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -598,7 +549,6 @@
 				8532EC062264B74A0080062F /* OCastDomainWebApp.swift in Sources */,
 				97DC974420EA229100DBB1B0 /* Settings.swift in Sources */,
 				97DC974C20EA229100DBB1B0 /* ApplicationController.swift in Sources */,
-				97DC97BD20EA302500DBB1B0 /* SSLSecurity.swift in Sources */,
 				97DC974220EA229100DBB1B0 /* Link.swift in Sources */,
 				9790DFFB227C707A0031A70F /* SSDPMSearchRequest.swift in Sources */,
 				97DC974820EA229100DBB1B0 /* Private.swift in Sources */,
@@ -613,10 +563,7 @@
 				8532EC072264B74A0080062F /* OCastDomainSettings.swift in Sources */,
 				9790DFFD227C707A0031A70F /* SSDPHeader.swift in Sources */,
 				97DC975320EA229100DBB1B0 /* SocketProvider.swift in Sources */,
-				97DC97BE20EA302500DBB1B0 /* WebSocket.swift in Sources */,
-				97DC97BC20EA302500DBB1B0 /* Compression.swift in Sources */,
 				97DC974720EA229100DBB1B0 /* HttpManager.swift in Sources */,
-				97DC97BA20EA302500DBB1B0 /* SSLClientCertificate.swift in Sources */,
 				9790DFF9227C707A0031A70F /* UPNPService.swift in Sources */,
 				97DC974620EA229100DBB1B0 /* OCastLog.swift in Sources */,
 				9790DFF8227C707A0031A70F /* DeviceDiscovery.swift in Sources */,
@@ -716,7 +663,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_INCLUDE_PATHS = $SRCROOT/OCast/Starscream/zlib;
+				SWIFT_INCLUDE_PATHS = "$SRCROOT/OCast/Starscream/zlib";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -774,7 +721,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_INCLUDE_PATHS = $SRCROOT/OCast/Starscream/zlib;
+				SWIFT_INCLUDE_PATHS = "$SRCROOT/OCast/Starscream/zlib";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;

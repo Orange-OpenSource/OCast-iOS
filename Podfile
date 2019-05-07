@@ -12,13 +12,12 @@ target :OCast do
     project 'OCast.xcodeproj'
     pod 'CocoaAsyncSocket', '7.6.3'
     pod 'DynamicCodable', '1.0'
+    pod 'Starscream', '3.1.0'
 end
 
 target :OCastTests do
     platform :ios, '8.0'
     project 'OCast.xcodeproj'
-    #pod 'CocoaAsyncSocket', '7.6.3'
-    pod 'Swifter', '1.4.6'
 end
 
 target :OCastDemoSwift do

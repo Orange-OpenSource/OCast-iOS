@@ -9,19 +9,20 @@ PODS:
     - DynamicCodable (= 1.0)
   - OCast/ReferenceDriver (2.0.0):
     - OCast/Core
-  - Swifter (1.4.6)
+    - Starscream (= 3.1.0)
+  - Starscream (3.1.0)
 
 DEPENDENCIES:
   - CocoaAsyncSocket (= 7.6.3)
   - DynamicCodable (= 1.0)
   - OCast (from `./`)
-  - Swifter (= 1.4.6)
+  - Starscream (= 3.1.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - CocoaAsyncSocket
     - DynamicCodable
-    - Swifter
+    - Starscream
 
 EXTERNAL SOURCES:
   OCast:
@@ -30,9 +31,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   CocoaAsyncSocket: eafaa68a7e0ec99ead0a7b35015e0bf25d2c8987
   DynamicCodable: 2cf558d057b3e6540552943254e1c9eeb706dde2
-  OCast: 233949a354972cfccfc3e9d353939a050f6ac52d
-  Swifter: 2ed278fbf7b16cbe97269eb56d8e8749b1ec4042
+  OCast: 49aec94e7dca4931d451ca3efa7f84950eccdac1
+  Starscream: 08172b481e145289c4930cb567230fb55897cfa4
 
-PODFILE CHECKSUM: 7ef807ece4406a1bfd42277f083dc3a3677d2821
+PODFILE CHECKSUM: b9577627f5f1d4214a3ba96e2f29b729f1a9eb4b
 
 COCOAPODS: 1.6.1
