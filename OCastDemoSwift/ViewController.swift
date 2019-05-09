@@ -21,7 +21,7 @@ import OCast
 class ViewController: UIViewController, DeviceDiscoveryDelegate, DeviceManagerDelegate, MediaControllerDelegate {
     
     /// The object to discover the devices
-    private let deviceDiscovery = DeviceDiscovery(forTargets: [ReferenceDriver.searchTarget])
+    private let deviceDiscovery = DeviceDiscovery([ReferenceDriver.searchTarget])
     
     /// The `DeviceManager`
     private var deviceManager: DeviceManager?
@@ -53,7 +53,7 @@ class ViewController: UIViewController, DeviceDiscoveryDelegate, DeviceManagerDe
         
         // Launch the discovery process
         deviceDiscovery.delegate = self
-        deviceDiscovery.start()
+        deviceDiscovery.resume()
     }
     
     // MARK: Private methods
@@ -117,9 +117,9 @@ class ViewController: UIViewController, DeviceDiscoveryDelegate, DeviceManagerDe
     
     // MARK: DeviceDiscoveryDelegate methods
     
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAddDevice device: Device) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [Device]) {
         // Only one device (the first found)
-        guard deviceManager == nil else { return }
+        guard deviceManager == nil, let device = devices.first else { return }
         
         // Create the device manager
         deviceManager = DeviceManager(with: device, sslConfiguration: nil)
@@ -137,14 +137,16 @@ class ViewController: UIViewController, DeviceDiscoveryDelegate, DeviceManagerDe
                                              onError: { _ in })
     }
     
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemoveDevice device: Device) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [Device]) {
+        guard let device = devices.first else { return }
+        
         if deviceManager?.device == device {
             deviceManager = nil
             resetUI()
         }
     }
     
-    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, withError error: Error?) {}
+    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, with error: Error?) {}
     
     // MARK: DeviceManagerDelegate methods
     

@@ -21,8 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		85225F822278ABC200FDAFC3 /* DIALService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85225F812278ABC200FDAFC3 /* DIALService.swift */; };
-		85225F842278ABCE00FDAFC3 /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85225F832278ABCE00FDAFC3 /* HTTPRequest.swift */; };
+		85225F882281BD9100FDAFC3 /* DIALService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85225F872281BD9100FDAFC3 /* DIALService.swift */; };
 		8532EC052264B74A0080062F /* OCastDomainGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC012264B74A0080062F /* OCastDomainGeneral.swift */; };
 		8532EC062264B74A0080062F /* OCastDomainWebApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC022264B74A0080062F /* OCastDomainWebApp.swift */; };
 		8532EC072264B74A0080062F /* OCastDomainSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC032264B74A0080062F /* OCastDomainSettings.swift */; };
@@ -30,6 +29,22 @@
 		970856C32278A2B000175A1B /* TestOCastXMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970856C22278A2B000175A1B /* TestOCastXMLParser.swift */; };
 		9726F0BA20EFA6E400BAE3BC /* WifiSecurity.h in Headers */ = {isa = PBXBuildFile; fileRef = 9726F0B920EFA6E400BAE3BC /* WifiSecurity.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9751ADC420F655C200815600 /* ReferenceDriverErrorCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9751ADC320F655C200815600 /* ReferenceDriverErrorCode.swift */; };
+		9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */; };
+		9790DFF8227C707A0031A70F /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF1227C707A0031A70F /* DeviceDiscovery.swift */; };
+		9790DFF9227C707A0031A70F /* UPNPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF2227C707A0031A70F /* UPNPService.swift */; };
+		9790DFFA227C707A0031A70F /* SSDPResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF3227C707A0031A70F /* SSDPResponseParser.swift */; };
+		9790DFFB227C707A0031A70F /* SSDPMSearchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF4227C707A0031A70F /* SSDPMSearchRequest.swift */; };
+		9790DFFC227C707A0031A70F /* UDPSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF5227C707A0031A70F /* UDPSocket.swift */; };
+		9790DFFD227C707A0031A70F /* SSDPHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF6227C707A0031A70F /* SSDPHeader.swift */; };
+		9790E006227C70940031A70F /* TestSSDPMSearchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFFE227C70930031A70F /* TestSSDPMSearchRequest.swift */; };
+		9790E007227C70940031A70F /* MockURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFFF227C70930031A70F /* MockURLSession.swift */; };
+		9790E008227C70940031A70F /* TestSSDPMSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E000227C70930031A70F /* TestSSDPMSearchResponse.swift */; };
+		9790E009227C70940031A70F /* TestSSDPResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E001227C70930031A70F /* TestSSDPResponseParser.swift */; };
+		9790E00A227C70940031A70F /* TestUPNPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E002227C70930031A70F /* TestUPNPService.swift */; };
+		9790E00B227C70940031A70F /* MockUDPSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E003227C70930031A70F /* MockUDPSocket.swift */; };
+		9790E00C227C70940031A70F /* MockUPNPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E004227C70940031A70F /* MockUPNPService.swift */; };
+		9790E00D227C70940031A70F /* TestDeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E005227C70940031A70F /* TestDeviceDiscovery.swift */; };
+		9790E00F227C70D70031A70F /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E00E227C70D70031A70F /* HTTPRequest.swift */; };
 		97AF814220EA0EAD00C502D5 /* OCast.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97AF813820EA0EAD00C502D5 /* OCast.framework */; };
 		97AF814920EA0EAD00C502D5 /* OCast.h in Headers */ = {isa = PBXBuildFile; fileRef = 97AF813B20EA0EAD00C502D5 /* OCast.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		97DC974220EA229100DBB1B0 /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC972720EA229100DBB1B0 /* Link.swift */; };
@@ -40,7 +55,6 @@
 		97DC974720EA229100DBB1B0 /* HttpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC972D20EA229100DBB1B0 /* HttpManager.swift */; };
 		97DC974820EA229100DBB1B0 /* Private.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC972F20EA229100DBB1B0 /* Private.swift */; };
 		97DC974920EA229100DBB1B0 /* Public.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC973020EA229100DBB1B0 /* Public.swift */; };
-		97DC974A20EA229100DBB1B0 /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC973220EA229100DBB1B0 /* DeviceDiscovery.swift */; };
 		97DC974B20EA229100DBB1B0 /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC973320EA229100DBB1B0 /* DeviceManager.swift */; };
 		97DC974C20EA229100DBB1B0 /* ApplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC973520EA229100DBB1B0 /* ApplicationController.swift */; };
 		97DC974D20EA229100DBB1B0 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC973720EA229100DBB1B0 /* Stream.swift */; };
@@ -77,8 +91,7 @@
 		55997461E6B225FD51BD3D75 /* Pods-OCastTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OCastTests/Pods-OCastTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6F9D010C25D3F8143329984C /* Pods_OCastTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCastTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		72FBC7B997F2E02A32F442DE /* Pods-OCast.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast.release.xcconfig"; path = "Pods/Target Support Files/Pods-OCast/Pods-OCast.release.xcconfig"; sourceTree = "<group>"; };
-		85225F812278ABC200FDAFC3 /* DIALService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DIALService.swift; path = Utils/DIALService.swift; sourceTree = "<group>"; };
-		85225F832278ABCE00FDAFC3 /* HTTPRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
+		85225F872281BD9100FDAFC3 /* DIALService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DIALService.swift; path = Utils/DIALService.swift; sourceTree = "<group>"; };
 		8532EC012264B74A0080062F /* OCastDomainGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainGeneral.swift; path = Models/OCastDomainGeneral.swift; sourceTree = "<group>"; };
 		8532EC022264B74A0080062F /* OCastDomainWebApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainWebApp.swift; path = Models/OCastDomainWebApp.swift; sourceTree = "<group>"; };
 		8532EC032264B74A0080062F /* OCastDomainSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainSettings.swift; path = Models/OCastDomainSettings.swift; sourceTree = "<group>"; };
@@ -87,6 +100,22 @@
 		970856C22278A2B000175A1B /* TestOCastXMLParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestOCastXMLParser.swift; sourceTree = "<group>"; };
 		9726F0B920EFA6E400BAE3BC /* WifiSecurity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WifiSecurity.h; sourceTree = "<group>"; };
 		9751ADC320F655C200815600 /* ReferenceDriverErrorCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceDriverErrorCode.swift; sourceTree = "<group>"; };
+		9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSDPMSearchResponse.swift; sourceTree = "<group>"; };
+		9790DFF1227C707A0031A70F /* DeviceDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
+		9790DFF2227C707A0031A70F /* UPNPService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UPNPService.swift; sourceTree = "<group>"; };
+		9790DFF3227C707A0031A70F /* SSDPResponseParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSDPResponseParser.swift; sourceTree = "<group>"; };
+		9790DFF4227C707A0031A70F /* SSDPMSearchRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSDPMSearchRequest.swift; sourceTree = "<group>"; };
+		9790DFF5227C707A0031A70F /* UDPSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UDPSocket.swift; sourceTree = "<group>"; };
+		9790DFF6227C707A0031A70F /* SSDPHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSDPHeader.swift; sourceTree = "<group>"; };
+		9790DFFE227C70930031A70F /* TestSSDPMSearchRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestSSDPMSearchRequest.swift; sourceTree = "<group>"; };
+		9790DFFF227C70930031A70F /* MockURLSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockURLSession.swift; sourceTree = "<group>"; };
+		9790E000227C70930031A70F /* TestSSDPMSearchResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestSSDPMSearchResponse.swift; sourceTree = "<group>"; };
+		9790E001227C70930031A70F /* TestSSDPResponseParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestSSDPResponseParser.swift; sourceTree = "<group>"; };
+		9790E002227C70930031A70F /* TestUPNPService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestUPNPService.swift; sourceTree = "<group>"; };
+		9790E003227C70930031A70F /* MockUDPSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockUDPSocket.swift; sourceTree = "<group>"; };
+		9790E004227C70940031A70F /* MockUPNPService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockUPNPService.swift; sourceTree = "<group>"; };
+		9790E005227C70940031A70F /* TestDeviceDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDeviceDiscovery.swift; sourceTree = "<group>"; };
+		9790E00E227C70D70031A70F /* HTTPRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
 		97AF813820EA0EAD00C502D5 /* OCast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		97AF813B20EA0EAD00C502D5 /* OCast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCast.h; sourceTree = "<group>"; };
 		97AF813C20EA0EAD00C502D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -100,7 +129,6 @@
 		97DC972D20EA229100DBB1B0 /* HttpManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpManager.swift; sourceTree = "<group>"; };
 		97DC972F20EA229100DBB1B0 /* Private.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Private.swift; sourceTree = "<group>"; };
 		97DC973020EA229100DBB1B0 /* Public.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Public.swift; sourceTree = "<group>"; };
-		97DC973220EA229100DBB1B0 /* DeviceDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
 		97DC973320EA229100DBB1B0 /* DeviceManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
 		97DC973520EA229100DBB1B0 /* ApplicationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationController.swift; sourceTree = "<group>"; };
 		97DC973720EA229100DBB1B0 /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
@@ -162,9 +190,23 @@
 				8532EC042264B74A0080062F /* OCastDomainMedia.swift */,
 				8532EC032264B74A0080062F /* OCastDomainSettings.swift */,
 				8532EC022264B74A0080062F /* OCastDomainWebApp.swift */,
-				85225F812278ABC200FDAFC3 /* DIALService.swift */,
+				85225F872281BD9100FDAFC3 /* DIALService.swift */,
 			);
 			name = 2.0;
+			sourceTree = "<group>";
+		};
+		9790DFEF227C707A0031A70F /* DeviceDiscovery */ = {
+			isa = PBXGroup;
+			children = (
+				9790DFF1227C707A0031A70F /* DeviceDiscovery.swift */,
+				9790DFF6227C707A0031A70F /* SSDPHeader.swift */,
+				9790DFF4227C707A0031A70F /* SSDPMSearchRequest.swift */,
+				9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */,
+				9790DFF3227C707A0031A70F /* SSDPResponseParser.swift */,
+				9790DFF5227C707A0031A70F /* UDPSocket.swift */,
+				9790DFF2227C707A0031A70F /* UPNPService.swift */,
+			);
+			path = DeviceDiscovery;
 			sourceTree = "<group>";
 		};
 		97AF812E20EA0EAD00C502D5 = {
@@ -201,8 +243,16 @@
 		97AF814520EA0EAD00C502D5 /* OCastTests */ = {
 			isa = PBXGroup;
 			children = (
-				970856C22278A2B000175A1B /* TestOCastXMLParser.swift */,
 				97AF814820EA0EAD00C502D5 /* Info.plist */,
+				9790E003227C70930031A70F /* MockUDPSocket.swift */,
+				9790E004227C70940031A70F /* MockUPNPService.swift */,
+				9790DFFF227C70930031A70F /* MockURLSession.swift */,
+				9790E005227C70940031A70F /* TestDeviceDiscovery.swift */,
+				970856C22278A2B000175A1B /* TestOCastXMLParser.swift */,
+				9790DFFE227C70930031A70F /* TestSSDPMSearchRequest.swift */,
+				9790E000227C70930031A70F /* TestSSDPMSearchResponse.swift */,
+				9790E001227C70930031A70F /* TestSSDPResponseParser.swift */,
+				9790E002227C70930031A70F /* TestUPNPService.swift */,
 			);
 			path = OCastTests;
 			sourceTree = "<group>";
@@ -210,6 +260,7 @@
 		97DC972520EA229100DBB1B0 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				9790DFEF227C707A0031A70F /* DeviceDiscovery */,
 				8532EC002264B73E0080062F /* 2.0 */,
 				97DC972620EA229100DBB1B0 /* Driver */,
 				97DC972A20EA229100DBB1B0 /* Utils */,
@@ -233,11 +284,11 @@
 		97DC972A20EA229100DBB1B0 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				97DC972B20EA229100DBB1B0 /* XMLHelper.swift */,
+				97DC972D20EA229100DBB1B0 /* HttpManager.swift */,
+				9790E00E227C70D70031A70F /* HTTPRequest.swift */,
 				97DC972C20EA229100DBB1B0 /* OCastLog.swift */,
 				97E3D9D6227891A7006D8D50 /* OCastXMLParser.swift */,
-				97DC972D20EA229100DBB1B0 /* HttpManager.swift */,
-				85225F832278ABCE00FDAFC3 /* HTTPRequest.swift */,
+				97DC972B20EA229100DBB1B0 /* XMLHelper.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -255,7 +306,6 @@
 		97DC973120EA229100DBB1B0 /* Device */ = {
 			isa = PBXGroup;
 			children = (
-				97DC973220EA229100DBB1B0 /* DeviceDiscovery.swift */,
 				97DC973320EA229100DBB1B0 /* DeviceManager.swift */,
 			);
 			path = Device;
@@ -553,30 +603,36 @@
 				97DC974C20EA229100DBB1B0 /* ApplicationController.swift in Sources */,
 				97DC97BD20EA302500DBB1B0 /* SSLSecurity.swift in Sources */,
 				97DC974220EA229100DBB1B0 /* Link.swift in Sources */,
+				9790DFFB227C707A0031A70F /* SSDPMSearchRequest.swift in Sources */,
 				97DC974820EA229100DBB1B0 /* Private.swift in Sources */,
 				97DC975220EA229100DBB1B0 /* ReferenceDriver.swift in Sources */,
 				97DC974B20EA229100DBB1B0 /* DeviceManager.swift in Sources */,
+				9790DFFA227C707A0031A70F /* SSDPResponseParser.swift in Sources */,
 				8532EC082264B74A0080062F /* OCastDomainMedia.swift in Sources */,
 				97DC974320EA229100DBB1B0 /* Driver.swift in Sources */,
 				97DC974F20EA229100DBB1B0 /* Browser.swift in Sources */,
 				97DC975120EA229100DBB1B0 /* ReferencePublicSettings.swift in Sources */,
-				85225F822278ABC200FDAFC3 /* DIALService.swift in Sources */,
-				97DC974A20EA229100DBB1B0 /* DeviceDiscovery.swift in Sources */,
 				97DC974D20EA229100DBB1B0 /* Stream.swift in Sources */,
 				8532EC072264B74A0080062F /* OCastDomainSettings.swift in Sources */,
+				9790DFFD227C707A0031A70F /* SSDPHeader.swift in Sources */,
 				97DC975320EA229100DBB1B0 /* SocketProvider.swift in Sources */,
 				97DC97BE20EA302500DBB1B0 /* WebSocket.swift in Sources */,
 				97DC97BC20EA302500DBB1B0 /* Compression.swift in Sources */,
 				97DC974720EA229100DBB1B0 /* HttpManager.swift in Sources */,
 				97DC97BA20EA302500DBB1B0 /* SSLClientCertificate.swift in Sources */,
+				9790DFF9227C707A0031A70F /* UPNPService.swift in Sources */,
 				97DC974620EA229100DBB1B0 /* OCastLog.swift in Sources */,
+				9790DFF8227C707A0031A70F /* DeviceDiscovery.swift in Sources */,
+				9790DFFC227C707A0031A70F /* UDPSocket.swift in Sources */,
 				97DC974E20EA229100DBB1B0 /* MediaController.swift in Sources */,
 				8532EC052264B74A0080062F /* OCastDomainGeneral.swift in Sources */,
 				97DC975020EA229100DBB1B0 /* ReferenceLink.swift in Sources */,
 				9751ADC420F655C200815600 /* ReferenceDriverErrorCode.swift in Sources */,
-				85225F842278ABCE00FDAFC3 /* HTTPRequest.swift in Sources */,
+				9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */,
+				9790E00F227C70D70031A70F /* HTTPRequest.swift in Sources */,
 				97DC974920EA229100DBB1B0 /* Public.swift in Sources */,
 				97DC974520EA229100DBB1B0 /* XMLHelper.swift in Sources */,
+				85225F882281BD9100FDAFC3 /* DIALService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -584,7 +640,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9790E008227C70940031A70F /* TestSSDPMSearchResponse.swift in Sources */,
+				9790E009227C70940031A70F /* TestSSDPResponseParser.swift in Sources */,
+				9790E00B227C70940031A70F /* MockUDPSocket.swift in Sources */,
+				9790E00A227C70940031A70F /* TestUPNPService.swift in Sources */,
+				9790E00D227C70940031A70F /* TestDeviceDiscovery.swift in Sources */,
+				9790E007227C70940031A70F /* MockURLSession.swift in Sources */,
 				970856C32278A2B000175A1B /* TestOCastXMLParser.swift in Sources */,
+				9790E00C227C70940031A70F /* MockUPNPService.swift in Sources */,
+				9790E006227C70940031A70F /* TestSSDPMSearchRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

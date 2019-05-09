@@ -47,7 +47,7 @@ extension HttpProtocol {
         urlRequest.allHTTPHeaderFields = httpHeaders
 
         let urlSession = URLSession(configuration: .default)
-        let task = urlSession.dataTask(with: urlRequest) {
+        let task: URLSessionDataTask = urlSession.dataTask(with: urlRequest) {
             data, response, error in
 
             if let error = error {

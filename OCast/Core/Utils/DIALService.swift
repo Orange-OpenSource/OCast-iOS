@@ -18,25 +18,24 @@
 
 import Foundation
 
-public enum DIALError : Error {
+enum DIALError : Error {
     case httpRequest(HTTPRequestError)
     case badContentResponse
 }
 
-public struct DIALApplicationInfo {
+struct DIALApplicationInfo {
     public let app2appURL: String?
     public let version: String?
-    public let rel: String?
     public let runLink: String?
-    public let name: String?
-    public let state: String?
+    public let name: String
+    public let state: String
 }
 
-public class DIALService {
+class DIALService {
     
-    private var baseURL: String!
+    private let baseURL: String
     
-    public init(forURL url: String!) {
+    public init(forURL url: String) {
         baseURL = url
     }
     
@@ -44,24 +43,25 @@ public class DIALService {
     ///
     /// - Parameter completion: result
     public func info(ofApplication name: String, withCompletion completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> ()) {
-        HTTPRequest.launch(method: .GET, url: "\(baseURL!)/\(name)", httpHeaders: nil, body: nil) { result in
+        HTTPRequest.launch(method: .GET, url: "\(baseURL)/\(name)") { result in
             switch result {
             case .failure(let httpError):
                 completion(.failure(.httpRequest(httpError)))
                 return
-            case .success(let data): // success
+            case .success((let data, _)): // success
                 guard let data = data,
-                    let element = OCastXMLParser().parse(data: data)?["service"] else {
+                    let element = OCastXMLParser().parse(data: data)?["service"],
+                    let appName = element["name"]?.value,
+                     let state = element["state"]?.value else {
                         completion(.failure(.badContentResponse))
                         return
                 }
-                let state = element["state"]?.value
+               
                 let app2app = element["additionalData"]?["ocast:X_OCAST_App2AppURL"]?.value
                 let version = element["additionalData"]?["ocast:X_OCAST_Version"]?.value
-                let rel = element["link"]?.attributes?["rel"]
                 let runLink = element["link"]?.attributes?["href"]
-                let appName = element["name"]?.value
-                let info = DIALApplicationInfo(app2appURL: app2app, version: version, rel: rel, runLink: runLink, name: appName, state: state)
+                
+                let info = DIALApplicationInfo(app2appURL: app2app, version: version, runLink: runLink, name: appName, state: state)
                 completion(.success(info))
             }
         }
@@ -70,13 +70,13 @@ public class DIALService {
     /// Start the application
     ///
     /// - Parameter completion: result
-    public func start(application name: String, withCompletion completion: @escaping (Result<Bool, DIALError>) -> ()) {
-        HTTPRequest.launch(method: .POST, url: "\(baseURL!)/\(name)", httpHeaders: nil, body: nil) { result in
+    public func start(application name: String, withCompletion completion: @escaping (Result<Void, DIALError>) -> ()) {
+        HTTPRequest.launch(method: .POST, url: "\(baseURL)/\(name)", successCode: 201) { result in
             switch result {
             case .failure(let httpError):
                 completion(.failure(.httpRequest(httpError)))
             case .success(_):
-                completion(.success(true))
+                completion(.success(()))
             }
         }
     }
@@ -84,26 +84,32 @@ public class DIALService {
     /// Stop the application
     ///
     /// - Parameter completion: result
-    public func stop(application name: String, withCompletion completion: @escaping (Result<Bool, DIALError>) -> ()) {
+    public func stop(application name: String, withCompletion completion: @escaping (Result<Void, DIALError>) -> ()) {
         info(ofApplication:name) { result in
             switch result {
             case .failure(let error):
                 completion(.failure(error))
             case .success(let info):
-                if let runLink = info.runLink {
-                    HTTPRequest.launch(method: .DELETE, url: runLink, httpHeaders: nil, body: nil, completion: { result in
-                        switch result {
-                        case .failure(let httpError):
-                            completion(.failure(.httpRequest(httpError)))
-                        case .success(_):
-                            completion(.success(true))
-                        }
-                    })
+                var stopLink:String!
+                if  let runLink = info.runLink,
+                    let url = URL(string: runLink),
+                    let _ = url.host {
+                    stopLink = runLink
+                } else if let runLink = URL(string: self.baseURL)?.appendingPathComponent(info.runLink ?? "run").absoluteString {
+                    stopLink = runLink
                 } else {
                     completion(.failure(.badContentResponse))
+                    return
                 }
+                HTTPRequest.launch(method: .DELETE, url: stopLink, completion: { result in
+                    switch result {
+                    case .failure(let httpError):
+                        completion(.failure(.httpRequest(httpError)))
+                    case .success(_):
+                        completion(.success(()))
+                    }
+                })
             }
         }
     }
-    
 }
