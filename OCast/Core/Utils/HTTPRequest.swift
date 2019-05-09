@@ -55,12 +55,13 @@ enum HTTPMethod: String {
 }
 
 class HTTPRequest {
-    
+
     public static func launch(urlSession: URLSessionProtocol = URLSession(configuration: .default),
                               method: HTTPMethod = .GET,
                               url urlString: String,
                               httpHeaders: [String : String]? = nil,
                               body: String? = nil,
+                              successCode: Int = 200,
                               completion: ((Result<(Data?, [AnyHashable: Any]), HTTPRequestError>) -> ())?) {
         
         guard let url = URL(string: urlString) else {
@@ -78,12 +79,11 @@ class HTTPRequest {
                 completion?(.failure(.failed(error.localizedDescription)))
                 return
             }
-            
+
             if let httpResponse = response as? HTTPURLResponse {
-                switch httpResponse.statusCode {
-                case 200 ..< 300:
+                if successCode == httpResponse.statusCode {
                     completion?(.success((data, httpResponse.allHeaderFields)))
-                default:
+                } else {
                     completion?(.failure(.badCode(httpResponse.statusCode)))
                 }
             }
