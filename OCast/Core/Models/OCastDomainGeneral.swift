@@ -23,15 +23,30 @@ import Foundation
 
 public let OCastErrorDomain = "OCastError"
 
+public class OCastError: NSError {
+    
+    public convenience init(_ message: String) {
+        self.init(code: 0, message: message)
+    }
+    
+    public init(code: Int, message: String) {
+        super.init(domain: OCastErrorDomain, code: code, userInfo: ["Error": message])
+    }
+    
+    required convenience init?(coder aDecoder: NSCoder) {
+        self.init("Unknown")
+    }
+}
+
+public let kOCastDeviceDisconnectedEvent = "OCastDeviceDisconnectedEvent"
 public let kOCastPlaybackStatusEvent = "OCastPlaybackStatusEvent"
 public let kOCastMetadataChangedEvent = "OCastMetadataChangedEvent"
-public let kOCastFirmwareUpdateEvent = "OCastFirmwareUpdateEvent"
-public let kOCastCustomEvent = "OCastCustomEvent"
+public let kOCastUpdateStatusEvent = "OCastFirmwareUpdateEvent"
 
+public let OCastDeviceDisconnectedEventNotification = Notification.Name(kOCastDeviceDisconnectedEvent)
 public let OCastPlaybackStatusEventNotification = Notification.Name(kOCastPlaybackStatusEvent)
 public let OCastMetadataChangedEventNotification = Notification.Name(kOCastMetadataChangedEvent)
-public let OCastUpdateStatusEventNotification = Notification.Name(kOCastFirmwareUpdateEvent)
-public let OCastCustomEventNotification = Notification.Name(kOCastCustomEvent)
+public let OCastUpdateStatusEventNotification = Notification.Name(kOCastUpdateStatusEvent)
 
 public let OCastTransportErrors = [
     "json_format_error": "There is an error in the JSON formatting",

@@ -22,10 +22,13 @@
 
 /* Begin PBXBuildFile section */
 		85225F882281BD9100FDAFC3 /* DIALService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85225F872281BD9100FDAFC3 /* DIALService.swift */; };
+		85225F8B2284651E00FDAFC3 /* OCastDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85225F8A2284651E00FDAFC3 /* OCastDevice.swift */; };
+		85225F8D228498BC00FDAFC3 /* OCastReferenceDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85225F8C228498BC00FDAFC3 /* OCastReferenceDevice.swift */; };
 		8532EC052264B74A0080062F /* OCastDomainGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC012264B74A0080062F /* OCastDomainGeneral.swift */; };
 		8532EC062264B74A0080062F /* OCastDomainWebApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC022264B74A0080062F /* OCastDomainWebApp.swift */; };
 		8532EC072264B74A0080062F /* OCastDomainSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC032264B74A0080062F /* OCastDomainSettings.swift */; };
 		8532EC082264B74A0080062F /* OCastDomainMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8532EC042264B74A0080062F /* OCastDomainMedia.swift */; };
+		8549ABB1228C165B00E205A3 /* OCastReferenceDeviceCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ABB0228C165B00E205A3 /* OCastReferenceDeviceCommand.swift */; };
 		970856C32278A2B000175A1B /* TestOCastXMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970856C22278A2B000175A1B /* TestOCastXMLParser.swift */; };
 		9726F0BA20EFA6E400BAE3BC /* WifiSecurity.h in Headers */ = {isa = PBXBuildFile; fileRef = 9726F0B920EFA6E400BAE3BC /* WifiSecurity.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9751ADC420F655C200815600 /* ReferenceDriverErrorCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9751ADC320F655C200815600 /* ReferenceDriverErrorCode.swift */; };
@@ -87,10 +90,13 @@
 		6F9D010C25D3F8143329984C /* Pods_OCastTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCastTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		72FBC7B997F2E02A32F442DE /* Pods-OCast.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast.release.xcconfig"; path = "Pods/Target Support Files/Pods-OCast/Pods-OCast.release.xcconfig"; sourceTree = "<group>"; };
 		85225F872281BD9100FDAFC3 /* DIALService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DIALService.swift; path = Utils/DIALService.swift; sourceTree = "<group>"; };
+		85225F8A2284651E00FDAFC3 /* OCastDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDevice.swift; path = Device/OCastDevice.swift; sourceTree = "<group>"; };
+		85225F8C228498BC00FDAFC3 /* OCastReferenceDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OCastReferenceDevice.swift; path = Device/OCastReferenceDevice.swift; sourceTree = "<group>"; };
 		8532EC012264B74A0080062F /* OCastDomainGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainGeneral.swift; path = Models/OCastDomainGeneral.swift; sourceTree = "<group>"; };
 		8532EC022264B74A0080062F /* OCastDomainWebApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainWebApp.swift; path = Models/OCastDomainWebApp.swift; sourceTree = "<group>"; };
 		8532EC032264B74A0080062F /* OCastDomainSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainSettings.swift; path = Models/OCastDomainSettings.swift; sourceTree = "<group>"; };
 		8532EC042264B74A0080062F /* OCastDomainMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDomainMedia.swift; path = Models/OCastDomainMedia.swift; sourceTree = "<group>"; };
+		8549ABB0228C165B00E205A3 /* OCastReferenceDeviceCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCastReferenceDeviceCommand.swift; sourceTree = "<group>"; };
 		94033FF71A7BA57C853AF46A /* Pods_OCast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		970856C22278A2B000175A1B /* TestOCastXMLParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestOCastXMLParser.swift; sourceTree = "<group>"; };
 		9726F0B920EFA6E400BAE3BC /* WifiSecurity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WifiSecurity.h; sourceTree = "<group>"; };
@@ -179,6 +185,9 @@
 				8532EC032264B74A0080062F /* OCastDomainSettings.swift */,
 				8532EC022264B74A0080062F /* OCastDomainWebApp.swift */,
 				85225F872281BD9100FDAFC3 /* DIALService.swift */,
+				85225F8A2284651E00FDAFC3 /* OCastDevice.swift */,
+				85225F8C228498BC00FDAFC3 /* OCastReferenceDevice.swift */,
+				8549ABB0228C165B00E205A3 /* OCastReferenceDeviceCommand.swift */,
 			);
 			name = 2.0;
 			sourceTree = "<group>";
@@ -562,6 +571,7 @@
 				97DC974B20EA229100DBB1B0 /* DeviceManager.swift in Sources */,
 				9790DFFA227C707A0031A70F /* SSDPResponseParser.swift in Sources */,
 				8532EC082264B74A0080062F /* OCastDomainMedia.swift in Sources */,
+				8549ABB1228C165B00E205A3 /* OCastReferenceDeviceCommand.swift in Sources */,
 				97DC974320EA229100DBB1B0 /* Driver.swift in Sources */,
 				97DC974F20EA229100DBB1B0 /* Browser.swift in Sources */,
 				97DC975120EA229100DBB1B0 /* ReferencePublicSettings.swift in Sources */,
@@ -582,7 +592,9 @@
 				9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */,
 				9790E00F227C70D70031A70F /* HTTPRequest.swift in Sources */,
 				97DC974920EA229100DBB1B0 /* Public.swift in Sources */,
+				85225F8B2284651E00FDAFC3 /* OCastDevice.swift in Sources */,
 				97DC974520EA229100DBB1B0 /* XMLHelper.swift in Sources */,
+				85225F8D228498BC00FDAFC3 /* OCastReferenceDevice.swift in Sources */,
 				85225F882281BD9100FDAFC3 /* DIALService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
