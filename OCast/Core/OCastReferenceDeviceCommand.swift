@@ -25,70 +25,104 @@ import Foundation
 extension OCastDevice {
     
     // MARK: Media commands
-    @objc
-    public func prepare(_ command: MediaPrepareCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "prepare", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: command, andOptions: nil, andCompletion: handler)
+    
+    public func prepare(_ prepare: MediaPrepareCommand, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "prepare", params: prepare, options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func track(_ command: MediaTrackCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "track", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: command, andOptions: nil, andCompletion: handler)
+    public func setTrack(_ track: MediaTrackCommand, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "track", params: track, options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func play(_ command: MediaPlayCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "play", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: command, andOptions: nil, andCompletion: handler)
+    public func play(at position: Double, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "play", params: MediaPlayCommand(position: position), options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func stop(withOptions options: [String: Any]?, andCompletion handler : @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "stop", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: MediaStopCommand(), andOptions: nil, andCompletion: handler)
+    public func stop(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "stop", params: MediaStopCommand(), options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func resume(withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "resume", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: MediaResumeCommand(), andOptions: nil, andCompletion: handler)
+    public func resume(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "resume", params: MediaResumeCommand(), options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func volume(_ command: MediaVolumeCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "volume", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: command, andOptions: nil, andCompletion: handler)
+    public func setVolume(_ volume: Float, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "volume", params: MediaVolumeCommand(volume: volume), options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func pause(withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "pause", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: MediaPauseCommand(), andOptions: nil, andCompletion: handler)
+    public func pause(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "pause", params: MediaPauseCommand(), options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func seek(_ command: MediaSeekCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "seek", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: command, andOptions: nil, andCompletion: handler)
+    public func seek(to position: Double, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "seek", params: MediaSeekCommand(position: position), options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func metadata(withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithResultHandler<MediaMetadataChanged>) {
-        sendCustomCommand(name: "getMetadata", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: MediaGetMetadataCommand(), andOptions: options, andCompletion: handler)
+    public func metadata(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithResultHandler<MediaMetadataChanged>) {
+        let command = OCastDataLayer(name: "getMetadata", params: MediaGetMetadataCommand(), options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func playbackStatus(withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithResultHandler<MediaPlaybackStatus>) {
-        sendCustomCommand(name: "getPlaybackStatus", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: MediaGetPlaybackStatusCommand(), andOptions: options, andCompletion: handler)
+    public func playbackStatus(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithResultHandler<MediaPlaybackStatus>) {
+        let command = OCastDataLayer(name: "getPlaybackStatus", params: MediaGetPlaybackStatusCommand(), options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func mute(_ isMuted: Bool, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "mute", forDomain: OCastDomainName.browser, andService: "org.ocast.media", withParams: MediaMuteCommand(mute: isMuted), andOptions: nil, andCompletion: handler)
+    public func mute(_ flag: Bool, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "mute", params: MediaMuteCommand(mute: flag), options: options)
+        let message = OCastApplicationLayer(service: OCastMediaServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    // MARK: Settings commands
-    public func updateStatusWithCompletionHandler(_ handler: @escaping CommandWithResultHandler<SettingsUpdateStatus>) {
-        sendCustomCommand(name: "getUpdateStatus", forDomain: OCastDomainName.settings, andService: "org.ocast.settings.device", withParams: SettingsGetUpdateStatusCommand(), andOptions: nil, andCompletion: handler)
+    // MARK: Device settings commands
+    
+    public func updateStatus(_ completion: @escaping CommandWithResultHandler<SettingsUpdateStatus>) {
+        let command = OCastDataLayer(name: "getUpdateStatus", params: SettingsGetUpdateStatusCommand())
+        let message = OCastApplicationLayer(service: OCastDeviceSettingsServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func deviceIDWithCompletionHandler(_ handler: @escaping CommandWithResultHandler<SettingsDeviceID>) {
-        sendCustomCommand(name: "getDeviceID", forDomain: OCastDomainName.settings, andService: "org.ocast.settings.device", withParams: SettingsGetDeviceIDCommand(), andOptions: nil, andCompletion: handler)
+    public func deviceID(_ completion: @escaping CommandWithResultHandler<SettingsDeviceID>) {
+        let command = OCastDataLayer(name: "getDeviceID", params: SettingsGetDeviceIDCommand())
+        let message = OCastApplicationLayer(service: OCastDeviceSettingsServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    // MARK: Settings input commands
-    public func keyPressed(_ command: SettingsKeyPressedCommand, withCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "keyPressed", forDomain: OCastDomainName.settings, andService: "org.ocast.settings.input", withParams: command, andOptions: nil, andCompletion: handler)
+    // MARK: Input settings commands
+    
+    public func sendKeyEvent(_ keyEvent: SettingsKeyPressedCommand, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "keyPressed", params: keyEvent)
+        let message = OCastApplicationLayer(service: OCastInputSettingsServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func mouseEvent(_ command: SettingsMouseEventCommand, withCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "mouseEvent", forDomain: OCastDomainName.settings, andService: "org.ocast.settings.input", withParams: command, andOptions: nil, andCompletion: handler)
+    public func sendMouseEvent(_ mouseEvent: SettingsMouseEventCommand, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "mouseEvent", params: mouseEvent)
+        let message = OCastApplicationLayer(service: OCastInputSettingsServiceName, data: command)
+        send(message, completion: completion)
     }
     
-    public func gamepadEvent(_ command: SettingsGamepadEventCommand, withCompletion handler: @escaping CommandWithoutResultHandler) {
-        sendCustomCommand(name: "gamepadEvent", forDomain: OCastDomainName.settings, andService: "org.ocast.settings.input", withParams: command, andOptions: nil, andCompletion: handler)
+    public func sendGamepadEvent(_ gamepadEvent: SettingsGamepadEventCommand, completion: @escaping CommandWithoutResultHandler) {
+        let command = OCastDataLayer(name: "gamepadEvent", params: gamepadEvent)
+        let message = OCastApplicationLayer(service: OCastInputSettingsServiceName, data: command)
+        send(message, completion: completion)
     }
 }

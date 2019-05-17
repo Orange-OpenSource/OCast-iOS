@@ -19,19 +19,13 @@
 //
 
 import Foundation
-import DynamicCodable
-
-@objc
-public protocol OCastDeviceDelegate {
-    func device(_ device: OCastDevicePublic, didDisconnectWith error: Error?)
-}
 
 @objc
 public enum DeviceState: Int {
-    case connecting = 0
+    case disconnected
+    case connecting
     case connected
     case disconnecting
-    case idle
 }
 
 @objc
@@ -43,11 +37,12 @@ public protocol OCastSSDPDevice {
     static var searchTarget: String { get }
 }
 
-public typealias CommandWithResultHandler<T> = (_ result: T?, _ error: Error?) -> ()
-public typealias CommandWithoutResultHandler = (_ error:Error?) -> ()
+public typealias CommandWithResultHandler<T> = (_ result: T?, _ error: Error?) -> () // ResultHandler
+public typealias CommandWithoutResultHandler = (_ error: Error?) -> ()// NoResultHandler
 public typealias EventHandler = (_ data: Data) -> ()
 
 @objc
+// TODO: renommer en OCastDevice quand on aura viré le SDK v1
 public protocol OCastDevicePublic {
     
     // Properties
@@ -57,39 +52,48 @@ public protocol OCastDevicePublic {
     var sslConfiguration: SSLConfiguration { set get }
         
     init(ipAddress: String, applicationURL: String)
+        
     // Connection
-    func connect(withCompletion handler: CommandWithoutResultHandler?)
-    func connect(withSSLConfiguration configuration: SSLConfiguration, completion handler: CommandWithoutResultHandler?)
-    func disconnect(withCompletion handler: CommandWithoutResultHandler?)
+    
+    func connect(_ configuration: SSLConfiguration, completion: @escaping CommandWithoutResultHandler)
+    func disconnect(_ completion: @escaping CommandWithoutResultHandler)
+        
     // Application
-    func startApplicationWithCompletionHandler(_ handler: @escaping (_: Bool, _: Error?) -> ())
-    func stopApplicationWithCompletionHandler(_ handler: @escaping (_: Bool, _: Error?) -> ())
+    
+    func startApplication(_ completion: @escaping CommandWithoutResultHandler)
+    func stopApplication(_ completion: @escaping CommandWithoutResultHandler)
+    
     // Events
     func registerEvent(_ name: String, withHandler handler: @escaping EventHandler)
+    
     // Media commands
-    func prepare(_ command: MediaPrepareCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
-    func track(_ command: MediaTrackCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
-    func play(_ command: MediaPlayCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
-    func stop(withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
-    func resume(withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
-    func volume(_ command: MediaVolumeCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
-    func pause(withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
-    func seek(_ command: MediaSeekCommand, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
-    func metadata(withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithResultHandler<MediaMetadataChanged>)
-    func playbackStatus(withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithResultHandler<MediaPlaybackStatus>)
-    func mute(_ isMuted: Bool, withOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
+    
+    func prepare(_ prepare: MediaPrepareCommand, withOptions options: [String: Any]?, completion: @escaping CommandWithoutResultHandler)
+    func setTrack(_ track: MediaTrackCommand, withOptions options: [String: Any]?, completion: @escaping CommandWithoutResultHandler)
+    func play(at position: Double, withOptions options: [String: Any]?, completion: @escaping CommandWithoutResultHandler)
+    func stop(withOptions options: [String: Any]?, completion: @escaping CommandWithoutResultHandler)
+    func resume(withOptions options: [String: Any]?, completion: @escaping CommandWithoutResultHandler)
+    func setVolume(_ volume: Float, withOptions options: [String: Any]?, completion: @escaping CommandWithoutResultHandler)
+    func pause(withOptions options: [String: Any]?, completion: @escaping CommandWithoutResultHandler)
+    func seek(to position: Double, withOptions options: [String: Any]?, completion: @escaping CommandWithoutResultHandler)
+    func metadata(withOptions options: [String: Any]?, completion: @escaping CommandWithResultHandler<MediaMetadataChanged>)
+    func playbackStatus(withOptions options: [String: Any]?, completion: @escaping CommandWithResultHandler<MediaPlaybackStatus>)
+    func mute(_ flag: Bool, withOptions options: [String: Any]?, completion: @escaping CommandWithoutResultHandler)
+    
     // Settings commands
-    func updateStatusWithCompletionHandler(_ handler: @escaping CommandWithResultHandler<SettingsUpdateStatus>)
-    func deviceIDWithCompletionHandler(_ handler: @escaping CommandWithResultHandler<SettingsDeviceID>)
+    
+    func updateStatus(_ completion: @escaping CommandWithResultHandler<SettingsUpdateStatus>)
+    func deviceID(_ completion: @escaping CommandWithResultHandler<SettingsDeviceID>)
+    
     // Settings input commands
-    func keyPressed(_ command: SettingsKeyPressedCommand, withCompletion handler: @escaping CommandWithoutResultHandler)
-    func mouseEvent(_ command: SettingsMouseEventCommand, withCompletion handler: @escaping CommandWithoutResultHandler)
-    func gamepadEvent(_ command: SettingsGamepadEventCommand, withCompletion handler: @escaping CommandWithoutResultHandler)
+    
+    func sendKeyEvent(_ keyEvent: SettingsKeyPressedCommand, completion: @escaping CommandWithoutResultHandler)
+    func sendMouseEvent(_ mouseEvent: SettingsMouseEventCommand, completion: @escaping CommandWithoutResultHandler)
+    func sendGamepadEvent(_ gamepadEvent: SettingsGamepadEventCommand, completion: @escaping CommandWithoutResultHandler)
 }
 
-public protocol OCastDeviceCustom {
-    // Custom commands
-    func sendCustomCommand<T: OCastMessage>(name: String, forDomain domain: OCastDomainName, andService service: String, withParams params: T, andOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler)
+public protocol OCastSenderDevice {
     
-    func sendCustomCommand<T: OCastMessage>(name: String, forDomain domain: OCastDomainName, andService service: String, withParams params: T, andOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithResultHandler<String>)
+    func send<T: OCastMessage>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName, completion: @escaping CommandWithoutResultHandler)
+    func send<T: OCastMessage, U: Decodable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName, completion: @escaping CommandWithResultHandler<U>)
 }

@@ -21,20 +21,41 @@
 import DynamicCodable
 import Foundation
 
-public let OCastErrorDomain = "OCastError"
+public enum OCastError: Int, Error {
+    case wrongStateDisconnected
+    case wrongStateConnecting
+    case wrongStateConnected
+    case wrongStateDisconnecting
+    case applicationNameNotSet
+    case badApplicationURL
+    case websocketConnectionEventNotReceived
+    case badReplyFormatReceived
+    case misformedCommand
+    case transportError
+    case badCommand
+    case deviceHasBeenDisconnected
+}
 
-public class OCastError: NSError {
+extension OCastError {
+    var localizedDescription: String {
+        return "Operation failed : \(String(describing: self)) (code: \((self as NSError).code))"
+    }
+}
+
+public let OCastErrorDomain = "org.ocast.error"
+
+public class NSOCastError: NSError {
     
-    public convenience init(_ message: String) {
-        self.init(code: 0, message: message)
+    init(_ error: OCastError, failureReason: String? = nil) {
+        var userInfo = [NSLocalizedDescriptionKey: error.localizedDescription];
+        if let failureReason = failureReason {
+            userInfo[NSLocalizedFailureReasonErrorKey] = failureReason
+        }
+        super.init(domain: OCastErrorDomain, code: error.rawValue, userInfo: userInfo)
     }
     
-    public init(code: Int, message: String) {
-        super.init(domain: OCastErrorDomain, code: code, userInfo: ["Error": message])
-    }
-    
-    required convenience init?(coder aDecoder: NSCoder) {
-        self.init("Unknown")
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -115,7 +136,7 @@ public class OCastDataLayer<T: Codable>: OCastMessage {
         case name, params, options
     }
     
-    public init(name: String, params: T, options: [String: Any]?) {
+    public init(name: String, params: T, options: [String: Any]? = nil) {
         self.name = name
         self.params = params
         self.options = options

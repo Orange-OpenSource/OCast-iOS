@@ -24,9 +24,9 @@ import Foundation
 internal typealias CommandResult = (Result<Data?, Error>) -> ()
 
 @objc @objcMembers
-open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCastDeviceCustom {
+open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
     
-    public private(set) var state: DeviceState = .idle {
+    public private(set) var state: DeviceState = .disconnected {
         didSet {
             // Reset state every time state is modified
             if oldValue != state {
@@ -80,160 +80,132 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
         self.applicationURL = applicationURL
         self.dialService = DIALService(forURL: applicationURL)
         self.semaphore = DispatchSemaphore(value: 0)
+        
         super.init()
-        managePublicEvents()
+        
+        registerEvents()
     }
     
-    // MARK: Connect/disconnect
-    public func connect(withSSLConfiguration configuration: SSLConfiguration, completion handler: CommandWithoutResultHandler?) {
+    // MARK: Connect/disconnectguard let `self` = self else { return }
+    
+    public func connect(_ configuration: SSLConfiguration, completion: @escaping CommandWithoutResultHandler) {
+        let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
+        if error != nil || state == .connected {
+            completion(error)
+            return
+        }
         
-        switch state {
-        case .connecting:
-            handler?(OCastError("Device is already connecting"))
-            break
-        case .connected:
-            handler?(nil)
-            break
-        case .disconnecting:
-            handler?(OCastError("Device is disconnecting"))
-        case .idle:
-            guard let applicationName = applicationName else {
-                handler?(OCastError("Property applicationName is not defined."))
-                return
-            }
-            dialService.info(ofApplication: applicationName) { result in
-                switch result {
-                case .success(let info):
-                    guard let ws = SocketProvider(urlString: info.app2appURL ?? self.settingsWebSocketURL, sslConfiguration: configuration) else {
-                        handler?(OCastError("Unable to init SocketProvider"))
-                        return
-                    }
-                    self.websocket = ws
-                    self.connectHandler = handler
-                    self.state = .connecting
-                    self.websocket?.delegate = self
-                    self.websocket?.connect()
-                    break
-                case .failure(let error):
-                    handler?(error)
-                    break
-                    
+        guard let applicationName = applicationName else {
+            completion(NSOCastError(.applicationNameNotSet))
+            return
+        }
+        
+        dialService.info(ofApplication: applicationName) { [weak self] result in
+            switch result {
+            case .success(let info):
+                guard let `self` = self else { return }
+                
+                guard let websocket = SocketProvider(urlString: info.app2appURL ?? self.settingsWebSocketURL, sslConfiguration: configuration) else {
+                    completion(NSOCastError(.badApplicationURL))
+                    return
                 }
+                
+                self.websocket = websocket
+                self.connectHandler = completion
+                self.state = .connecting
+                self.websocket?.delegate = self
+                self.websocket?.connect()
+                break
+            case .failure(let error):
+                completion(error)
             }
         }
     }
     
-    public func connect(withCompletion handler: CommandWithoutResultHandler? = nil) {
-        connect(withSSLConfiguration: sslConfiguration, completion: handler)
-    }
-    
-    public func disconnect(withCompletion handler: CommandWithoutResultHandler? = nil) {
+    public func disconnect(_ completion: @escaping CommandWithoutResultHandler) {
+        let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
+        if error != nil || state == .disconnected {
+            completion(error)
+            return
+        }
+        
         state = .disconnecting
-        disconnectHandler = handler
+        disconnectHandler = completion
         websocket?.disconnect()
     }
     
     // MARK: Events methods
+    
     public func registerEvent(_ name: String, withHandler handler: @escaping EventHandler) {
         registeredEvents[name] = handler
     }
     
     // MARK: DIAL methods
-    public func startApplicationWithCompletionHandler(_ handler: @escaping (_: Bool, _: Error?) -> ()) {
-        
+    public func startApplication(_ completion: @escaping CommandWithoutResultHandler) {
         guard let applicationName = applicationName else {
-            handler(false, OCastError("Property applicationName is not defined."))
+            completion(NSOCastError(.applicationNameNotSet))
             return
         }
         
-        // DIAL Start App process
-        let dialStartApp = { [weak self] in
-            guard let `self` = self else { return }
-            self.dialService.info(ofApplication: applicationName, withCompletion: { result in
-                switch result {
-                case .success(let applicationInfo):
-                    if applicationInfo.state.lowercased() == "running" {
-                        self.isApplicationRunning = true
-                        handler(true, nil)
-                    } else {
-                        self.isApplicationRunning = false
-                        self.dialService.start(application: applicationName, withCompletion: { result in
-                            switch result {
-                            case .success(_):
-                                self.isConnectedEvent = false
-                                let _ = self.semaphore?.wait(timeout: .now() + 60)
-                                if self.isConnectedEvent {
-                                    self.isApplicationRunning = true
-                                    handler(true, nil)
-                                } else {
-                                    handler(false, OCastError("No connect message received from WS"))
-                                }
-                            case .failure(let error):
-                                handler(false, error)
-                                break
-                            }
-                        })
-                    }
-                    break
-                case .failure(let error):
-                    handler(false, error)
-                    break
-                }
-            })
+        if let error = self.error(forForbiddenStates: [.connecting, .disconnecting, .disconnected]) {
+            completion(error)
+            return
         }
         
-        // Check if device connection state
-        switch state {
-        case .connected:
-            dialStartApp()
-        case .idle:
-            handler(false, OCastError("Device is disconnected, start cannot be processed."))
-        case .connecting:
-            handler(false, OCastError("Device is connecting, start cannot be processed yet."))
-        case .disconnecting:
-            handler(false, OCastError("Device is connecting, start cannot be processed."))
-        }
+        dialService.info(ofApplication: applicationName, withCompletion: { [weak self] result in
+            guard let `self` = self else { return }
+            
+            switch result {
+            case .success(let applicationInfo):
+                if applicationInfo.state.lowercased() == "running" {
+                    self.isApplicationRunning = true
+                    completion(nil)
+                } else {
+                    self.isApplicationRunning = false
+                    self.dialService.start(application: applicationName, withCompletion: { result in
+                        switch result {
+                        case .success(_):
+                            self.isConnectedEvent = false
+                            let _ = self.semaphore?.wait(timeout: .now() + 60)
+                            if self.isConnectedEvent {
+                                self.isApplicationRunning = true
+                                completion(nil)
+                            } else {
+                                completion(NSOCastError(.websocketConnectionEventNotReceived))
+                            }
+                        case .failure(let error):
+                            completion(error)
+                            break
+                        }
+                    })
+                }
+                break
+            case .failure(let error):
+                completion(error)
+                break
+            }
+        })
     }
     
-    public func stopApplicationWithCompletionHandler(_ handler: @escaping (_: Bool, _: Error?) -> ()) {
-        
+    public func stopApplication(_ completion: @escaping CommandWithoutResultHandler) {
         guard let applicationName = applicationName else {
-            handler(false, OCastError("Property applicationName is not defined."))
+            completion(NSOCastError(.applicationNameNotSet))
             return
         }
         
         dialService.stop(application: applicationName) { result in
             switch result {
             case .success(_):
-                handler(true, nil)
+                completion(nil)
             case .failure(let error):
-                handler(false, error)
+                completion(error)
             }
-        }
-    }
-    
-    // MARK: Custom Commands
-    public func sendCustomCommand<T: OCastMessage>(name: String, forDomain domain: OCastDomainName, andService service: String, withParams params: T, andOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithoutResultHandler) {
-        let message = OCastDeviceLayer(source: uuid, destination: domain.rawValue, id: generateId(), status: nil, type: "command", message: OCastApplicationLayer(service: service, data: OCastDataLayer(name: name, params: params, options: options)))
-        if domain == .browser {
-            sendToApplication(layer: message, withCompletionHandler: handler)
-        } else {
-            send(layer: message, withCompletionHandler: handler)
-        }
-    }
-    
-    public func sendCustomCommand<T: OCastMessage, U: Decodable>(name: String, forDomain domain: OCastDomainName, andService service: String, withParams params: T, andOptions options: [String: Any]?, andCompletion handler: @escaping CommandWithResultHandler<U>) {
-        let message = OCastDeviceLayer(source: uuid, destination: domain.rawValue, id: generateId(), status: nil, type: "command", message: OCastApplicationLayer(service: service, data: OCastDataLayer(name: name, params: params, options: options)))
-        if domain == .browser {
-            sendToApplication(layer: message, withCompletionHandler: handler)
-        } else {
-            send(layer: message, withCompletionHandler: handler)
         }
     }
     
     // MARK: Internal methods
-    internal func sendToApplication<T: Encodable>(layer: OCastDeviceLayer<T>, withCompletionHandler handler: @escaping CommandWithoutResultHandler) {
-
+    
+    func sendToApplication<T: Encodable>(layer: OCastDeviceLayer<T>, withCompletionHandler handler: @escaping CommandWithoutResultHandler) {
         sendToApplication(layer: layer, withCompletion: { (result:Result<Data?, Error>) in
             switch result {
             case .success(_):
@@ -246,13 +218,13 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
         })
     }
     
-    internal func sendToApplication<T: Encodable, U: Decodable>(layer: OCastDeviceLayer<T>, withCompletionHandler handler: @escaping CommandWithResultHandler<U>) {
+    func sendToApplication<T: Encodable, U: Decodable>(layer: OCastDeviceLayer<T>, withCompletionHandler handler: @escaping CommandWithResultHandler<U>) {
         sendToApplication(layer: layer, withCompletion: { (result:Result<Data?, Error>) in
             switch result {
             case .success(let data):
                 guard let data = data,
                     let result = try? JSONDecoder().decode(U.self, from: data) else {
-                        handler(nil, OCastError("Result is bad formatted."))
+                        handler(nil, NSOCastError(.badReplyFormatReceived))
                         return
                 }
                 handler(result, nil)
@@ -264,21 +236,21 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
         })
     }
     
-    internal func sendToApplication<T: Encodable>(layer: OCastDeviceLayer<T>, withCompletion completion: @escaping CommandResult) {
+    func sendToApplication<T: Encodable>(layer: OCastDeviceLayer<T>, withCompletion completion: @escaping CommandResult) {
         if isApplicationRunning {
             self.send(layer: layer, withCompletion: completion)
         } else {
-            startApplicationWithCompletionHandler { (success, error) in
-                if success {
-                    self.send(layer: layer, withCompletion: completion)
+            startApplication { error in
+                if let error = error {
+                    completion(.failure(error))
                 } else {
-                    completion(.failure(error!))
+                    self.send(layer: layer, withCompletion: completion)
                 }
             }
         }
     }
     
-    internal func send<T: Encodable>(layer: OCastDeviceLayer<T>, withCompletionHandler handler: @escaping CommandWithoutResultHandler) {
+    func send<T: Encodable>(layer: OCastDeviceLayer<T>, withCompletionHandler handler: @escaping CommandWithoutResultHandler) {
         send(layer: layer, withCompletion: { result in
             switch result {
             case .success(_):
@@ -291,13 +263,13 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
         })
     }
     
-    internal func send<T: Encodable, U: Decodable>(layer: OCastDeviceLayer<T>, withCompletionHandler handler: @escaping CommandWithResultHandler<U>) {
+    func send<T: Encodable, U: Decodable>(layer: OCastDeviceLayer<T>, withCompletionHandler handler: @escaping CommandWithResultHandler<U>) {
         send(layer: layer, withCompletion: { result in
             switch result {
             case .success(let data):
                 guard let data = data,
                     let result = try? JSONDecoder().decode(U.self, from: data) else {
-                        handler(nil, OCastError("Result is bad formatted."))
+                        handler(nil, NSOCastError(.badReplyFormatReceived))
                         return
                 }
                 handler(result, nil)
@@ -309,10 +281,9 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
         })
     }
     
-    internal func send<T: Encodable>(layer: OCastDeviceLayer<T>, withCompletion completion: @escaping CommandResult) {
-        
-        guard state == .connected else {
-            completion(.failure(OCastError("Device is not connected.")))
+    func send<T: Encodable>(layer: OCastDeviceLayer<T>, withCompletion completion: @escaping CommandResult) {
+        if let error = self.error(forForbiddenStates: [.connecting, .disconnecting, .disconnected]) {
+            completion(.failure(error))
             return
         }
         
@@ -322,7 +293,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
                 commandHandlers[layer.id] = completion
                 websocket?.sendMessage(message: jsonString)
             } else {
-                completion(.failure(OCastError("Unable to get string from data")))
+                completion(.failure(NSOCastError(.misformedCommand)))
             }
         } catch {
             completion(.failure(error))
@@ -330,7 +301,23 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
     }
     
     // MARK: Private methods
-    private func managePublicEvents() {
+    
+    private func error(forForbiddenStates forbiddenStates: [DeviceState]) -> NSOCastError? {
+        guard forbiddenStates.contains(state) else { return nil }
+        
+        switch state {
+        case .connecting:
+            return NSOCastError(.wrongStateConnecting)
+        case .connected:
+            return NSOCastError(.wrongStateConnected)
+        case .disconnecting:
+            return NSOCastError(.wrongStateDisconnecting)
+        case .disconnected:
+            return NSOCastError(.wrongStateDisconnected)
+        }
+    }
+    
+    private func registerEvents() {
         registerEvent("playbackStatus") { data in
             if let playbackStatus = try? JSONDecoder().decode(OCastDeviceLayer<MediaPlaybackStatus>.self, from: data) {
                 NotificationCenter.default.post(name: OCastPlaybackStatusEventNotification, object: ["device": self, "event": playbackStatus.message.data.params])
@@ -367,21 +354,24 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
     }
     
     public func socketProvider(_ socketProvider: SocketProvider, didDisconnectWithError error: Error?) {
+        state = .disconnected
         
-        state = .idle
-        
-        let ocastError = OCastError("Socket has been disconnected with error : \(error.debugDescription)")
+        // TODO: report reason
+        //let error = NSOCastError("Socket has been disconnected with error : \(error.debugDescription)")
         commandHandlers.forEach { (_, completion) in
-            completion(.failure(ocastError))
+            completion(.failure(NSOCastError(.deviceHasBeenDisconnected)))
         }
         commandHandlers.removeAll()
         
+        // TODO: Embed the socket error ?
         if let error = error {
-            disconnectHandler?(error)
-            disconnectHandler = nil
+            if let disconnectHandler = disconnectHandler {
+                disconnectHandler(error)
+                self.disconnectHandler = nil
+            } else {
+                NotificationCenter.default.post(name: OCastDeviceDisconnectedEventNotification, object: ["device": self, "error": error])
+            }
         }
-        
-        NotificationCenter.default.post(name: OCastDeviceDisconnectedEventNotification, object: ["device": self, "error": error ?? OCastError("Unknown Error")])
     }
     
     public func socketProvider(_ socketProvider: SocketProvider, didReceiveMessage message: String) {
@@ -394,13 +384,13 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
                 case "reply":
                     if let status = deviceLayer.status,
                         status.lowercased() != "ok" {
-                        commandHandlers[deviceLayer.id]?(.failure(OCastError(OCastTransportErrors[status] ?? "Unknown error value : \(status)")))
+                        commandHandlers[deviceLayer.id]?(.failure(NSOCastError(.transportError, failureReason: OCastTransportErrors[status] ?? "Unknown error value : \(status)")))
                         commandHandlers.removeValue(forKey: deviceLayer.id)
                         return
                     } else if let code = deviceLayer.message.data.params.code, code != 0 {
                         // command
                         // TODO: add info about error code above OCast Specification
-                        commandHandlers[deviceLayer.id]?(.failure(OCastError("Error in command")))
+                        commandHandlers[deviceLayer.id]?(.failure(NSOCastError(.badCommand, failureReason: "Code: \(code)")))
                         commandHandlers.removeValue(forKey: deviceLayer.id)
                         return
                     }
@@ -435,6 +425,27 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate, OCa
             } catch {
                 print("OCast: Unable to read response : \(error.localizedDescription)")
             }
+        }
+    }
+}
+
+extension OCastDevice: OCastSenderDevice {
+    
+    public func send<T: OCastMessage>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping CommandWithoutResultHandler) {
+        let message = OCastDeviceLayer(source: uuid, destination: domain.rawValue, id: generateId(), status: nil, type: "command", message: message)
+        if domain == .browser {
+            sendToApplication(layer: message, withCompletionHandler: completion)
+        } else {
+            send(layer: message, withCompletionHandler: completion)
+        }
+    }
+    
+    public func send<T: OCastMessage, U: Decodable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping CommandWithResultHandler<U>) {
+        let message = OCastDeviceLayer(source: uuid, destination: domain.rawValue, id: generateId(), status: nil, type: "command", message: message)
+        if domain == .browser {
+            sendToApplication(layer: message, withCompletionHandler: completion)
+        } else {
+            send(layer: message, withCompletionHandler: completion)
         }
     }
 }

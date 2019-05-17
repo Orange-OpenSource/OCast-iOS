@@ -19,6 +19,8 @@
 
 import Foundation
 
+public let OCastMediaServiceName = "org.ocast.media"
+
 // MARK: - Media objects
 
 /**

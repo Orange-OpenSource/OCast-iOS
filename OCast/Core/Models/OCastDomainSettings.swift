@@ -19,6 +19,9 @@
 
 import Foundation
 
+public let OCastDeviceSettingsServiceName = "org.ocast.settings.device"
+public let OCastInputSettingsServiceName = "org.ocast.settings.input"
+
 // MARK: - Settings Objects
 @objc
 public enum UpdateStatusState: Int, RawRepresentable, Codable {
