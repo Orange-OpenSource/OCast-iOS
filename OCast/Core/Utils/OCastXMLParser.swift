@@ -108,6 +108,7 @@ class OCastXMLParser: NSObject, XMLParserDelegate {
                 namespaceURI: String?,
                 qualifiedName qName: String?) {
         currentParent = currentParent?.parent
+        currentElement?.value = currentElement?.value.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         currentElement = nil
     }
 }
