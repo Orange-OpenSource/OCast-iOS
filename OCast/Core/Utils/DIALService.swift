@@ -23,12 +23,16 @@ enum DIALError : Error {
     case badContentResponse
 }
 
+enum DIALState: String {
+    case running, stopped, hidden
+}
+
 struct DIALApplicationInfo {
     public let app2appURL: String?
     public let version: String?
     public let runLink: String?
     public let name: String
-    public let state: String
+    public let state: DIALState
 }
 
 class DIALService {
@@ -46,23 +50,24 @@ class DIALService {
         HTTPRequest.launch(method: .GET, url: "\(baseURL)/\(name)") { result in
             switch result {
             case .failure(let httpError):
-                completion(.failure(.httpRequest(httpError)))
+                DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
                 return
             case .success((let data, _)): // success
                 guard let data = data,
                     let element = OCastXMLParser().parse(data: data)?["service"],
                     let appName = element["name"]?.value,
-                     let state = element["state"]?.value else {
-                        completion(.failure(.badContentResponse))
+                    let stateValue = element["state"]?.value,
+                    let state = DIALState(rawValue: stateValue) else {
+                        DispatchQueue.main.async { completion(.failure(.badContentResponse)) }
                         return
                 }
-               
+                
                 let app2app = element["additionalData"]?["ocast:X_OCAST_App2AppURL"]?.value
                 let version = element["additionalData"]?["ocast:X_OCAST_Version"]?.value
                 let runLink = element["link"]?.attributes?["href"]
                 
                 let info = DIALApplicationInfo(app2appURL: app2app, version: version, runLink: runLink, name: appName, state: state)
-                completion(.success(info))
+                DispatchQueue.main.async { completion(.success(info)) }
             }
         }
     }
@@ -74,9 +79,9 @@ class DIALService {
         HTTPRequest.launch(method: .POST, url: "\(baseURL)/\(name)", successCode: 201) { result in
             switch result {
             case .failure(let httpError):
-                completion(.failure(.httpRequest(httpError)))
+                DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
             case .success(_):
-                completion(.success(()))
+                DispatchQueue.main.async { completion(.success(())) }
             }
         }
     }
@@ -104,9 +109,9 @@ class DIALService {
                 HTTPRequest.launch(method: .DELETE, url: stopLink, completion: { result in
                     switch result {
                     case .failure(let httpError):
-                        completion(.failure(.httpRequest(httpError)))
+                        DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
                     case .success(_):
-                        completion(.success(()))
+                        DispatchQueue.main.async { completion(.success(())) }
                     }
                 })
             }

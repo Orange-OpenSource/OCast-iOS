@@ -19,10 +19,17 @@
 
 import Foundation
 
+/// The device setttings service name
 public let OCastDeviceSettingsServiceName = "org.ocast.settings.device"
+
+/// The input setttings service name
 public let OCastInputSettingsServiceName = "org.ocast.settings.input"
 
-// MARK: - Settings Objects
+public let OCastUpdateStatusEventNotification = Notification.Name("OCastFirmwareUpdateEvent")
+public let OCastUpdateStatusUserInfoKey = Notification.Name("OCastUpdateStatusKey")
+
+// MARK: - Settings objects
+
 @objc
 public enum UpdateStatusState: Int, RawRepresentable, Codable {
     
@@ -83,6 +90,7 @@ public class InputGamepadAxes: OCastMessage {
 }
 
 // MARK: - Settings Commands
+
 @objc public class SettingsGetUpdateStatusCommand: OCastMessage {}
 @objc public class SettingsGetDeviceIDCommand: OCastMessage {}
 
@@ -118,4 +126,8 @@ public class SettingsMouseEventCommand: OCastMessage {
 public class SettingsGamepadEventCommand: OCastMessage {
     public let axes: [InputGamepadAxes]
     public let buttons: Int
+}
+
+@objc public enum OCastDeviceSettingsError: Int, Error {
+    case unknownError = 1199
 }

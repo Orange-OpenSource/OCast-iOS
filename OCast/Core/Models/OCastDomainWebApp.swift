@@ -19,37 +19,18 @@
 
 import Foundation
 
-// MARK: - WebApp Event
+/// The web app service name
+let OCastWebAppServiceName = "org.ocast.webapp"
 
-/**
- WebApp Status
- - `.connected`: connected
- - `.disconnected`: disconnected
- */
-
-@objc public enum OCastWebAppStatusState: Int, RawRepresentable, Codable {
+/// The web app status
+///
+/// - connected: The web app is started and connected.
+/// - disconnected: The web app is stopped and disconnected.
+enum OCastWebAppStatusState: String, Codable {
     case connected
     case disconnected
-    
-    public typealias RawValue = String
-    
-    public var rawValue: RawValue {
-        switch self {
-        case .connected: return "connected"
-        case .disconnected: return "disconnected"
-        }
-    }
-    
-    public init(rawValue: RawValue) {
-        switch (rawValue) {
-        case "connected": self = .connected
-        case "disconnected": self = .disconnected
-        default: self = .disconnected
-        }
-    }
 }
 
-@objc
-public class OCastWebAppConnectedStatusEvent: OCastMessage {
+class OCastWebAppConnectedStatusEvent: OCastMessage {
     public let status: OCastWebAppStatusState
 }

@@ -21,6 +21,7 @@
 import DynamicCodable
 import Foundation
 
+@objc
 public enum OCastError: Int, Error {
     case wrongStateDisconnected
     case wrongStateConnecting
@@ -32,42 +33,17 @@ public enum OCastError: Int, Error {
     case badReplyFormatReceived
     case misformedCommand
     case transportError
-    case badCommand
     case deviceHasBeenDisconnected
 }
 
-extension OCastError {
-    var localizedDescription: String {
-        return "Operation failed : \(String(describing: self)) (code: \((self as NSError).code))"
-    }
+/// Due to Objective-C restrictions (lack of enumeration with associated value),
+/// this struct is used to store the application layer code when an error occurs.
+struct OCastReplyError: Error {
+    let code: Int
 }
 
-public let OCastErrorDomain = "org.ocast.error"
-
-public class NSOCastError: NSError {
-    
-    init(_ error: OCastError, failureReason: String? = nil) {
-        var userInfo = [NSLocalizedDescriptionKey: error.localizedDescription];
-        if let failureReason = failureReason {
-            userInfo[NSLocalizedFailureReasonErrorKey] = failureReason
-        }
-        super.init(domain: OCastErrorDomain, code: error.rawValue, userInfo: userInfo)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-public let kOCastDeviceDisconnectedEvent = "OCastDeviceDisconnectedEvent"
-public let kOCastPlaybackStatusEvent = "OCastPlaybackStatusEvent"
-public let kOCastMetadataChangedEvent = "OCastMetadataChangedEvent"
-public let kOCastUpdateStatusEvent = "OCastFirmwareUpdateEvent"
-
-public let OCastDeviceDisconnectedEventNotification = Notification.Name(kOCastDeviceDisconnectedEvent)
-public let OCastPlaybackStatusEventNotification = Notification.Name(kOCastPlaybackStatusEvent)
-public let OCastMetadataChangedEventNotification = Notification.Name(kOCastMetadataChangedEvent)
-public let OCastUpdateStatusEventNotification = Notification.Name(kOCastUpdateStatusEvent)
+public let OCastDeviceDisconnectedEventNotification = Notification.Name("OCastDeviceDisconnectedEvent")
+public let OCastDeviceUserInfoKey = Notification.Name("OCastDeviceKey")
 
 public let OCastTransportErrors = [
     "json_format_error": "There is an error in the JSON formatting",
@@ -85,19 +61,53 @@ public enum OCastDomainName: String {
     case all = "*"
 }
 
-public class OCastDeviceLayer<T: Codable>: OCastMessage {
+enum OCastDeviceLayerType: String, Codable {
+    case command, reply, event
+}
+
+enum StatusType: Codable, Equatable {
+    case ok, error(String)
+    
+    public init(from decoder: Decoder) throws {
+        let value = try decoder.singleValueContainer().decode(String.self).lowercased()
+        
+        if value == "ok" {
+            self = .ok
+        } else {
+            self = .error(OCastTransportErrors[value] ?? "unknown transport error")
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self)
+    }
+    
+    public static func == (lhs: StatusType, rhs: StatusType) -> Bool {
+        switch (lhs, rhs) {
+        case (.ok, .ok):
+            return true
+        case (let .error(lhsErrorMessage), let .error(rhsErrorMessage)):
+            return lhsErrorMessage == rhsErrorMessage
+        default:
+            return false
+        }
+    }
+}
+
+class OCastDeviceLayer<T: Codable>: OCastMessage {
     public let id: Int
     public let source: String
     public let destination: String
-    public let status: String?
-    public let type: String
+    public let status: StatusType?
+    public let type: OCastDeviceLayerType
     public let message: OCastApplicationLayer<T>
     
     private enum CodingKeys : String, CodingKey {
         case source = "src", destination = "dst", id, status, type, message
     }
     
-    public init(source: String, destination: String, id: Int, status: String?, type: String, message: OCastApplicationLayer<T>) {
+    init(source: String, destination: String, id: Int, status: StatusType?, type: OCastDeviceLayerType, message: OCastApplicationLayer<T>) {
         self.source = source
         self.destination = destination
         self.id = id
@@ -106,11 +116,11 @@ public class OCastDeviceLayer<T: Codable>: OCastMessage {
         self.message = message
     }
     
-    public convenience init(source: String, destination: String, id: Int, status: String?, type: String, service: String, name: String, params: T) {
+    convenience init(source: String, destination: String, id: Int, status: StatusType?, type: OCastDeviceLayerType, service: String, name: String, params: T) {
         self.init(source: source, destination: destination, id: id, status: status, type: type, service: service, name: name, params: params, options: nil)
     }
     
-    public convenience init(source: String, destination: String, id: Int, status: String?, type: String, service: String, name: String, params: T, options: [String: Any]?) {
+    convenience init(source: String, destination: String, id: Int, status: StatusType?, type: OCastDeviceLayerType, service: String, name: String, params: T, options: [String: Any]?) {
         let reference = OCastDataLayer(name: name, params: params, options: options)
         let application = OCastApplicationLayer(service: service, data: reference)
         self.init(source: source, destination: destination, id: id, status: status, type: type, message: application)
@@ -159,6 +169,9 @@ public class OCastDataLayer<T: Codable>: OCastMessage {
 
 // Default Response is containing code property for every command.
 @objc
-public class OCastDefaultResponseDataLayer: OCastMessage {
+class OCastDefaultResponseDataLayer: OCastMessage {
     public let code: Int?
+    static let successCode = 0
 }
+
+struct NoResult: Decodable {}

@@ -19,7 +19,13 @@
 
 import Foundation
 
+/// The media service name
 public let OCastMediaServiceName = "org.ocast.media"
+
+public let OCastPlaybackStatusEventNotification = Notification.Name("OCastPlaybackStatusEvent")
+public let OCastMetadataChangedEventNotification = Notification.Name("OCastMetadataChangedEvent")
+public let OCastPlaybackStatusUserInfoKey = Notification.Name("OCastPlaybackStatusKey")
+public let OCastMetadataUserInfoKey = Notification.Name("OCastMetadataKey")
 
 // MARK: - Media objects
 
@@ -86,7 +92,6 @@ public let OCastMediaServiceName = "org.ocast.media"
  - `.buffered`: buffered type
  - `.streamed`: streamed type
  */
-
 @objc public enum OCastMediaTransferMode: Int, RawRepresentable, Codable {
     case buffered
     case streamed
@@ -146,7 +151,6 @@ public class MediaPlaybackStatus: OCastMessage {
     enum CodingKeys : String, CodingKey {
         case _volume = "volume", _mute = "mute", state = "state", _position = "position", _duration = "duration"
     }
-    
 }
 
 @objc
@@ -192,10 +196,7 @@ public class MediaTrack: OCastMessage {
  - `.unknownTransferMode`: unknown transfer mode
  - `.unknownError`: Internal error
  */
-
-@objc public enum OCastMediaErrorCode: Int {
-    
-    case noError = 0
+@objc public enum OCastMediaError: Int, Error {
     case invalidService = 2404
     case noImplementation = 2400
     case missingParameter = 2422
@@ -204,30 +205,13 @@ public class MediaTrack: OCastMessage {
     case invalidTrack = 2414
     case unknowMediaType = 2415
     case unknownTransferMode = 2416
-    case unknownError = 2500
+    case internalError = 2500
+    case unknownError = 2999
     /// :nodoc:
     case invalidMetadata = 9997
     case invalidPlaybackStatus = 9998
     case invalidErrorCode = 9999
-    
-
-    public var stringValue: String {
-        switch self {
-        case .invalidService: return "invalidService"
-        case .noImplementation: return "noImplementation"
-        case .missingParameter: return "missingParameter"
-        case .invalidPlayerState: return "invalidPlayerState"
-        case .unknowMediaType: return "unknowMediaType"
-        case .unknownTransferMode: return "unknownTransferMode"
-        case .unknownError: return "unknownError"
-        case .invalidTrack: return "invalidTtrack"
-        case .noError: return"noError"
-        default: return "Unvalid error code"
-        }
-    }
-    
 }
-
 
 // MARK: - Media Commands
 @objc
