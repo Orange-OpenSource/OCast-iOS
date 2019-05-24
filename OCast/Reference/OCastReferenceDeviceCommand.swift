@@ -33,7 +33,7 @@ extension OCastDevice {
         sendMediaCommand(command, completion: completionBlock)
     }
     
-    private func sendMediaCommand<T: OCastMessage, U: Decodable>(_ command: OCastDataLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
+    private func sendMediaCommand<T: OCastMessage, U: Codable>(_ command: OCastDataLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
         let completionBlock: CommandWithResultHandler<U> = { result, error in
             if let error = error as? OCastReplyError {
                 completion(result, OCastMediaError(rawValue: error.code) ?? .unknownError)
@@ -102,7 +102,7 @@ extension OCastDevice {
     
     // MARK: Device settings commands
     
-    private func sendDeviceSettingsCommand<T: OCastMessage, U: Decodable>(_ command: OCastDataLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
+    private func sendDeviceSettingsCommand<T: OCastMessage, U: Codable>(_ command: OCastDataLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
         let completionBlock: CommandWithResultHandler<U> = { result, error in
             if let error = error as? OCastReplyError {
                 completion(result, OCastDeviceSettingsError(rawValue: error.code) ?? .unknownError)

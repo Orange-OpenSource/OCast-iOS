@@ -203,7 +203,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
     
     // MARK: Internal methods
     
-    func sendToApplication<T: Encodable, U: Decodable>(layer: OCastDeviceLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
+    func sendToApplication<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
         if isApplicationRunning {
             self.send(layer: layer, completion: completion)
         } else {
@@ -217,20 +217,22 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
         }
     }
     
-    func send<T: Encodable, U: Decodable>(layer: OCastDeviceLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
+    func send<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
         let completionBlock: CommandResult = { result in
             switch result {
             case .success(let data):
-                guard let data = data,
-                    let result = try? JSONDecoder().decode(U.self, from: data) else {
-                        completion(nil, OCastError.badReplyFormatReceived)
-                        return
+                guard let data = data else {
+                    completion(nil, OCastError.emptyReplyReceived)
+                    return
                 }
-                completion(result, nil)
-                return
+                do {
+                    let result = try JSONDecoder().decode(OCastDeviceLayer<U>.self, from: data)
+                    completion(result.message.data.params, nil)
+                } catch {
+                    completion(nil, OCastError.badReplyFormatReceived)
+                }
             case .failure(let error):
                 completion(nil, error)
-                return
             }
         }
         send(layer: layer, completion: completionBlock)
@@ -396,7 +398,7 @@ extension OCastDevice: OCastSenderDevice {
         }
     }
     
-    public func send<T: OCastMessage, U: Decodable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping CommandWithResultHandler<U>) {
+    public func send<T: OCastMessage, U: Codable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping CommandWithResultHandler<U>) {
         let deviceLayer = OCastDeviceLayer(source: uuid, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
         if domain == .browser {
             sendToApplication(layer: deviceLayer, completion: completion)

@@ -96,5 +96,5 @@ public protocol OCastDevicePublic {
 public protocol OCastSenderDevice {
     
     func send<T: OCastMessage>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName, completion: @escaping CommandWithoutResultHandler)
-    func send<T: OCastMessage, U: Decodable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName, completion: @escaping CommandWithResultHandler<U>)
+    func send<T: OCastMessage, U: Codable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName, completion: @escaping CommandWithResultHandler<U>)
 }

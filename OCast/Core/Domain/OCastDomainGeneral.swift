@@ -30,6 +30,7 @@ public enum OCastError: Int, Error {
     case applicationNameNotSet
     case badApplicationURL
     case websocketConnectionEventNotReceived
+    case emptyReplyReceived
     case badReplyFormatReceived
     case misformedCommand
     case unableToSendCommand
@@ -176,4 +177,4 @@ class OCastDefaultResponseDataLayer: OCastMessage {
     static let successCode = 0
 }
 
-struct NoResult: Decodable {}
+struct NoResult: Codable {}
