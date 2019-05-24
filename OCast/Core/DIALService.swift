@@ -39,15 +39,19 @@ class DIALService {
     
     private let baseURL: String
     
-    public init(forURL url: String) {
+    /// The URLSession used to launch the requests.
+    private let urlSession: URLSessionProtocol
+    
+    public init(forURL url: String, urlSession: URLSessionProtocol = URLSession(configuration: .default)) {
         baseURL = url
+        self.urlSession = urlSession
     }
     
     /// Get application info
     ///
     /// - Parameter completion: result
     public func info(ofApplication name: String, withCompletion completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> ()) {
-        HTTPRequest.launch(method: .GET, url: "\(baseURL)/\(name)") { result in
+        HTTPRequest.launch(urlSession: urlSession, method: .GET, url: "\(baseURL)/\(name)") { result in
             switch result {
             case .failure(let httpError):
                 DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
@@ -76,7 +80,7 @@ class DIALService {
     ///
     /// - Parameter completion: result
     public func start(application name: String, withCompletion completion: @escaping (Result<Void, DIALError>) -> ()) {
-        HTTPRequest.launch(method: .POST, url: "\(baseURL)/\(name)", successCode: 201) { result in
+        HTTPRequest.launch(urlSession: urlSession, method: .POST, url: "\(baseURL)/\(name)", successCode: 201) { result in
             switch result {
             case .failure(let httpError):
                 DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
@@ -106,7 +110,7 @@ class DIALService {
                     completion(.failure(.badContentResponse))
                     return
                 }
-                HTTPRequest.launch(method: .DELETE, url: stopLink, completion: { result in
+                HTTPRequest.launch(urlSession: self.urlSession, method: .DELETE, url: stopLink, completion: { result in
                     switch result {
                     case .failure(let httpError):
                         DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
