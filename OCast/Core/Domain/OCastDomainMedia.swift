@@ -175,10 +175,6 @@ public class MediaTrack: OCastMessage {
     public let label: String
     public let enabled: Bool
     public let trackId: String
-    
-    enum CodingKeys: String, CodingKey {
-        case language, label, enabled = "enable", trackId
-    }
 }
 
 // MARK: - Media Error Codes
