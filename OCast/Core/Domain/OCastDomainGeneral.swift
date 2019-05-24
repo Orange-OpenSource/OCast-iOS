@@ -45,6 +45,7 @@ struct OCastReplyError: Error {
 
 public let OCastDeviceDisconnectedEventNotification = Notification.Name("OCastDeviceDisconnectedEvent")
 public let OCastDeviceUserInfoKey = Notification.Name("OCastDeviceKey")
+public let OCastErrorUserInfoKey = Notification.Name("OCastErrorKey")
 
 public let OCastTransportErrors = [
     "json_format_error": "There is an error in the JSON formatting",

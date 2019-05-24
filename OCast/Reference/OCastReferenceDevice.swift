@@ -280,19 +280,19 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
         registerEvent("playbackStatus") { data in
             if let playbackStatus = try? JSONDecoder().decode(OCastDeviceLayer<MediaPlaybackStatus>.self, from: data) {
                 NotificationCenter.default.post(name: OCastPlaybackStatusEventNotification,
-                                                object: [OCastDeviceUserInfoKey: self, OCastPlaybackStatusUserInfoKey: playbackStatus.message.data.params])
+                                                object: self, userInfo: [OCastPlaybackStatusUserInfoKey: playbackStatus.message.data.params])
             }
         }
         registerEvent("metadataChanged") { data in
             if let metadata = try? JSONDecoder().decode(OCastDeviceLayer<MediaMetadataChanged>.self, from: data) {
                 NotificationCenter.default.post(name: OCastMetadataChangedEventNotification,
-                                                object: [OCastDeviceUserInfoKey: self, OCastMetadataUserInfoKey: metadata.message.data.params])
+                                                object: self, userInfo: [OCastMetadataUserInfoKey: metadata.message.data.params])
             }
         }
         registerEvent("updateStatus") { data in
             if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<SettingsUpdateStatus>.self, from: data) {
                 NotificationCenter.default.post(name: OCastUpdateStatusEventNotification,
-                                                object: [OCastDeviceUserInfoKey: self, OCastUpdateStatusUserInfoKey: updateStatus.message.data.params])
+                                                object: self, userInfo:[OCastUpdateStatusUserInfoKey: updateStatus.message.data.params])
             }
         }
     }
@@ -330,7 +330,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
                 disconnectHandler(error)
                 self.disconnectHandler = nil
             } else {
-                NotificationCenter.default.post(name: OCastDeviceDisconnectedEventNotification, object: ["device": self, "error": error])
+                NotificationCenter.default.post(name: OCastDeviceDisconnectedEventNotification, object: self, userInfo: [OCastErrorUserInfoKey: error])
             }
         }
     }
