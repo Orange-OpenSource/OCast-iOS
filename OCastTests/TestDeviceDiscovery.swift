@@ -22,8 +22,8 @@ import XCTest
 /// Converts a DeviceDiscoveryDelegate delegate to closure style...
 class TestDeviceDiscoveryDelegate: DeviceDiscoveryDelegate {
     
-    var devicesAdded: (_: [Device]) -> Void
-    var devicesRemoved: (_: [Device]) -> Void
+    var devicesAdded: (_: [UPNPDevice]) -> Void
+    var devicesRemoved: (_: [UPNPDevice]) -> Void
     var discoveryStopped: (_: Error?) -> Void
     
     init() {
@@ -32,11 +32,11 @@ class TestDeviceDiscoveryDelegate: DeviceDiscoveryDelegate {
         self.discoveryStopped = { _ in }
     }
     
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [Device]) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [UPNPDevice]) {
         devicesAdded(devices)
     }
     
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [Device]) {
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [UPNPDevice]) {
         devicesRemoved(devices)
     }
     
@@ -47,7 +47,7 @@ class TestDeviceDiscoveryDelegate: DeviceDiscoveryDelegate {
 
 class TestDeviceDiscovery: XCTestCase {
 
-    private var mockDevice: Device!
+    private var mockDevice: UPNPDevice!
     private var mockUPNPService: MockUPNPService!
     private var mockUDPSocket: MockUDPSocket!
     private var deviceDiscovery: DeviceDiscovery!
@@ -71,7 +71,7 @@ class TestDeviceDiscovery: XCTestCase {
         BOOTID.UPNP.ORG: 1\r
         
         """
-        mockDevice = Device(baseURL: URL(string: "http://foo")!,
+        mockDevice = UPNPDevice(baseURL: URL(string: "http://foo")!,
                             ipAddress: "127.0.0.1",
                             servicePort: 8080,
                             deviceID: "DeviceID",

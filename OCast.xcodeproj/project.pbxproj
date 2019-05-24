@@ -53,10 +53,6 @@
 		97AF814220EA0EAD00C502D5 /* OCast.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97AF813820EA0EAD00C502D5 /* OCast.framework */; };
 		97AF814920EA0EAD00C502D5 /* OCast.h in Headers */ = {isa = PBXBuildFile; fileRef = 97AF813B20EA0EAD00C502D5 /* OCast.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		97DC97C220EA313800DBB1B0 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97DC97C120EA313800DBB1B0 /* libz.tbd */; };
-		97FA52E22297F261006E4703 /* Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FA52DE2297F261006E4703 /* Compression.swift */; };
-		97FA52E32297F261006E4703 /* SSLClientCertificate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FA52DF2297F261006E4703 /* SSLClientCertificate.swift */; };
-		97FA52E42297F261006E4703 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FA52E02297F261006E4703 /* WebSocket.swift */; };
-		97FA52E52297F261006E4703 /* SSLSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FA52E12297F261006E4703 /* SSLSecurity.swift */; };
 		A093B5DC96BF900B610ACFA0 /* Pods_OCast.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71FB5CBDE24B01B079C1F883 /* Pods_OCast.framework */; };
 		A848A1988345B8A8BC34B2C5 /* Pods_OCastTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5069F8175A5472E918DF16AC /* Pods_OCastTests.framework */; };
 /* End PBXBuildFile section */
@@ -110,10 +106,6 @@
 		97AF814120EA0EAD00C502D5 /* OCastTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OCastTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		97AF814820EA0EAD00C502D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		97DC97C120EA313800DBB1B0 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		97FA52DE2297F261006E4703 /* Compression.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Compression.swift; path = Sources/Compression.swift; sourceTree = "<group>"; };
-		97FA52DF2297F261006E4703 /* SSLClientCertificate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SSLClientCertificate.swift; path = Sources/SSLClientCertificate.swift; sourceTree = "<group>"; };
-		97FA52E02297F261006E4703 /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebSocket.swift; path = Sources/WebSocket.swift; sourceTree = "<group>"; };
-		97FA52E12297F261006E4703 /* SSLSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SSLSecurity.swift; path = Sources/SSLSecurity.swift; sourceTree = "<group>"; };
 		99DF48D12C227FE930DF4427 /* Pods-OCastTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastTests.debug.xcconfig"; path = "Target Support Files/Pods-OCastTests/Pods-OCastTests.debug.xcconfig"; sourceTree = "<group>"; };
 		DF8CEC5050DAF5A730C15073 /* Pods-OCast.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast.release.xcconfig"; path = "Target Support Files/Pods-OCast/Pods-OCast.release.xcconfig"; sourceTree = "<group>"; };
 		DFFDB7FF2F910EBFFBFEA46A /* Pods-OCast.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCast.debug.xcconfig"; path = "Target Support Files/Pods-OCast/Pods-OCast.debug.xcconfig"; sourceTree = "<group>"; };
@@ -474,7 +466,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9790DFFB227C707A0031A70F /* SSDPMSearchRequest.swift in Sources */,
-				97FA52E32297F261006E4703 /* SSLClientCertificate.swift in Sources */,
 				9790DFFA227C707A0031A70F /* SSDPResponseParser.swift in Sources */,
 				8549AD052296E82100E205A3 /* OCastReferenceDevice.swift in Sources */,
 				8549AD032296E82100E205A3 /* OCastReferenceDeviceCommand.swift in Sources */,
@@ -486,16 +477,13 @@
 				97010329229BDEB500749F49 /* WebSocket.swift in Sources */,
 				8549ACFA2296E80700E205A3 /* OCastDomainWebApp.swift in Sources */,
 				8549ACF92296E80700E205A3 /* OCastDomainSettings.swift in Sources */,
-				97FA52E42297F261006E4703 /* WebSocket.swift in Sources */,
 				9790DFF8227C707A0031A70F /* DeviceDiscovery.swift in Sources */,
 				9790DFFC227C707A0031A70F /* UDPSocket.swift in Sources */,
 				9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */,
 				8549ACFC2296E80700E205A3 /* OCastCenter.swift in Sources */,
 				8549AD7A2296E94400E205A3 /* SSLConfiguration.swift in Sources */,
 				8549AD722296E83700E205A3 /* HTTPRequest.swift in Sources */,
-				97FA52E22297F261006E4703 /* Compression.swift in Sources */,
 				8549ACFE2296E80700E205A3 /* OCastDevice.swift in Sources */,
-				97FA52E52297F261006E4703 /* SSLSecurity.swift in Sources */,
 				8549ACFD2296E80700E205A3 /* DIALService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
