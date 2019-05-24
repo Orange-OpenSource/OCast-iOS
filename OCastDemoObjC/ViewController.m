@@ -19,19 +19,17 @@
 #import "Constants.h"
 @import OCast;
 
-@interface ViewController () <DeviceDiscoveryDelegate, DeviceManagerDelegate, MediaControllerDelegate>
+@interface ViewController () <OCastDiscoveryDelegate>
 
-/// The object to discover the devices
-@property(nonatomic, strong) DeviceDiscovery * deviceDiscovery;
 
 /// The `DeviceManager`
-@property(nonatomic, strong) DeviceManager * deviceManager;
+@property(nonatomic, strong) OCastCenter * center;
 
 /// The `ApplicationController`
-@property(nonatomic, strong) ApplicationController * applicationController;
+@property(nonatomic, strong) id<OCastDeviceProtocol> device;
 
-/// The state to know if a cast is in progress
-@property(nonatomic, assign) PlayerState playerState;
+/// The `ApplicationController`
+@property(nonatomic) BOOL isCastInProgress;
 
 /// IBOutlets
 @property (weak, nonatomic) IBOutlet UILabel *stickLabel;
@@ -45,10 +43,9 @@
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super initWithCoder:aDecoder]) {
-        _deviceDiscovery = [[DeviceDiscovery alloc] init:@[ReferenceDriver.searchTarget]];
-        self.playerState = PlayerStateUnknown;
+        _center = [[OCastCenter alloc] init];
     }
-    
+    self.isCastInProgress = false;
     return self;
 }
 
@@ -58,21 +55,21 @@
     [self resetUI];
     
     // Register the driver
-    [DeviceManager registerDriver:ReferenceDriver.class forManufacturer:OCastDemoDriverName];
+    [self.center registerDevice:OCastDevice.class];
     
     // Launch the discovery process
-    self.deviceDiscovery.delegate = self;
-    [self.deviceDiscovery resume];
+    self.center.discoveryDelegate = self;
+    [self.center startDiscovery];
 }
 
 // MARK: Private methods
 
 - (IBAction)actionButtonClicked:(id)sender {
-    if (self.applicationController != nil) {
-        if (![self isCastInProgress]) {
-            [self startCastWith:self.applicationController.mediaController];
+    if (self.device != nil) {
+        if (!self.isCastInProgress) {
+            [self startCast];
         } else {
-            [self stopCastWith:self.applicationController.mediaController];
+            [self stopCast];
         }
     }
 }
@@ -80,29 +77,21 @@
 /// Starts the cast
 ///
 /// - Parameter mediaController: The `MediaController` used to cast.
-- (void)startCastWith:(MediaController *)mediaController {
-    MediaPrepare * mediaPrepare = [[MediaPrepare alloc] initWithUrl:[NSURL URLWithString:@"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"]
-                                                          frequency:1
-                                                              title:@"Movie sample"
-                                                           subtitle:@"Brought to you by Orange OCast"
-                                                               logo:[NSURL URLWithString:@"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"]
-                                                          mediaType:MediaTypeVideo
-                                                       transferMode:TransferModeBuffered
-                                                           autoplay:true];
+- (void)startCast {
+    self.isCastInProgress = YES;
+    MediaPrepareCommand * command = [[MediaPrepareCommand alloc] initWithUrl:@"" frequency:1 title:@"" subtitle:@"" logo:@"" mediaType:OCastMediaTypeVideo transferMode:OCastMediaTransferModeBuffered autoPlay:true];
     
-    [mediaController prepareFor:mediaPrepare
-                    withOptions:@{}
-                      onSuccess:^{}
-                        onError:^(NSError * error) {}];
+    [_device prepare:command withOptions:nil completion:^(NSError * _Nullable error) {
+        
+    }];
 }
 
 /// Stops the cast
 ///
 /// - Parameter mediaController: The `MediaController` used to stop the cast.
-- (void)stopCastWith:(MediaController *)mediaController {
-    [mediaController stopWithOptions:@{}
-                           onSuccess:^{}
-                             onError:^(NSError * error) {}];
+- (void)stopCast {
+    self.isCastInProgress = false;
+    [self.device stopWithOptions:nil completion:^(NSError * _Nullable error) { }];
 }
 
 /// Resets the UI
@@ -111,74 +100,34 @@
     self.actionButton.enabled = false;
 }
 
-/// Indicates whether a cast is in progress
-- (BOOL)isCastInProgress {
-    return self.playerState != PlayerStateUnknown && self.playerState != PlayerStateIdle;
-}
-
 /// Starts the application
 - (void)startApplication {
-    if (self.applicationController != nil) {
-        [self.applicationController startOnSuccess:^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.actionButton.enabled = true;
-            });
-        } onError:^(NSError * error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.actionButton.enabled = false;
-            });
+    if (self.device != nil) {
+        [self.device connect:[[SSLConfiguration alloc] init] completion:^(NSError * _Nullable error) {
+            self.actionButton.enabled = error == nil;
         }];
     }
 }
 
-// MARK: DeviceDiscoveryDelegate methods
-
-- (void)deviceDiscovery:(DeviceDiscovery * _Nonnull)deviceDiscovery didAdd:(NSArray<Device *> * _Nonnull)devices {
-    if (self.deviceManager == nil && devices.count > 0) {
-        Device * device = devices[0];
-        // Create the device manager
-        _deviceManager = [[DeviceManager alloc] initWith:device sslConfiguration:nil];
-        self.deviceManager.delegate = self;
-        
+// MARK: OCastDiscoveryDelegate methods
+- (void)discovery:(OCastCenter * _Nonnull)center didAddDevice:(id<OCastDeviceProtocol> _Nonnull)device {
+    if (self.device == nil) {
+        self.device = device;
         self.stickLabel.text = [NSString stringWithFormat:@"Stick: %@", device.friendlyName];
-        
-        // Retrieve the applicationController
-        [self.deviceManager applicationControllerFor:OCastDemoApplicationName
-                                           onSuccess:^(ApplicationController * applicationController) {
-                                               applicationController.mediaController.delegate = self;
-                                               self.applicationController = applicationController;
-                                               [self startApplication];
-                                           } onError:^(NSError * error) {}];
+        [self.device connect:[[SSLConfiguration alloc] init] completion:^(NSError * _Nullable error) {
+            self.actionButton.enabled = error == nil;
+        }];
     }
 }
 
-- (void)deviceDiscovery:(DeviceDiscovery * _Nonnull)deviceDiscovery didRemove:(NSArray<Device *> * _Nonnull)devices {
-    if (devices.count > 0 && self.deviceManager.device == devices[0]) {
-        self.deviceManager = nil;
+- (void)discovery:(OCastCenter * _Nonnull)center didRemoveDevice:(id<OCastDeviceProtocol> _Nonnull)device {
+    if (self.device.ipAddress == device.ipAddress) {
+        self.device = nil;
         [self resetUI];
+        self.isCastInProgress = false;
     }
 }
 
-- (void)deviceDiscoveryDidStop:(DeviceDiscovery *)deviceDiscovery with:(NSError *)error {}
-
-// MARK: DeviceManagerDelegate methods
-
-- (void)deviceManager:(DeviceManager *)deviceManager applicationDidDisconnectWithError:(NSError *)error {
-    self.deviceManager = nil;
-    [self resetUI];
-}
-
-// MARK: MediaControllerDelegate methods
-
-- (void)mediaController:(MediaController *)mediaController didReceivePlaybackStatus:(PlaybackStatus *)playbackStatus {
-    self.playerState = playbackStatus.state;
-    if ([self isCastInProgress]) {
-        [self.actionButton setTitle:@"Stop" forState: UIControlStateNormal];
-    } else {
-        [self.actionButton setTitle:@"Play" forState: UIControlStateNormal];
-    }
-}
-
-- (void)mediaController:(MediaController *)mediaController didReceiveMetadata:(Metadata *)metadata {}
+- (void)discoveryDidStop:(OCastCenter * _Nonnull)center withError:(NSError * _Nullable)error {}
 
 @end

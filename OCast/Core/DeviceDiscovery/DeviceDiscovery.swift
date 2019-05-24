@@ -26,14 +26,14 @@ import Foundation
     /// - Parameters:
     ///   - deviceDiscovery: The device discovery informing the delegate.
     ///   - devices: The new devices found.
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [Device])
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [UPNPDevice])
     
     /// Tells the delegate that devices are lost.
     ///
     /// - Parameters:
     ///   - deviceDiscovery: The device discovery informing the delegate.
     ///   - devices: The devices lost.
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [Device])
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [UPNPDevice])
     
     /// Tells the delegate that the discovery is stopped. All the devices are removed.
     ///
@@ -69,7 +69,7 @@ import Foundation
     private var ssdpLastSeenDevices = [String: Date]()
     
     /// The dictionary (device ID/ device) to save the devices discovered on the local network.
-    private var discoveredDevices = [String: Device]()
+    private var discoveredDevices = [String: UPNPDevice]()
     
     /// The timer to launch the M-SEARCH requests depending the `interval`.
     private var refreshTimer: Timer?
@@ -92,7 +92,7 @@ import Foundation
     public weak var delegate: DeviceDiscoveryDelegate?
     
     /// The devices discovered on the network
-    public var devices: [Device] {
+    public var devices: [UPNPDevice] {
         return Array(discoveredDevices.values)
     }
     

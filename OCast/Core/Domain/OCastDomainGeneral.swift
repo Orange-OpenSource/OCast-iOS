@@ -32,6 +32,7 @@ public enum OCastError: Int, Error {
     case websocketConnectionEventNotReceived
     case badReplyFormatReceived
     case misformedCommand
+    case unableToSendCommand
     case transportError
     case deviceHasBeenDisconnected
 }

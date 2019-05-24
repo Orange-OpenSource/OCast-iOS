@@ -160,12 +160,12 @@ public class MediaMetadataChanged: OCastMessage {
     public let logo: String
     public var mediaType: OCastMediaType { return OCastMediaType(rawValue: _mediaType) ?? .audio }
     private let _mediaType: String
-    public let textTracks: [MediaTrack]
+    public let subtitleTracks: [MediaTrack]
     public let audioTracks: [MediaTrack]
     public let videoTracks: [MediaTrack]
     
     enum CodingKeys : String, CodingKey {
-        case title = "title", subtitle = "subtitle", logo = "logo", _mediaType = "mediaType", textTracks = "textTracks", audioTracks = "audioTracks", videoTracks = "videoTracks"
+        case title = "title", subtitle = "subtitle", logo = "logo", _mediaType = "mediaType", subtitleTracks = "textTracks", audioTracks = "audioTracks", videoTracks = "videoTracks"
     }
 }
 

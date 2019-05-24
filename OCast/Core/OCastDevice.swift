@@ -49,9 +49,10 @@ public protocol OCastDevicePublic {
     var applicationName: String? { get set }
     var ipAddress: String { get }
     var applicationURL: String { get }
+    var friendlyName: String { get }
     var sslConfiguration: SSLConfiguration { set get }
-        
-    init(ipAddress: String, applicationURL: String)
+    
+    init(upnpDevice: UPNPDevice)
         
     // Connection
     

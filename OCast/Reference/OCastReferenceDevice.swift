@@ -24,7 +24,7 @@ import Foundation
 internal typealias CommandResult = (Result<Data?, Error>) -> ()
 
 @objc @objcMembers
-open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
+open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
     
     public private(set) var state: DeviceState = .disconnected {
         didSet {
@@ -36,6 +36,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
     }
     public private(set) var ipAddress: String
     public private(set) var applicationURL: String
+    public private(set) var friendlyName: String
     private let dialService: DIALService
 
     public var applicationName: String? {
@@ -60,7 +61,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
     }
     
     public var sslConfiguration: SSLConfiguration = SSLConfiguration(deviceCertificates: nil, clientCertificate: nil)
-    private var websocket: SocketProvider?
+    private var websocket: WebSocketProtocol?
     private var connectHandler: CommandWithoutResultHandler?
     private var disconnectHandler: CommandWithoutResultHandler?
     private var commandHandlers: [Int: CommandResult] = [:]
@@ -75,9 +76,10 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
     private var semaphore: DispatchSemaphore?
     private var isConnectedEvent = false
     
-    public required init(ipAddress: String, applicationURL: String) {
-        self.ipAddress = ipAddress
-        self.applicationURL = applicationURL
+    public required init(upnpDevice: UPNPDevice) {
+        self.ipAddress = upnpDevice.ipAddress
+        self.applicationURL = upnpDevice.baseURL.absoluteString
+        self.friendlyName = upnpDevice.friendlyName
         self.dialService = DIALService(forURL: applicationURL)
         self.semaphore = DispatchSemaphore(value: 0)
         
@@ -105,7 +107,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
             case .success(let info):
                 guard let `self` = self else { return }
                 
-                guard let websocket = SocketProvider(urlString: info.app2appURL ?? self.settingsWebSocketURL, sslConfiguration: configuration) else {
+                guard let websocket = WebSocket(urlString: info.app2appURL ?? self.settingsWebSocketURL, sslConfiguration: configuration) else {
                     completion(OCastError.badApplicationURL)
                     return
                 }
@@ -244,7 +246,11 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
             let jsonData = try JSONEncoder().encode(layer)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
                 commandHandlers[layer.id] = completion
-                websocket?.sendMessage(message: jsonString)
+                let result = websocket?.send(jsonString)
+                if case .failure(_)? = result {
+                    completion(.failure(OCastError.unableToSendCommand))
+                    commandHandlers[layer.id] = nil
+                }
             } else {
                 completion(.failure(OCastError.misformedCommand))
             }
@@ -302,16 +308,16 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
         }
     }
     
-    // MARK: SocketProviderDelegate methods
+    // MARK: WebSocketDelegate methods
     
-    public func socketProvider(_ socketProvider: SocketProvider, didConnectToURL url: URL) {
+    func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL) {
         state = .connected
         
         connectHandler?(nil)
         connectHandler = nil
     }
     
-    public func socketProvider(_ socketProvider: SocketProvider, didDisconnectWithError error: Error?) {
+    func websocket(_ websocket: WebSocketProtocol, didDisconnectWith error: Error?) {
         state = .disconnected
         
         commandHandlers.forEach { (_, completion) in
@@ -329,24 +335,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
         }
     }
     
-    private func handleReply(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {
-        guard let status = deviceLayer.status else { return }
-        
-        switch status {
-        case .ok:
-            if let code = deviceLayer.message.data.params.code, code != OCastDefaultResponseDataLayer.successCode {
-                commandHandlers[deviceLayer.id]?(.failure(OCastReplyError(code: code)))
-            } else {
-                commandHandlers[deviceLayer.id]?(.success(jsonData))
-            }
-        case .error(_):
-            commandHandlers[deviceLayer.id]?(.failure(OCastError.transportError))
-        }
-        
-        commandHandlers.removeValue(forKey: deviceLayer.id)
-    }
-    
-    public func socketProvider(_ socketProvider: SocketProvider, didReceiveMessage message: String) {
+    func websocket(_ websocket: WebSocketProtocol, didReceiveMessage message: String) {
         guard let jsonData = message.data(using: .utf8) else { return }
         
         do {
@@ -373,6 +362,23 @@ open class OCastDevice: NSObject, OCastDevicePublic, SocketProviderDelegate {
                 }
             }
         } catch {}
+    }
+
+    private func handleReply(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {
+        guard let status = deviceLayer.status else { return }
+        
+        switch status {
+        case .ok:
+            if let code = deviceLayer.message.data.params.code, code != OCastDefaultResponseDataLayer.successCode {
+                commandHandlers[deviceLayer.id]?(.failure(OCastReplyError(code: code)))
+            } else {
+                commandHandlers[deviceLayer.id]?(.success(jsonData))
+            }
+        case .error(_):
+            commandHandlers[deviceLayer.id]?(.failure(OCastError.transportError))
+        }
+        
+        commandHandlers.removeValue(forKey: deviceLayer.id)
     }
 }
 

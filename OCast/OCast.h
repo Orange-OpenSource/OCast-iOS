@@ -16,7 +16,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <OCast/WifiSecurity.h>
 
 //! Project version number for OCast.
 FOUNDATION_EXPORT double OCastVersionNumber;

@@ -18,7 +18,36 @@
 
 import Foundation
 
-typealias UPNPServiceProtocolCompletionHandler = ((Result<Device, UPNPServiceProtocolError>)) -> Void
+/// Describes a Device
+@objc public final class UPNPDevice: NSObject {
+    /// base URL of the device
+    public let baseURL: URL
+    /// IP address
+    public let ipAddress: String
+    /// service port
+    public let servicePort: UInt16
+    /// unique device ID (aka USN)
+    public let deviceID: String
+    /// friendly name
+    public let friendlyName: String
+    /// manufacturer's name
+    public let manufacturer: String
+    /// model name
+    public let modelName: String
+
+    init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String) {
+        self.baseURL = baseURL
+        self.ipAddress = ipAddress
+        self.servicePort = servicePort
+        self.deviceID = deviceID
+        self.friendlyName = friendlyName
+        self.manufacturer = manufacturer
+        self.modelName = modelName
+    }
+}
+
+
+typealias UPNPServiceProtocolCompletionHandler = ((Result<UPNPDevice, UPNPServiceProtocolError>)) -> Void
 
 /// UPNP service errors.
 enum UPNPServiceProtocolError: Error {
@@ -105,7 +134,7 @@ class UPNPService: UPNPServiceProtocol {
     ///   - data: The data representing the response.
     ///   - httpHeaders: The HTTP response headers.
     /// - Returns: The new device or `nil` if an error occurs.
-    private func device(from data: Data?, httpHeaders: [AnyHashable: Any]) -> Device? {
+    private func device(from data: Data?, httpHeaders: [AnyHashable: Any]) -> UPNPDevice? {
         guard let data = data,
             let applicationURLString = applicationURL(fromHttpHeaders: httpHeaders),
             let applicationURL = URL(string: applicationURLString),
@@ -117,7 +146,7 @@ class UPNPService: UPNPServiceProtocol {
             let modelName = xmlDeviceElement["modelName"]?.value,
             let UDN = xmlDeviceElement["UDN"]?.value else { return nil }
         
-        return Device(baseURL: applicationURL,
+        return UPNPDevice(baseURL: applicationURL,
                       ipAddress: ipAddress,
                       servicePort: UInt16(applicationURL.port ?? 80),
                       deviceID: UPNPService.extractUUID(from: UDN) ?? UDN,

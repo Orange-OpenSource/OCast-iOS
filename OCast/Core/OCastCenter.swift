@@ -46,13 +46,6 @@ public let OCastDeviceDiscoveryErrorNotification = Notification.Name(kOCastDevic
     ///   - device: lost device information . See `Device` for details.
     func discovery(_ center: OCastCenter, didRemoveDevice device: OCastDeviceProtocol)
     
-    /// Gets called when a device is updated (name for example).
-    ///
-    /// - Parameters:
-    ///   - center: center which call the method
-    ///   - device: lost device information . See `Device` for details.
-    func discovery(_ center: OCastCenter, didUpdateDevice device: OCastDeviceProtocol)
-    
     /// Gets called when the discovery is stopped by error or not. All the devices are removed.
     ///
     /// - Parameters:
@@ -95,11 +88,11 @@ public class OCastCenter: NSObject, DeviceDiscoveryDelegate {
     }
     
     // MARK: DeviceDiscoveryDelegate
-    public func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [Device]) {
+    public func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [UPNPDevice]) {
         devices.forEach { device in
             if let type = registeredDevices[device.manufacturer] {
                 if detectedDevice[device.ipAddress] == nil {
-                    let ocastDevice = type.init(ipAddress: device.ipAddress, applicationURL: device.baseURL.absoluteString)
+                    let ocastDevice = type.init(upnpDevice: device)
                     detectedDevice[device.ipAddress] = ocastDevice
                     discoveryDelegate?.discovery(self, didAddDevice: ocastDevice)
                     NotificationCenter.default.post(name: OCastAddDeviceNotification, object: ocastDevice)
@@ -108,7 +101,7 @@ public class OCastCenter: NSObject, DeviceDiscoveryDelegate {
         }
     }
     
-    public func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [Device]) {
+    public func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [UPNPDevice]) {
         devices.forEach { device in
             if let device = detectedDevice[device.ipAddress] {
                 detectedDevice.removeValue(forKey: device.ipAddress)

@@ -30,18 +30,15 @@ s.ios.deployment_target = '8.0'
 s.swift_version = '5.0'
 
 s.subspec 'Core' do |core|
-    core.source_files   = 'OCast/Core/**/*.{swift,m,h}', 'OCast/OCast.h'
+    core.source_files   = 'OCast/Core/**/*.{swift,m,h}', 'OCast/Utils/**/*.{swift,m,h}', 'OCast/OCast.h'
     core.dependency 'CocoaAsyncSocket', '7.6.3'
     core.dependency 'DynamicCodable', '1.0'
 end
 
-s.subspec 'ReferenceDriver' do |reference|
-    reference.source_files   = 'OCast/ReferenceDriver/**/*.{swift,m,h}', 'OCast/Starscream/Sources/*.swift'
+s.subspec 'Reference' do |reference|
+    reference.source_files   = 'OCast/Reference/**/*.{swift,m,h}', 'OCast/Starscream/Sources/*.swift'
     reference.dependency 'OCast/Core'
     reference.dependency 'Starscream', '3.1.0'
-    #reference.libraries      = 'z'
-    #reference.preserve_paths = 'OCast/Starscream/zlib/*'
-    #reference.pod_target_xcconfig = { 'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/OCast/Starscream/zlib' }
 end
 
 end
