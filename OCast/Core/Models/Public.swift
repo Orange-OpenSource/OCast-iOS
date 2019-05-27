@@ -208,7 +208,7 @@ public struct DataMapper {
 @objcMembers
 @objc public class SSLConfigurationClientCertificate: NSObject {
     /// The client certificate
-    public let certificate: Data
+    public let certificate: URL
     /// The password to import the certificate
     public let password: String
     
@@ -217,7 +217,7 @@ public struct DataMapper {
     /// - Parameters:
     ///   - certificate: The certificate (PKCS12 format)
     ///   - password: The certificate password
-    public init(certificate: Data, password: String) {
+    public init(certificate: URL, password: String) {
         self.certificate = certificate
         self.password = password
     }

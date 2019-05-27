@@ -24,7 +24,7 @@ DESC
 s.homepage         = 'https://github.com/Orange-OpenSource/OCast-iOS'
 s.license          = { :type => 'Apache V2', :file => 'LICENSE' }
 s.author           = { 'Orange' => ['christophe.azemar@orange.com', 'francois.suc@orange.com'] }
-s.source           = { :git => 'https://github.com/Orange-OpenSource/OCast-iOS.git', :tag => s.version.to_s, :submodules => true }
+s.source           = { :git => 'https://github.com/Orange-OpenSource/OCast-iOS.git', :tag => s.version.to_s }
 
 s.ios.deployment_target = '8.0'
 s.swift_version = '5.0'
@@ -38,9 +38,10 @@ end
 s.subspec 'ReferenceDriver' do |reference|
     reference.source_files   = 'OCast/ReferenceDriver/**/*.{swift,m,h}', 'OCast/Starscream/Sources/*.swift'
     reference.dependency 'OCast/Core'
-    reference.libraries      = 'z'
-    reference.preserve_paths = 'OCast/Starscream/zlib/*'
-    reference.pod_target_xcconfig = { 'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/OCast/Starscream/zlib' }
+    reference.dependency 'Starscream', '3.1.0'
+    #reference.libraries      = 'z'
+    #reference.preserve_paths = 'OCast/Starscream/zlib/*'
+    #reference.pod_target_xcconfig = { 'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/OCast/Starscream/zlib' }
 end
 
 end
