@@ -50,7 +50,7 @@ class DIALService {
     /// Get application info
     ///
     /// - Parameter completion: result
-    public func info(ofApplication name: String, withCompletion completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> ()) {
+    public func info(ofApplication name: String, completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> ()) {
         HTTPRequest.launch(urlSession: urlSession, method: .GET, url: "\(baseURL)/\(name)") { result in
             switch result {
             case .failure(let httpError):
@@ -79,7 +79,7 @@ class DIALService {
     /// Start the application
     ///
     /// - Parameter completion: result
-    public func start(application name: String, withCompletion completion: @escaping (Result<Void, DIALError>) -> ()) {
+    public func start(application name: String, completion: @escaping (Result<Void, DIALError>) -> ()) {
         HTTPRequest.launch(urlSession: urlSession, method: .POST, url: "\(baseURL)/\(name)", successCode: 201) { result in
             switch result {
             case .failure(let httpError):
@@ -93,7 +93,7 @@ class DIALService {
     /// Stop the application
     ///
     /// - Parameter completion: result
-    public func stop(application name: String, withCompletion completion: @escaping (Result<Void, DIALError>) -> ()) {
+    public func stop(application name: String, completion: @escaping (Result<Void, DIALError>) -> ()) {
         info(ofApplication:name) { result in
             switch result {
             case .failure(let error):

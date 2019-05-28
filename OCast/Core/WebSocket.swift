@@ -103,10 +103,12 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     /// - Parameters:
     ///   - urlString: The URL used to perform the connection.
     ///   - sslConfiguration: The SSL configuration for secure connections.
-    init?(urlString: String, sslConfiguration: SSLConfiguration?) {
+    ///   - Parameter delegateQueue: The queue on which a delegate is called (Default: main).
+    init?(urlString: String, sslConfiguration: SSLConfiguration?, delegateQueue: DispatchQueue = DispatchQueue.main) {
         guard let url = URL(string: urlString) else { return nil }
         
         socket = Starscream.WebSocket(url: url)
+        socket.callbackQueue = delegateQueue
         
         setup(sslConfiguration: sslConfiguration)
         socket.delegate = self
@@ -218,11 +220,12 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     
     func websocketDidConnect(socket: WebSocketClient) {
         delegate?.websocket(self, didConnectTo: self.socket.currentURL)
-        startPingPongTimer()
+        DispatchQueue.main.async { self.startPingPongTimer() }
     }
     
     func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
-        stopPingPongTimer()
+        DispatchQueue.main.async { self.stopPingPongTimer() }
+        
         var socketError = error
         if let error = error as? WSError, error.code == CloseCode.normal.rawValue {
             socketError = nil
@@ -233,6 +236,6 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     // MARK: - WebSocketPongDelegate methods
     
     func websocketDidReceivePong(socket: WebSocketClient, data: Data?) {
-        pingPongTimerRetry = 0
+        DispatchQueue.main.async { self.pingPongTimerRetry = 0 }
     }
 }
