@@ -98,3 +98,18 @@ public protocol OCastSenderDevice {
     func send<T: OCastMessage>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName, completion: @escaping CommandWithoutResultHandler)
     func send<T: OCastMessage, U: Codable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName, completion: @escaping CommandWithResultHandler<U>)
 }
+
+/// Extension to manage default parameter values (forbidden in a protocol)
+public extension OCastDevicePublic {
+    func prepare(_ prepare: MediaPrepareCommand, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {}
+    func setTrack(_ track: MediaTrackCommand, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {}
+    func play(at position: Double, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {}
+    func stop(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {}
+    func resume(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {}
+    func setVolume(_ volume: Float, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {}
+    func pause(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {}
+    func seek(to position: Double, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {}
+    func metadata(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithResultHandler<MediaMetadataChanged>) {}
+    func playbackStatus(withOptions options: [String: Any]? = nil, completion: @escaping CommandWithResultHandler<MediaPlaybackStatus>) {}
+    func mute(_ flag: Bool, withOptions options: [String: Any]? = nil, completion: @escaping CommandWithoutResultHandler) {}
+}
