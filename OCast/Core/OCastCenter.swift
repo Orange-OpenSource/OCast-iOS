@@ -22,8 +22,11 @@ public let kOCastAddDevice = "OCastAddDevice"
 public let kOCastRemoveDevice = "OCastRemoveDevice"
 public let kOCastDeviceDiscoveryError = "OCastDeviceDiscoveryError"
 
+/// Notification sent each time a new device is discovered
 public let OCastAddDeviceNotification = Notification.Name(kOCastAddDevice)
+/// Notification sent each time a device has been removed
 public let OCastRemoveDeviceNotification = Notification.Name(kOCastRemoveDevice)
+/// Notification send each time a error has occured during discovery
 public let OCastDeviceDiscoveryErrorNotification = Notification.Name(kOCastDeviceDiscoveryError)
 
 /**
@@ -55,14 +58,16 @@ public let OCastDeviceDiscoveryErrorNotification = Notification.Name(kOCastDevic
 }
 
 @objcMembers
+/// Center which discover OCast devices on the network
 public class OCastCenter: NSObject, DeviceDiscoveryDelegate {
 
     public weak var discoveryDelegate: OCastDiscoveryDelegate?
     
+    // manufacturer/device's type
     private var registeredDevices: [String: OCastDeviceProtocol.Type] = [:]
     private var searchTargets: [String] = []
     // mac/device
-    private var detectedDevice: [String: OCastDeviceProtocol] = [:]
+    private var detectedDevices: [String: OCastDeviceProtocol] = [:]
     private var discovery: DeviceDiscovery?
     
     /// Registers a driver to connect to a device.
@@ -74,6 +79,8 @@ public class OCastCenter: NSObject, DeviceDiscoveryDelegate {
         searchTargets.append(deviceType.searchTarget)
     }
     
+    
+    /// Start to discover devices
     public func startDiscovery() {
         // stop old discovery if existing and running
         discovery?.stop()
@@ -82,18 +89,19 @@ public class OCastCenter: NSObject, DeviceDiscoveryDelegate {
         discovery?.resume()
     }
     
+    // Stop to discover
     public func stopDiscovery() {
         discovery?.delegate = nil
         discovery?.stop()
     }
     
-    // MARK: DeviceDiscoveryDelegate
+    // MARK: DeviceDiscoveryDelegate methods
     public func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [UPNPDevice]) {
         devices.forEach { device in
             if let type = registeredDevices[device.manufacturer] {
-                if detectedDevice[device.ipAddress] == nil {
+                if detectedDevices[device.ipAddress] == nil {
                     let ocastDevice = type.init(upnpDevice: device)
-                    detectedDevice[device.ipAddress] = ocastDevice
+                    detectedDevices[device.ipAddress] = ocastDevice
                     discoveryDelegate?.discovery(self, didAddDevice: ocastDevice)
                     NotificationCenter.default.post(name: OCastAddDeviceNotification, object: ocastDevice)
                 }
@@ -103,8 +111,8 @@ public class OCastCenter: NSObject, DeviceDiscoveryDelegate {
     
     public func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [UPNPDevice]) {
         devices.forEach { device in
-            if let device = detectedDevice[device.ipAddress] {
-                detectedDevice.removeValue(forKey: device.ipAddress)
+            if let device = detectedDevices[device.ipAddress] {
+                detectedDevices.removeValue(forKey: device.ipAddress)
                 discoveryDelegate?.discovery(self, didRemoveDevice: device)
                 NotificationCenter.default.post(name: OCastRemoveDeviceNotification, object: device)
             }
