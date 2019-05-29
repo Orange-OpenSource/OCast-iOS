@@ -89,7 +89,6 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
     }
     
     // MARK: Connect/disconnect
-    
     public func connect(_ configuration: SSLConfiguration, completion: @escaping CommandWithoutResultHandler) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .connected {
@@ -97,31 +96,18 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
             return
         }
         
-        guard let applicationName = applicationName else {
-            completion(OCastError.applicationNameNotSet)
-            return
-        }
-        
-        dialService.info(ofApplication: applicationName) { [weak self] result in
-            switch result {
-            case .success(let info):
-                guard let `self` = self else { return }
-                
-                guard let websocket = WebSocket(urlString: info.app2appURL ?? self.settingsWebSocketURL,
-                                                sslConfiguration: configuration,
-                                                delegateQueue: DispatchQueue(label: "org.ocast.websocket")) else {
-                    completion(OCastError.badApplicationURL)
-                    return
+        if let applicationName = applicationName {
+            dialService.info(ofApplication: applicationName) { [weak self] result in
+                switch result {
+                case .success(let info):
+                    guard let `self` = self else { return }
+                    self.connect(info.app2appURL ?? self.settingsWebSocketURL, andSSLConfiguration: configuration, completion)
+                case .failure(let error):
+                    completion(error)
                 }
-                
-                self.websocket = websocket
-                self.connectHandler = completion
-                self.state = .connecting
-                self.websocket?.delegate = self
-                self.websocket?.connect()
-            case .failure(let error):
-                completion(error)
             }
+        } else {
+            connect(settingsWebSocketURL, andSSLConfiguration: configuration, completion)
         }
     }
     
@@ -303,6 +289,22 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
                                                 object: self, userInfo:[OCastUpdateStatusUserInfoKey: updateStatus.message.data.params])
             }
         }
+    }
+    
+    private func connect(_ url: String, andSSLConfiguration configuration: SSLConfiguration, _ completion: @escaping CommandWithoutResultHandler) {
+        
+        guard let websocket = WebSocket(urlString: url,
+                                        sslConfiguration: configuration,
+                                        delegateQueue: DispatchQueue(label: "org.ocast.websocket")) else {
+                                            completion(OCastError.badApplicationURL)
+                                            return
+        }
+        
+        self.websocket = websocket
+        self.connectHandler = completion
+        self.state = .connecting
+        self.websocket?.delegate = self
+        self.websocket?.connect()
     }
     
     private func generateId() -> Int {
