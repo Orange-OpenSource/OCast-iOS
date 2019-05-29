@@ -21,20 +21,20 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		8549ACF82296E80700E205A3 /* OCastDomainGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF12296E80700E205A3 /* OCastDomainGeneral.swift */; };
-		8549ACF92296E80700E205A3 /* OCastDomainSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF22296E80700E205A3 /* OCastDomainSettings.swift */; };
-		8549ACFA2296E80700E205A3 /* OCastDomainWebApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF32296E80700E205A3 /* OCastDomainWebApp.swift */; };
-		8549ACFB2296E80700E205A3 /* OCastDomainMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF42296E80700E205A3 /* OCastDomainMedia.swift */; };
-		8549ACFC2296E80700E205A3 /* OCastCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF52296E80700E205A3 /* OCastCenter.swift */; };
+		8549ACF82296E80700E205A3 /* OCastGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF12296E80700E205A3 /* OCastGeneral.swift */; };
+		8549ACF92296E80700E205A3 /* OCastSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF22296E80700E205A3 /* OCastSettings.swift */; };
+		8549ACFA2296E80700E205A3 /* OCastWebApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF32296E80700E205A3 /* OCastWebApp.swift */; };
+		8549ACFB2296E80700E205A3 /* OCastMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF42296E80700E205A3 /* OCastMedia.swift */; };
+		8549ACFC2296E80700E205A3 /* DeviceCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF52296E80700E205A3 /* DeviceCenter.swift */; };
 		8549ACFD2296E80700E205A3 /* DIALService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF62296E80700E205A3 /* DIALService.swift */; };
-		8549ACFE2296E80700E205A3 /* OCastDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF72296E80700E205A3 /* OCastDevice.swift */; };
-		8549AD032296E82100E205A3 /* OCastReferenceDeviceCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD002296E82000E205A3 /* OCastReferenceDeviceCommand.swift */; };
-		8549AD052296E82100E205A3 /* OCastReferenceDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD022296E82000E205A3 /* OCastReferenceDevice.swift */; };
+		8549ACFE2296E80700E205A3 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549ACF72296E80700E205A3 /* Device.swift */; };
+		8549AD032296E82100E205A3 /* ReferenceDeviceCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD002296E82000E205A3 /* ReferenceDeviceCommand.swift */; };
+		8549AD052296E82100E205A3 /* ReferenceDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD022296E82000E205A3 /* ReferenceDevice.swift */; };
 		8549AD722296E83700E205A3 /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD702296E83700E205A3 /* HTTPRequest.swift */; };
-		8549AD732296E83700E205A3 /* OCastXMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD712296E83700E205A3 /* OCastXMLParser.swift */; };
+		8549AD732296E83700E205A3 /* XMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD712296E83700E205A3 /* XMLReader.swift */; };
 		8549AD7A2296E94400E205A3 /* SSLConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD792296E94400E205A3 /* SSLConfiguration.swift */; };
-		97010329229BDEB500749F49 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97010328229BDEB500749F49 /* WebSocket.swift */; };
-		970856C32278A2B000175A1B /* TestOCastXMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970856C22278A2B000175A1B /* TestOCastXMLParser.swift */; };
+		8549AD95229E8E9400E205A3 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD94229E8E9400E205A3 /* WebSocket.swift */; };
+		970856C32278A2B000175A1B /* TestXMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970856C22278A2B000175A1B /* TestXMLReader.swift */; };
 		9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */; };
 		9790DFF8227C707A0031A70F /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF1227C707A0031A70F /* DeviceDiscovery.swift */; };
 		9790DFF9227C707A0031A70F /* UPNPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF2227C707A0031A70F /* UPNPService.swift */; };
@@ -72,21 +72,21 @@
 /* Begin PBXFileReference section */
 		5069F8175A5472E918DF16AC /* Pods_OCastTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCastTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		71FB5CBDE24B01B079C1F883 /* Pods_OCast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OCast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8549ACF12296E80700E205A3 /* OCastDomainGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastDomainGeneral.swift; sourceTree = "<group>"; };
-		8549ACF22296E80700E205A3 /* OCastDomainSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastDomainSettings.swift; sourceTree = "<group>"; };
-		8549ACF32296E80700E205A3 /* OCastDomainWebApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastDomainWebApp.swift; sourceTree = "<group>"; };
-		8549ACF42296E80700E205A3 /* OCastDomainMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastDomainMedia.swift; sourceTree = "<group>"; };
-		8549ACF52296E80700E205A3 /* OCastCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastCenter.swift; path = OCast/Core/OCastCenter.swift; sourceTree = SOURCE_ROOT; };
+		8549ACF12296E80700E205A3 /* OCastGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastGeneral.swift; sourceTree = "<group>"; };
+		8549ACF22296E80700E205A3 /* OCastSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastSettings.swift; sourceTree = "<group>"; };
+		8549ACF32296E80700E205A3 /* OCastWebApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastWebApp.swift; sourceTree = "<group>"; };
+		8549ACF42296E80700E205A3 /* OCastMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastMedia.swift; sourceTree = "<group>"; };
+		8549ACF52296E80700E205A3 /* DeviceCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DeviceCenter.swift; path = OCast/Core/DeviceCenter.swift; sourceTree = SOURCE_ROOT; };
 		8549ACF62296E80700E205A3 /* DIALService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DIALService.swift; path = OCast/Core/DIALService.swift; sourceTree = SOURCE_ROOT; };
-		8549ACF72296E80700E205A3 /* OCastDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OCastDevice.swift; path = OCast/Core/OCastDevice.swift; sourceTree = SOURCE_ROOT; };
-		8549AD002296E82000E205A3 /* OCastReferenceDeviceCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastReferenceDeviceCommand.swift; sourceTree = "<group>"; };
-		8549AD022296E82000E205A3 /* OCastReferenceDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastReferenceDevice.swift; sourceTree = "<group>"; };
+		8549ACF72296E80700E205A3 /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Device.swift; path = OCast/Core/Device.swift; sourceTree = SOURCE_ROOT; };
+		8549AD002296E82000E205A3 /* ReferenceDeviceCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferenceDeviceCommand.swift; sourceTree = "<group>"; };
+		8549AD022296E82000E205A3 /* ReferenceDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferenceDevice.swift; sourceTree = "<group>"; };
 		8549AD702296E83700E205A3 /* HTTPRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
-		8549AD712296E83700E205A3 /* OCastXMLParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OCastXMLParser.swift; sourceTree = "<group>"; };
+		8549AD712296E83700E205A3 /* XMLReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XMLReader.swift; sourceTree = "<group>"; };
 		8549AD792296E94400E205A3 /* SSLConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLConfiguration.swift; sourceTree = "<group>"; };
+		8549AD94229E8E9400E205A3 /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
 		8BC8721E9BC32C5BB5171BFA /* Pods-OCastTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastTests.release.xcconfig"; path = "Target Support Files/Pods-OCastTests/Pods-OCastTests.release.xcconfig"; sourceTree = "<group>"; };
-		97010328229BDEB500749F49 /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
-		970856C22278A2B000175A1B /* TestOCastXMLParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestOCastXMLParser.swift; sourceTree = "<group>"; };
+		970856C22278A2B000175A1B /* TestXMLReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestXMLReader.swift; sourceTree = "<group>"; };
 		9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSDPMSearchResponse.swift; sourceTree = "<group>"; };
 		9790DFF1227C707A0031A70F /* DeviceDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
 		9790DFF2227C707A0031A70F /* UPNPService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UPNPService.swift; sourceTree = "<group>"; };
@@ -161,10 +161,10 @@
 		8549ACF02296E80700E205A3 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
-				8549ACF12296E80700E205A3 /* OCastDomainGeneral.swift */,
-				8549ACF22296E80700E205A3 /* OCastDomainSettings.swift */,
-				8549ACF32296E80700E205A3 /* OCastDomainWebApp.swift */,
-				8549ACF42296E80700E205A3 /* OCastDomainMedia.swift */,
+				8549ACF12296E80700E205A3 /* OCastGeneral.swift */,
+				8549ACF22296E80700E205A3 /* OCastSettings.swift */,
+				8549ACF32296E80700E205A3 /* OCastWebApp.swift */,
+				8549ACF42296E80700E205A3 /* OCastMedia.swift */,
 			);
 			name = Domain;
 			path = OCast/Core/Domain;
@@ -173,8 +173,9 @@
 		8549ACFF2296E82000E205A3 /* Reference */ = {
 			isa = PBXGroup;
 			children = (
-				8549AD002296E82000E205A3 /* OCastReferenceDeviceCommand.swift */,
-				8549AD022296E82000E205A3 /* OCastReferenceDevice.swift */,
+				8549AD002296E82000E205A3 /* ReferenceDeviceCommand.swift */,
+				8549AD022296E82000E205A3 /* ReferenceDevice.swift */,
+				8549AD94229E8E9400E205A3 /* WebSocket.swift */,
 			);
 			path = Reference;
 			sourceTree = "<group>";
@@ -183,7 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				8549AD702296E83700E205A3 /* HTTPRequest.swift */,
-				8549AD712296E83700E205A3 /* OCastXMLParser.swift */,
+				8549AD712296E83700E205A3 /* XMLReader.swift */,
 				97E21345229D4051003AAF7C /* SynchronizedDictionary.swift */,
 				97E21347229D41C5003AAF7C /* SynchronizedValue.swift */,
 			);
@@ -244,7 +245,7 @@
 				9790E004227C70940031A70F /* MockUPNPService.swift */,
 				9790DFFF227C70930031A70F /* MockURLSession.swift */,
 				9790E005227C70940031A70F /* TestDeviceDiscovery.swift */,
-				970856C22278A2B000175A1B /* TestOCastXMLParser.swift */,
+				970856C22278A2B000175A1B /* TestXMLReader.swift */,
 				9790DFFE227C70930031A70F /* TestSSDPMSearchRequest.swift */,
 				9790E000227C70930031A70F /* TestSSDPMSearchResponse.swift */,
 				9790E001227C70930031A70F /* TestSSDPResponseParser.swift */,
@@ -257,12 +258,11 @@
 			isa = PBXGroup;
 			children = (
 				9790DFEF227C707A0031A70F /* DeviceDiscovery */,
-				8549ACF62296E80700E205A3 /* DIALService.swift */,
 				8549ACF02296E80700E205A3 /* Domain */,
-				8549ACF52296E80700E205A3 /* OCastCenter.swift */,
-				8549ACF72296E80700E205A3 /* OCastDevice.swift */,
+				8549ACF52296E80700E205A3 /* DeviceCenter.swift */,
+				8549ACF72296E80700E205A3 /* Device.swift */,
+				8549ACF62296E80700E205A3 /* DIALService.swift */,
 				8549AD792296E94400E205A3 /* SSLConfiguration.swift */,
-				97010328229BDEB500749F49 /* WebSocket.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -473,24 +473,24 @@
 			files = (
 				9790DFFB227C707A0031A70F /* SSDPMSearchRequest.swift in Sources */,
 				9790DFFA227C707A0031A70F /* SSDPResponseParser.swift in Sources */,
-				8549AD052296E82100E205A3 /* OCastReferenceDevice.swift in Sources */,
-				8549AD032296E82100E205A3 /* OCastReferenceDeviceCommand.swift in Sources */,
+				8549AD052296E82100E205A3 /* ReferenceDevice.swift in Sources */,
+				8549AD95229E8E9400E205A3 /* WebSocket.swift in Sources */,
+				8549AD032296E82100E205A3 /* ReferenceDeviceCommand.swift in Sources */,
 				9790DFFD227C707A0031A70F /* SSDPHeader.swift in Sources */,
-				8549ACF82296E80700E205A3 /* OCastDomainGeneral.swift in Sources */,
-				8549ACFB2296E80700E205A3 /* OCastDomainMedia.swift in Sources */,
-				8549AD732296E83700E205A3 /* OCastXMLParser.swift in Sources */,
+				8549ACF82296E80700E205A3 /* OCastGeneral.swift in Sources */,
+				8549ACFB2296E80700E205A3 /* OCastMedia.swift in Sources */,
+				8549AD732296E83700E205A3 /* XMLReader.swift in Sources */,
 				97E21346229D4051003AAF7C /* SynchronizedDictionary.swift in Sources */,
 				9790DFF9227C707A0031A70F /* UPNPService.swift in Sources */,
-				97010329229BDEB500749F49 /* WebSocket.swift in Sources */,
-				8549ACFA2296E80700E205A3 /* OCastDomainWebApp.swift in Sources */,
-				8549ACF92296E80700E205A3 /* OCastDomainSettings.swift in Sources */,
+				8549ACFA2296E80700E205A3 /* OCastWebApp.swift in Sources */,
+				8549ACF92296E80700E205A3 /* OCastSettings.swift in Sources */,
 				9790DFF8227C707A0031A70F /* DeviceDiscovery.swift in Sources */,
 				9790DFFC227C707A0031A70F /* UDPSocket.swift in Sources */,
 				9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */,
-				8549ACFC2296E80700E205A3 /* OCastCenter.swift in Sources */,
+				8549ACFC2296E80700E205A3 /* DeviceCenter.swift in Sources */,
 				8549AD7A2296E94400E205A3 /* SSLConfiguration.swift in Sources */,
 				8549AD722296E83700E205A3 /* HTTPRequest.swift in Sources */,
-				8549ACFE2296E80700E205A3 /* OCastDevice.swift in Sources */,
+				8549ACFE2296E80700E205A3 /* Device.swift in Sources */,
 				8549ACFD2296E80700E205A3 /* DIALService.swift in Sources */,
 				97E21348229D41C5003AAF7C /* SynchronizedValue.swift in Sources */,
 			);
@@ -506,7 +506,7 @@
 				9790E00A227C70940031A70F /* TestUPNPService.swift in Sources */,
 				9790E00D227C70940031A70F /* TestDeviceDiscovery.swift in Sources */,
 				9790E007227C70940031A70F /* MockURLSession.swift in Sources */,
-				970856C32278A2B000175A1B /* TestOCastXMLParser.swift in Sources */,
+				970856C32278A2B000175A1B /* TestXMLReader.swift in Sources */,
 				9790E00C227C70940031A70F /* MockUPNPService.swift in Sources */,
 				9790E006227C70940031A70F /* TestSSDPMSearchRequest.swift in Sources */,
 			);

@@ -58,7 +58,7 @@ class DIALService {
                 return
             case .success((let data, _)): // success
                 guard let data = data,
-                    let element = OCastXMLParser().parse(data: data)?["service"],
+                    let element = XMLReader().parse(data: data)?["service"],
                     let appName = element["name"]?.value,
                     let stateValue = element["state"]?.value,
                     let state = DIALState(rawValue: stateValue) else {

@@ -1,5 +1,5 @@
 //
-// OCastXMLParser.swift
+// XMLReader.swift
 //
 // Copyright 2019 Orange
 //
@@ -59,7 +59,7 @@ class XMLElement {
 }
 
 /// Class to provide a XML parser used for SSDP and DIAL responses.
-class OCastXMLParser: NSObject, XMLParserDelegate {
+class XMLReader: NSObject, XMLParserDelegate {
     
     /// The root element.
     private var rootElement = XMLElement()

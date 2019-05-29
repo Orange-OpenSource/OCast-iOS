@@ -12,7 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 //
-//  OCastReferenceDevice.swift
+//  ReferenceDevice.swift
 //  OCast
 //
 //  Created by Christophe Azemar on 09/05/2019.
@@ -24,7 +24,7 @@ import Foundation
 internal typealias CommandResult = (Result<Data?, Error>) -> ()
 
 @objc @objcMembers
-open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
+open class Device: NSObject, DevicePublic, WebSocketDelegate {
     
     public private(set) var state: DeviceState = .disconnected {
         didSet {
@@ -62,8 +62,8 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
     
     public var sslConfiguration: SSLConfiguration = SSLConfiguration(deviceCertificates: nil, clientCertificate: nil)
     private var websocket: WebSocketProtocol?
-    private var connectHandler: CommandWithoutResultHandler?
-    private var disconnectHandler: CommandWithoutResultHandler?
+    private var connectHandler: NoResultHandler?
+    private var disconnectHandler: NoResultHandler?
     private var commandHandlers = SynchronizedDictionary<Int, CommandResult>()
     private var registeredEvents = SynchronizedDictionary<String, EventHandler>()
     
@@ -89,7 +89,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
     }
     
     // MARK: Connect/disconnect
-    public func connect(_ configuration: SSLConfiguration, completion: @escaping CommandWithoutResultHandler) {
+    public func connect(_ configuration: SSLConfiguration, completion: @escaping NoResultHandler) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .connected {
             completion(error)
@@ -111,7 +111,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
         }
     }
     
-    public func disconnect(_ completion: @escaping CommandWithoutResultHandler) {
+    public func disconnect(_ completion: @escaping NoResultHandler) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .disconnected {
             completion(error)
@@ -131,7 +131,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
     
     // MARK: DIAL methods
     
-    public func startApplication(_ completion: @escaping CommandWithoutResultHandler) {
+    public func startApplication(_ completion: @escaping NoResultHandler) {
         guard let applicationName = applicationName else {
             completion(OCastError.applicationNameNotSet)
             return
@@ -177,7 +177,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
         })
     }
     
-    public func stopApplication(_ completion: @escaping CommandWithoutResultHandler) {
+    public func stopApplication(_ completion: @escaping NoResultHandler) {
         guard let applicationName = applicationName else {
             completion(OCastError.applicationNameNotSet)
             return
@@ -195,7 +195,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
     
     // MARK: Internal methods
     
-    func sendToApplication<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
+    func sendToApplication<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping ResultHandler<U>) {
         if isApplicationRunning.synchronizedValue {
             self.send(layer: layer, completion: completion)
         } else {
@@ -209,7 +209,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
         }
     }
     
-    func send<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping CommandWithResultHandler<U>) {
+    func send<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping ResultHandler<U>) {
         let completionBlock: CommandResult = { result in
             switch result {
             case .success(let data):
@@ -291,7 +291,7 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
         }
     }
     
-    private func connect(_ url: String, andSSLConfiguration configuration: SSLConfiguration, _ completion: @escaping CommandWithoutResultHandler) {
+    private func connect(_ url: String, andSSLConfiguration configuration: SSLConfiguration, _ completion: @escaping NoResultHandler) {
         
         guard let websocket = WebSocket(urlString: url,
                                         sslConfiguration: configuration,
@@ -404,11 +404,11 @@ open class OCastDevice: NSObject, OCastDevicePublic, WebSocketDelegate {
     }
 }
 
-extension OCastDevice: OCastSenderDevice {
+extension Device: OCastSenderDevice {
     
-    public func send<T: OCastMessage>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping CommandWithoutResultHandler) {
+    public func send<T: OCastMessage>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping NoResultHandler) {
         let deviceLayer = OCastDeviceLayer(source: uuid, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
-        let completionBlock: CommandWithResultHandler<NoResult> = { _, error in
+        let completionBlock: ResultHandler<NoResult> = { _, error in
             completion(error)
         }
         if domain == .browser {
@@ -418,7 +418,7 @@ extension OCastDevice: OCastSenderDevice {
         }
     }
     
-    public func send<T: OCastMessage, U: Codable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping CommandWithResultHandler<U>) {
+    public func send<T: OCastMessage, U: Codable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping ResultHandler<U>) {
         let deviceLayer = OCastDeviceLayer(source: uuid, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
         if domain == .browser {
             sendToApplication(layer: deviceLayer, completion: completion)

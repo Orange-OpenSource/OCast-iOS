@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 //
-//  OCastDomainWebApp.swift
+//  OCastWebApp.swift
 //  OCast
 //
 //  Created by Christophe Azemar on 28/03/2019.

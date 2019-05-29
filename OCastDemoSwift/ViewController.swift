@@ -18,18 +18,20 @@
 import UIKit
 import OCast
 
-extension OCastDevice: OCastDeviceProtocol {
+
+extension Device: DeviceProtocol {
     public static var manufacturer: String = "manufacturer"
     public static var searchTarget: String = "urn:cast-ocast-org:service:cast:1"
 }
 
-class ViewController: UIViewController, OCastDiscoveryDelegate {
+class ViewController: UIViewController, DeviceCenterDelegate {
+    
     
     /// The object to discover the devices
-    private let center = OCastCenter()
+    private let center = DeviceCenter()
     
     // device
-    private var device: OCastDeviceProtocol?
+    private var device: DeviceProtocol?
     
     /// Indicates whether a cast is in progress
     private var isCastInProgress: Bool = false
@@ -46,10 +48,10 @@ class ViewController: UIViewController, OCastDiscoveryDelegate {
         resetUI()
         
         // Register the driver
-        center.registerDevice(OCastDevice.self)
+        center.registerDevice(Device.self)
         
         // Launch the discovery process
-        center.discoveryDelegate = self
+        center.centerDelegate = self
         center.startDiscovery()
     }
     
@@ -66,7 +68,6 @@ class ViewController: UIViewController, OCastDiscoveryDelegate {
     
     /// Starts the cast
     ///
-    /// - Parameter mediaController: The `MediaController` used to cast.
     private func startCast() {
         isCastInProgress = true
         let command = MediaPrepareCommand(url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", frequency: 1, title: "Movie Sample", subtitle: "Brought to you", logo: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/", mediaType: .video, transferMode: .buffered, autoPlay: true)
@@ -89,8 +90,8 @@ class ViewController: UIViewController, OCastDiscoveryDelegate {
         actionButton.isEnabled = false
     }
     
-    // MARK: DeviceDiscoveryDelegate methods
-    func discovery(_ center: OCastCenter, didAddDevice device: OCastDeviceProtocol) {
+    // MARK: DeviceCenter methods
+    func center(_ center: DeviceCenter, didAddDevice device: DeviceProtocol) {
         // Only one device (the first found)
         if self.device != nil {
             return
@@ -98,19 +99,20 @@ class ViewController: UIViewController, OCastDiscoveryDelegate {
         
         self.device = device
         stickLabel.text = String(format: "Stick: %@", device.ipAddress)
+        self.device?.applicationName = "OCastDemoApplicationName"
         self.device?.connect(SSLConfiguration(), completion: { error in
             self.actionButton.isEnabled = error == nil
         })
     }
     
-    func discovery(_ center: OCastCenter, didRemoveDevice device: OCastDeviceProtocol) {
+    func center(_ center: DeviceCenter, didRemoveDevice device: DeviceProtocol) {
         if device.ipAddress == self.device?.ipAddress {
             resetUI()
             self.device = nil
         }
     }
     
-    func discoveryDidStop(_ center: OCastCenter, withError error: Error?) {}
+    func centerDidStop(_ center: DeviceCenter, withError error: Error?) {}
 
 }
 

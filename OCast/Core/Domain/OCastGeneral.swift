@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 //
 //
-//  OCastDomain.swift
+//  OCastGeneral.swift
 //  OCast
 //
 //  Created by Christophe Azemar on 16/11/2018.

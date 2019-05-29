@@ -139,7 +139,7 @@ class UPNPService: UPNPServiceProtocol {
             let applicationURLString = applicationURL(fromHttpHeaders: httpHeaders),
             let applicationURL = URL(string: applicationURLString),
             let ipAddress = applicationURL.host,
-            let xmlRootElement = OCastXMLParser().parse(data: data),
+            let xmlRootElement = XMLReader().parse(data: data),
             let xmlDeviceElement = xmlRootElement["root"]?["device"],
             let friendlyName = xmlDeviceElement["friendlyName"]?.value,
             let manufacturer = xmlDeviceElement["manufacturer"]?.value,

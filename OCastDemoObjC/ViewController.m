@@ -19,14 +19,14 @@
 #import "Constants.h"
 @import OCast;
 
-@interface ViewController () <OCastDiscoveryDelegate>
+@interface ViewController () <DeviceCenterDelegate>
 
 
 /// The `DeviceManager`
-@property(nonatomic, strong) OCastCenter * center;
+@property(nonatomic, strong) DeviceCenter * center;
 
 /// The `ApplicationController`
-@property(nonatomic, strong) id<OCastDeviceProtocol> device;
+@property(nonatomic, strong) id<DeviceProtocol> device;
 
 /// The `ApplicationController`
 @property(nonatomic) BOOL isCastInProgress;
@@ -43,7 +43,7 @@
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super initWithCoder:aDecoder]) {
-        _center = [[OCastCenter alloc] init];
+        _center = [[DeviceCenter alloc] init];
     }
     self.isCastInProgress = false;
     return self;
@@ -55,10 +55,10 @@
     [self resetUI];
     
     // Register the driver
-    [self.center registerDevice:OCastDevice.class];
+    [self.center registerDevice:Device.class];
     
     // Launch the discovery process
-    self.center.discoveryDelegate = self;
+    self.center.centerDelegate = self;
     [self.center startDiscovery];
 }
 
@@ -81,6 +81,7 @@
     self.isCastInProgress = YES;
     MediaPrepareCommand * command = [[MediaPrepareCommand alloc] initWithUrl:@"" frequency:1 title:@"" subtitle:@"" logo:@"" mediaType:OCastMediaTypeVideo transferMode:OCastMediaTransferModeBuffered autoPlay:true];
     
+    _device.applicationName = OCastDemoApplicationName;
     [_device prepare:command withOptions:nil completion:^(NSError * _Nullable error) {
         
     }];
@@ -110,7 +111,7 @@
 }
 
 // MARK: OCastDiscoveryDelegate methods
-- (void)discovery:(OCastCenter * _Nonnull)center didAddDevice:(id<OCastDeviceProtocol> _Nonnull)device {
+- (void)center:(DeviceCenter * _Nonnull)center didAddDevice:(id<DeviceProtocol> _Nonnull)device {
     if (self.device == nil) {
         self.device = device;
         self.stickLabel.text = [NSString stringWithFormat:@"Stick: %@", device.friendlyName];
@@ -120,7 +121,7 @@
     }
 }
 
-- (void)discovery:(OCastCenter * _Nonnull)center didRemoveDevice:(id<OCastDeviceProtocol> _Nonnull)device {
+- (void)center:(DeviceCenter * _Nonnull)center didRemoveDevice:(id<DeviceProtocol> _Nonnull)device {
     if (self.device.ipAddress == device.ipAddress) {
         self.device = nil;
         [self resetUI];
@@ -128,6 +129,6 @@
     }
 }
 
-- (void)discoveryDidStop:(OCastCenter * _Nonnull)center withError:(NSError * _Nullable)error {}
+- (void)centerDidStop:(DeviceCenter * _Nonnull)center withError:(NSError * _Nullable)error {}
 
 @end
