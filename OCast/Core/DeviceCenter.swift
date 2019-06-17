@@ -18,105 +18,159 @@
 
 import Foundation
 
-public let kDeviceCenterAddDevice = "DeviceCenterAddDevice"
-public let kDeviceCenterRemoveDevice = "DeviceCenterRemoveDevice"
-public let kDeviceCenterDeviceDiscoveryError = "DeviceCenterDeviceDiscoveryError"
+/// The notification sent each time new devices is discovered.
+/// The userinfo `DeviceCenterDevicesUserInfoKey` key contains an array with the new devices.
+public let DeviceCenterAddDevicesNotification = Notification.Name("DeviceCenterAddDevices")
 
-/// Notification sent each time a new device is discovered
-public let DeviceCenterAddDeviceNotification = Notification.Name(kDeviceCenterAddDevice)
-/// Notification sent each time a device has been removed
-public let DeviceCenterRemoveDeviceNotification = Notification.Name(kDeviceCenterRemoveDevice)
-/// Notification send each time a error has occured during discovery
-public let DeviceCenterDeviceDiscoveryErrorNotification = Notification.Name(kDeviceCenterDeviceDiscoveryError)
+/// The notification sent each time devices has been removed.
+/// The userinfo `DeviceCenterDevicesUserInfoKey` key contains an array with the devices removed.
+public let DeviceCenterRemoveDevicesNotification = Notification.Name("DeviceCenterRemoveDevices")
 
+/// Notification sent each time an error has occured during discovery.
+/// The userinfo `DeviceCenterErrorUserInfoKey` key contains an error if it occurs.
+public let DeviceCenterDeviceDiscoveryErrorNotification = Notification.Name("DeviceCenterDeviceDiscoveryError")
+
+/// The notification user info key representing the devices.
+public let DeviceCenterDevicesUserInfoKey = "DeviceCenterDevicesUserInfoKey"
+
+/// The notification user info key representing the error when the discovery is stopped.
+public let DeviceCenterErrorUserInfoKey = "DeviceCenterErrorUserInfoKey"
+
+/// Protocol for responding to device discovery events.
 @objc public protocol DeviceCenterDelegate {
     
-    /// Gets called when a new device is found.
+    /// Tells the delegate that new devices are found.
     ///
     /// - Parameters:
-    ///   - center: center which call the method
-    ///   - device: added device information . See `Device` for details.
-    func center(_ center: DeviceCenter, didAddDevice device: DeviceProtocol)
+    ///   - center: The device center informing the delegate.
+    ///   - device: The new device found.
+    func center(_ center: DeviceCenter, didAdd devices: [DeviceProtocol])
     
-    /// Gets called when a device is lost.
+    /// Tells the delegate that devices are lost.
     ///
     /// - Parameters:
-    ///   - center: center which call the method
-    ///   - device: lost device information . See `Device` for details.
-    func center(_ center: DeviceCenter, didRemoveDevice device: DeviceProtocol)
+    ///   - center: The device center informing the delegate.
+    ///   - device: The device lost.
+    func center(_ center: DeviceCenter, didRemove devices: [DeviceProtocol])
     
-    /// Gets called when the discovery is stopped by error or not. All the devices are removed.
+    /// Tells the delegate that the discovery is stopped. All the devices are removed.
     ///
     /// - Parameters:
-    ///   - center: center which call the method
-    ///   - error: the error if there's a problem, nil if the `DeviceDiscovery` has been stopped normally.
+    ///   - center: The device center informing the delegate.
+    ///   - error: The error if there's an issue, `nil` if the device discovery has been stopped normally.
     func centerDidStop(_ center: DeviceCenter, withError error: Error?)
 }
 
+/// The center which discover OCast devices on the network.
 @objcMembers
-/// Center which discover OCast devices on the network
 public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
 
-    public weak var centerDelegate: DeviceCenterDelegate?
-    
-    // manufacturer/device's type
+    /// The registered devices saving the manufacturer and the device type.
     private var registeredDevices: [String: DeviceProtocol.Type] = [:]
-    private var searchTargets: [String] = []
-    // mac/device
-    private var detectedDevices: [String: DeviceProtocol] = [:]
-    private var discovery: DeviceDiscovery?
     
-    /// Registers a driver to discover it.
+    /// The search targets used to search the devices.
+    private var searchTargets: [String] = []
+    
+    /// The detected devices.
+    private var detectedDevices: [String: DeviceProtocol] = [:]
+    
+    /// The delegate to receive discovery events.
+    private var deviceDiscovery: DeviceDiscovery?
+    
+    /// The delegate to receive the device center events.
+    public weak var delegate: DeviceCenterDelegate?
+    
+    /// The interval in seconds to refresh the devices. The minimum value is 5 seconds.
+    public var deviceDiscoveryInterval: UInt16 {
+        get { return deviceDiscovery?.interval ?? 0 }
+        set { deviceDiscovery?.interval = deviceDiscoveryInterval }
+    }
+    
+    /// Registers a driver to discover devices of its manufacturer.
     ///
     /// - Parameters:
-    ///   - deviceType: The Type of the driver class to register (for example OCastReferenceDevice.self)
+    ///   - deviceType: The Type of the driver class to register (for example ReferenceDevice.self)
     public func registerDevice(_ deviceType: DeviceProtocol.Type) {
         registeredDevices[deviceType.manufacturer] = deviceType
         searchTargets.append(deviceType.searchTarget)
     }
     
-    /// Start to discover devices
-    public func startDiscovery() {
-        // stop old discovery if existing and running
-        discovery?.stop()
-        discovery = DeviceDiscovery(searchTargets)
-        discovery?.delegate = self
-        discovery?.resume()
+    /// Resumes the discovery process to found devices on the local network.
+    /// When a new devices are found the `DeviceCenterAddDevicesNotification` notification
+    /// and the `center(_:didAdd:)` method are trigerred.
+    /// When devices are lost the `DeviceCenterRemoveDevicesNotification` notification
+    /// and the `center(_:didRemove:)` method are trigerred.
+    ///
+    /// - Returns: `true` if the discovery is correctly started, otherwise `false`.
+    @discardableResult
+    public func resumeDiscovery() -> Bool {
+        // Initializes the device discovery with the drivers registered previously.
+        if deviceDiscovery == nil {
+            deviceDiscovery = DeviceDiscovery(searchTargets)
+        }
+        
+        deviceDiscovery?.delegate = self
+        return deviceDiscovery?.resume() ?? false
     }
     
-    // Stop to discover
-    public func stopDiscovery() {
-        discovery?.delegate = nil
-        discovery?.stop()
+    /// Stops to discovery process. The devices are removed so the `DeviceCenterRemoveDevicesNotification`
+    /// notification and the `center(_:didRemove:)` method will be triggered.
+    /// This method will alse trigger the `DeviceCenterDeviceDiscoveryErrorNotification` notification
+    /// and the `deviceDiscoveryDidStop(_:withError:)` method.
+    ///
+    /// - Returns: `true` if the discovery is correctly stopped, otherwise `false`.
+    @discardableResult
+    public func stopDiscovery() -> Bool {
+        deviceDiscovery?.delegate = nil
+        return deviceDiscovery?.stop() ?? false
+    }
+    
+    /// Pauses the discovery process. The devices are not removed.
+    ///
+    /// - Returns: `true` if the discovery is correctly paused, otherwise `false`.
+    @discardableResult
+    func pauseDiscovery() -> Bool {
+        return deviceDiscovery?.pause() ?? false
     }
     
     // MARK: DeviceDiscoveryDelegate methods
-    public func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [UPNPDevice]) {
+    
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [UPNPDevice]) {
+        var newDevices = [DeviceProtocol]()
         devices.forEach { device in
             if let type = registeredDevices[device.manufacturer] {
                 if detectedDevices[device.ipAddress] == nil {
                     let ocastDevice = type.init(upnpDevice: device)
                     detectedDevices[device.ipAddress] = ocastDevice
-                    centerDelegate?.center(self, didAddDevice: ocastDevice)
-                    NotificationCenter.default.post(name: DeviceCenterAddDeviceNotification, object: ocastDevice)
+                    newDevices.append(ocastDevice)
                 }
             }
         }
+        delegate?.center(self, didAdd: newDevices)
+        NotificationCenter.default.post(name: DeviceCenterAddDevicesNotification,
+                                        object: self,
+                                        userInfo: [DeviceCenterDevicesUserInfoKey: newDevices])
     }
     
-    public func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [UPNPDevice]) {
-        devices.forEach { device in
-            if let device = detectedDevices[device.ipAddress] {
-                detectedDevices.removeValue(forKey: device.ipAddress)
-                centerDelegate?.center(self, didRemoveDevice: device)
-                NotificationCenter.default.post(name: DeviceCenterRemoveDeviceNotification, object: device)
-            }
+    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [UPNPDevice]) {
+        let ocastDevices = devices.compactMap({ return detectedDevices[$0.ipAddress] })
+        delegate?.center(self, didRemove: ocastDevices)
+        NotificationCenter.default.post(name: DeviceCenterRemoveDevicesNotification,
+                                        object: self,
+                                        userInfo: [DeviceCenterDevicesUserInfoKey: ocastDevices])
+        ocastDevices.forEach { detectedDevices.removeValue(forKey: $0.ipAddress) }
+    }
+    
+    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, with error: Error?) {
+        delegate?.centerDidStop(self, withError: error)
+        
+        var userInfo: [String: Any]?
+        if let error = error {
+            userInfo = [DeviceCenterErrorUserInfoKey: error]
         }
-    }
-    
-    public func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, with error: Error?) {
-        centerDelegate?.centerDidStop(self, withError: error)
-        NotificationCenter.default.post(name: DeviceCenterDeviceDiscoveryErrorNotification, object: error)
+        NotificationCenter.default.post(name: DeviceCenterDeviceDiscoveryErrorNotification,
+                                        object: self,
+                                        userInfo: userInfo)
     }
 }
 

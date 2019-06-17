@@ -51,8 +51,8 @@ class ViewController: UIViewController, DeviceCenterDelegate {
         center.registerDevice(Device.self)
         
         // Launch the discovery process
-        center.centerDelegate = self
-        center.startDiscovery()
+        center.delegate = self
+        center.resumeDiscovery()
     }
     
     // MARK: Private methods
@@ -91,11 +91,9 @@ class ViewController: UIViewController, DeviceCenterDelegate {
     }
     
     // MARK: DeviceCenter methods
-    func center(_ center: DeviceCenter, didAddDevice device: DeviceProtocol) {
+    func center(_ center: DeviceCenter, didAdd devices: [DeviceProtocol]) {
         // Only one device (the first found)
-        if self.device != nil {
-            return
-        }
+        guard let device = devices.first, self.device == nil else { return }
         
         self.device = device
         stickLabel.text = String(format: "Stick: %@", device.ipAddress)
@@ -105,10 +103,12 @@ class ViewController: UIViewController, DeviceCenterDelegate {
         })
     }
     
-    func center(_ center: DeviceCenter, didRemoveDevice device: DeviceProtocol) {
-        if device.ipAddress == self.device?.ipAddress {
-            resetUI()
-            self.device = nil
+    func center(_ center: DeviceCenter, didRemove devices: [DeviceProtocol]) {
+        for device in devices {
+            if device.ipAddress == self.device?.ipAddress {
+                resetUI()
+                self.device = nil
+            }
         }
     }
     

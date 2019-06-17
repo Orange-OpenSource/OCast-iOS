@@ -18,35 +18,6 @@
 
 import Foundation
 
-/// Describes a Device
-@objc public final class UPNPDevice: NSObject {
-    /// base URL of the device
-    public let baseURL: URL
-    /// IP address
-    public let ipAddress: String
-    /// service port
-    public let servicePort: UInt16
-    /// unique device ID (aka USN)
-    public let deviceID: String
-    /// friendly name
-    public let friendlyName: String
-    /// manufacturer's name
-    public let manufacturer: String
-    /// model name
-    public let modelName: String
-
-    init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String) {
-        self.baseURL = baseURL
-        self.ipAddress = ipAddress
-        self.servicePort = servicePort
-        self.deviceID = deviceID
-        self.friendlyName = friendlyName
-        self.manufacturer = manufacturer
-        self.modelName = modelName
-    }
-}
-
-
 typealias UPNPServiceProtocolCompletionHandler = ((Result<UPNPDevice, UPNPServiceProtocolError>)) -> Void
 
 /// UPNP service errors.

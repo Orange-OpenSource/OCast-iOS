@@ -19,7 +19,7 @@
 import Foundation
 
 /// Protocol for responding to device discovery events.
-@objc public protocol DeviceDiscoveryDelegate: class {
+protocol DeviceDiscoveryDelegate: class {
     
     /// Tells the delegate that new devices are found.
     ///
@@ -44,8 +44,7 @@ import Foundation
 }
 
 /// Class to manage the device discovery using the SSDP protocol.
-@objcMembers
-@objc public class DeviceDiscovery: NSObject, UDPSocketDelegate {
+class DeviceDiscovery: NSObject, UDPSocketDelegate {
     
     /// The UDP socket.
     private var udpSocket: UDPSocketProtocol
@@ -89,15 +88,15 @@ import Foundation
     }
     
     // The delegate to receive the device discovery events.
-    public weak var delegate: DeviceDiscoveryDelegate?
+    weak var delegate: DeviceDiscoveryDelegate?
     
     /// The devices discovered on the network
-    public var devices: [UPNPDevice] {
+    var devices: [UPNPDevice] {
         return Array(discoveredDevices.values)
     }
     
     /// The interval in seconds to refresh the devices. The minimum value is 5 seconds.
-    public var interval: UInt16 = 30 {
+    var interval: UInt16 = 30 {
         didSet {
             interval = max(interval, 5)
             
@@ -110,13 +109,13 @@ import Foundation
     /// Newly-initialized discovery begin in a suspended state, so you need to call `resume` method to start the discovery.
     ///
     /// - Parameter searchTargets: The search targets used to discover the devices.
-    @objc public convenience init(_ searchTargets: [String]) {
+    convenience init(_ searchTargets: [String]) {
         self.init(searchTargets, udpSocket: UDPSocket(delegateQueue: DispatchQueue(label: "org.ocast.udpsocket")))
     }
     
     /// Initializes the device discovery with the OCast search target.
     /// Newly-initialized discovery begin in a suspended state, so you need to call `resume` method to start the discovery.
-    @objc public convenience override init() {
+    convenience override init() {
         self.init(["urn:cast-ocast-org:service:cast:1"])
     }
     
@@ -126,7 +125,7 @@ import Foundation
     ///   - searchTargets: The search targets used to discover the devices.
     ///   - udpSocket: The socket used to discover devices.
     ///   - upnpService: The UPNPService used.
-    internal init(_ searchTargets: [String], udpSocket: UDPSocketProtocol, upnpService: UPNPServiceProtocol = UPNPService()) {
+    init(_ searchTargets: [String], udpSocket: UDPSocketProtocol, upnpService: UPNPServiceProtocol = UPNPService()) {
         self.searchTargets = searchTargets
         self.udpSocket = udpSocket
         self.upnpService = upnpService
@@ -143,7 +142,7 @@ import Foundation
     ///
     /// - Returns: `true` if the discovery is correctly started, otherwise `false`.
     @discardableResult
-    @objc public func resume() -> Bool {
+    func resume() -> Bool {
         guard !isRunning else { return false }
         
         do {
@@ -163,7 +162,7 @@ import Foundation
     ///
     /// - Returns: `true` if the discovery is correctly stopped, otherwise `false`.
     @discardableResult
-    @objc public func stop() -> Bool {
+    func stop() -> Bool {
         guard !isStopped else { return false }
         
         isPaused = false
@@ -177,7 +176,7 @@ import Foundation
     ///
     /// - Returns: `true` if the discovery is correctly paused, otherwise `false`.
     @discardableResult
-    @objc public func pause() -> Bool {
+    func pause() -> Bool {
         guard isRunning else { return false }
         
         isPaused = true

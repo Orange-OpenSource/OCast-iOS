@@ -58,8 +58,8 @@
     [self.center registerDevice:Device.class];
     
     // Launch the discovery process
-    self.center.centerDelegate = self;
-    [self.center startDiscovery];
+    self.center.delegate = self;
+    [self.center resumeDiscovery];
 }
 
 // MARK: Private methods
@@ -111,8 +111,9 @@
 }
 
 // MARK: OCastDiscoveryDelegate methods
-- (void)center:(DeviceCenter * _Nonnull)center didAddDevice:(id<DeviceProtocol> _Nonnull)device {
-    if (self.device == nil) {
+- (void)center:(DeviceCenter * _Nonnull)center didAdd:(NSArray<id<DeviceProtocol>> * _Nonnull)devices {
+    if (devices.count > 0 && self.device == nil) {
+        id<DeviceProtocol> device = devices[0];
         self.device = device;
         self.stickLabel.text = [NSString stringWithFormat:@"Stick: %@", device.friendlyName];
         [self.device connect:[[SSLConfiguration alloc] init] completion:^(NSError * _Nullable error) {
@@ -121,11 +122,13 @@
     }
 }
 
-- (void)center:(DeviceCenter * _Nonnull)center didRemoveDevice:(id<DeviceProtocol> _Nonnull)device {
-    if (self.device.ipAddress == device.ipAddress) {
-        self.device = nil;
-        [self resetUI];
-        self.isCastInProgress = false;
+- (void)center:(DeviceCenter * _Nonnull)center didRemove:(NSArray<id<DeviceProtocol>> * _Nonnull)devices {
+    for (id<DeviceProtocol> device in devices) {
+        if (self.device.ipAddress == device.ipAddress) {
+            self.device = nil;
+            [self resetUI];
+            self.isCastInProgress = false;
+        }
     }
 }
 
