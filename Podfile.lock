@@ -2,14 +2,9 @@ PODS:
   - CocoaAsyncSocket (7.6.3)
   - DynamicCodable (1.0)
   - OCast (2.0.0):
-    - OCast/Core (= 2.0.0)
-    - OCast/Reference (= 2.0.0)
-  - OCast/Core (2.0.0):
-    - CocoaAsyncSocket (= 7.6.3)
-    - DynamicCodable (= 1.0)
-  - OCast/Reference (2.0.0):
-    - OCast/Core
-    - Starscream (= 3.1.0)
+    - CocoaAsyncSocket (~> 7.6.3)
+    - DynamicCodable (~> 1.0)
+    - Starscream (~> 3.1.0)
   - Starscream (3.1.0)
 
 DEPENDENCIES:
@@ -31,7 +26,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   CocoaAsyncSocket: eafaa68a7e0ec99ead0a7b35015e0bf25d2c8987
   DynamicCodable: 2cf558d057b3e6540552943254e1c9eeb706dde2
-  OCast: 79afa539fd600c4e372fce764faf65ecff19d82a
+  OCast: f4dc6beddcf98f4ea6477f05e32c4fa7f462141f
   Starscream: 08172b481e145289c4930cb567230fb55897cfa4
 
 PODFILE CHECKSUM: b9577627f5f1d4214a3ba96e2f29b729f1a9eb4b

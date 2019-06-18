@@ -160,7 +160,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		8549ACF02296E80700E205A3 /* Domain */ = {
+		8549ACF02296E80700E205A3 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				8549ACF12296E80700E205A3 /* OCastGeneral.swift */,
@@ -168,19 +168,9 @@
 				8549ACF32296E80700E205A3 /* OCastWebApp.swift */,
 				8549ACF42296E80700E205A3 /* OCastMedia.swift */,
 			);
-			name = Domain;
-			path = OCast/Core/Domain;
+			name = Model;
+			path = OCast/Model;
 			sourceTree = SOURCE_ROOT;
-		};
-		8549ACFF2296E82000E205A3 /* Reference */ = {
-			isa = PBXGroup;
-			children = (
-				8549AD022296E82000E205A3 /* ReferenceDevice.swift */,
-				8549AD002296E82000E205A3 /* ReferenceDeviceCommand.swift */,
-				8549AD94229E8E9400E205A3 /* WebSocket.swift */,
-			);
-			path = Reference;
-			sourceTree = "<group>";
 		};
 		8549AD6F2296E83700E205A3 /* Utils */ = {
 			isa = PBXGroup;
@@ -231,7 +221,8 @@
 			isa = PBXGroup;
 			children = (
 				97DC972520EA229100DBB1B0 /* Core */,
-				8549ACFF2296E82000E205A3 /* Reference */,
+				9790DFEF227C707A0031A70F /* DeviceDiscovery */,
+				8549ACF02296E80700E205A3 /* Model */,
 				8549AD6F2296E83700E205A3 /* Utils */,
 				97AF813B20EA0EAD00C502D5 /* OCast.h */,
 				97AF813C20EA0EAD00C502D5 /* Info.plist */,
@@ -259,13 +250,14 @@
 		97DC972520EA229100DBB1B0 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				9790DFEF227C707A0031A70F /* DeviceDiscovery */,
-				8549ACF02296E80700E205A3 /* Domain */,
-				8549ACF52296E80700E205A3 /* DeviceCenter.swift */,
-				976F264322B795F900C62F3F /* UPNPDevice.swift */,
 				8549ACF72296E80700E205A3 /* Device.swift */,
+				8549ACF52296E80700E205A3 /* DeviceCenter.swift */,
 				8549ACF62296E80700E205A3 /* DIALService.swift */,
+				8549AD022296E82000E205A3 /* ReferenceDevice.swift */,
+				8549AD002296E82000E205A3 /* ReferenceDeviceCommand.swift */,
 				8549AD792296E94400E205A3 /* SSLConfiguration.swift */,
+				976F264322B795F900C62F3F /* UPNPDevice.swift */,
+				8549AD94229E8E9400E205A3 /* WebSocket.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
