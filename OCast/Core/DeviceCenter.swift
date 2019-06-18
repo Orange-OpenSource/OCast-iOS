@@ -43,14 +43,14 @@ public let DeviceCenterErrorUserInfoKey = "DeviceCenterErrorUserInfoKey"
     ///
     /// - Parameters:
     ///   - center: The device center informing the delegate.
-    ///   - device: The new device found.
+    ///   - devices: The new device found.
     func center(_ center: DeviceCenter, didAdd devices: [Device])
     
     /// Tells the delegate that devices are lost.
     ///
     /// - Parameters:
     ///   - center: The device center informing the delegate.
-    ///   - device: The device lost.
+    ///   - devices: The device lost.
     func center(_ center: DeviceCenter, didRemove devices: [Device])
     
     /// Tells the delegate that the discovery is stopped. All the devices are removed.
