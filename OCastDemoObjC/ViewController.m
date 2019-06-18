@@ -26,7 +26,7 @@
 @property(nonatomic, strong) DeviceCenter * center;
 
 /// The `ApplicationController`
-@property(nonatomic, strong) id<DeviceProtocol> device;
+@property(nonatomic, strong) id<Device> device;
 
 /// The `ApplicationController`
 @property(nonatomic) BOOL isCastInProgress;
@@ -55,7 +55,7 @@
     [self resetUI];
     
     // Register the driver
-    [self.center registerDevice:Device.class];
+    [self.center registerDevice:ReferenceDevice.class forManufacturer:OCastDemoManufacturerName];
     
     // Launch the discovery process
     self.center.delegate = self;
@@ -79,7 +79,7 @@
 /// - Parameter mediaController: The `MediaController` used to cast.
 - (void)startCast {
     self.isCastInProgress = YES;
-    MediaPrepareCommand * command = [[MediaPrepareCommand alloc] initWithUrl:@"" frequency:1 title:@"" subtitle:@"" logo:@"" mediaType:OCastMediaTypeVideo transferMode:OCastMediaTransferModeBuffered autoPlay:true];
+    MediaPrepareCommand * command = [[MediaPrepareCommand alloc] initWithUrl:@"" frequency:1 title:@"" subtitle:@"" logo:@"" mediaType:MediaTypeVideo transferMode:MediaTransferModeBuffered autoPlay:true];
     
     _device.applicationName = OCastDemoApplicationName;
     [_device prepare:command withOptions:nil completion:^(NSError * _Nullable error) {
@@ -111,9 +111,9 @@
 }
 
 // MARK: OCastDiscoveryDelegate methods
-- (void)center:(DeviceCenter * _Nonnull)center didAdd:(NSArray<id<DeviceProtocol>> * _Nonnull)devices {
+- (void)center:(DeviceCenter * _Nonnull)center didAdd:(NSArray<id<Device>> * _Nonnull)devices {
     if (devices.count > 0 && self.device == nil) {
-        id<DeviceProtocol> device = devices[0];
+        id<Device> device = devices[0];
         self.device = device;
         self.stickLabel.text = [NSString stringWithFormat:@"Stick: %@", device.friendlyName];
         [self.device connect:[[SSLConfiguration alloc] init] completion:^(NSError * _Nullable error) {
@@ -122,8 +122,8 @@
     }
 }
 
-- (void)center:(DeviceCenter * _Nonnull)center didRemove:(NSArray<id<DeviceProtocol>> * _Nonnull)devices {
-    for (id<DeviceProtocol> device in devices) {
+- (void)center:(DeviceCenter * _Nonnull)center didRemove:(NSArray<id<Device>> * _Nonnull)devices {
+    for (id<Device> device in devices) {
         if (self.device.ipAddress == device.ipAddress) {
             self.device = nil;
             [self resetUI];

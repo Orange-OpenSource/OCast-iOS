@@ -175,8 +175,8 @@
 		8549ACFF2296E82000E205A3 /* Reference */ = {
 			isa = PBXGroup;
 			children = (
-				8549AD002296E82000E205A3 /* ReferenceDeviceCommand.swift */,
 				8549AD022296E82000E205A3 /* ReferenceDevice.swift */,
+				8549AD002296E82000E205A3 /* ReferenceDeviceCommand.swift */,
 				8549AD94229E8E9400E205A3 /* WebSocket.swift */,
 			);
 			path = Reference;
@@ -186,9 +186,9 @@
 			isa = PBXGroup;
 			children = (
 				8549AD702296E83700E205A3 /* HTTPRequest.swift */,
-				8549AD712296E83700E205A3 /* XMLReader.swift */,
 				97E21345229D4051003AAF7C /* SynchronizedDictionary.swift */,
 				97E21347229D41C5003AAF7C /* SynchronizedValue.swift */,
+				8549AD712296E83700E205A3 /* XMLReader.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";

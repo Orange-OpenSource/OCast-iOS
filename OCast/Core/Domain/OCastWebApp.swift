@@ -26,11 +26,12 @@ let OCastWebAppServiceName = "org.ocast.webapp"
 ///
 /// - connected: The web app is started and connected.
 /// - disconnected: The web app is stopped and disconnected.
-enum OCastWebAppStatusState: String, Codable {
+enum WebAppStatusState: String, Codable {
     case connected
     case disconnected
 }
 
-class OCastWebAppConnectedStatusEvent: OCastMessage {
-    public let status: OCastWebAppStatusState
+/// The connection status event.
+class WebAppConnectedStatusEvent: OCastMessage {
+    public let status: WebAppStatusState
 }

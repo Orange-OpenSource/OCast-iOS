@@ -22,10 +22,17 @@
 
 import Foundation
 
-extension Device {
+/// Manage the commands described by the OCast specification.
+extension ReferenceDevice {
     
-    // MARK: Media commands
+    // MARK: - Media commands methods
     
+    /// Sends a media command without result.
+    ///
+    /// - Parameters:
+    ///   - command: The command to send.
+    ///   - completion: The completion block called when the action completes.
+    /// If the error is nil, the command was successfully sent.
     private func sendMediaCommand<T: OCastMessage>(_ command: OCastDataLayer<T>, completion: @escaping NoResultHandler) {
         let completionBlock: ResultHandler<NoResult> = { _, error in
             completion(error)
@@ -33,10 +40,16 @@ extension Device {
         sendMediaCommand(command, completion: completionBlock)
     }
     
+    /// Sends a media command with a result.
+    ///
+    /// - Parameters:
+    ///   - command: The command to send.
+    ///   - completion: The completion block called when the action completes.
+    /// If the error is nil, the command was successfully sent and is described in `U` parameter.
     private func sendMediaCommand<T: OCastMessage, U: Codable>(_ command: OCastDataLayer<T>, completion: @escaping ResultHandler<U>) {
         let completionBlock: ResultHandler<U> = { result, error in
             if let error = error as? OCastReplyError {
-                completion(result, OCastMediaError(rawValue: error.code) ?? .unknownError)
+                completion(result, MediaError(rawValue: error.code) ?? .unknownError)
             } else {
                 completion(result, error)
             }
@@ -45,13 +58,13 @@ extension Device {
         send(message, completion: completionBlock)
     }
     
-    public func prepare(_ prepare: MediaPrepareCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        let command = OCastDataLayer(name: "prepare", params: prepare, options: options)
+    public func prepare(_ prepareCommand: MediaPrepareCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        let command = OCastDataLayer(name: "prepare", params: prepareCommand, options: options)
         sendMediaCommand(command, completion: completion)
     }
     
-    public func setTrack(_ track: MediaTrackCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        let command = OCastDataLayer(name: "track", params: track, options: options)
+    public func setTrack(_ trackCommand: MediaTrackCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        let command = OCastDataLayer(name: "track", params: trackCommand, options: options)
         sendMediaCommand(command, completion: completion)
     }
     
@@ -85,7 +98,7 @@ extension Device {
         sendMediaCommand(command, completion: completion)
     }
     
-    public func metadata(withOptions options: [String: Any]? = nil, completion: @escaping ResultHandler<MediaMetadataChanged>) {
+    public func metadata(withOptions options: [String: Any]? = nil, completion: @escaping ResultHandler<MediaMetadata>) {
         let command = OCastDataLayer(name: "getMetadata", params: MediaGetMetadataCommand(), options: options)
         sendMediaCommand(command, completion: completion)
     }
@@ -100,8 +113,14 @@ extension Device {
         sendMediaCommand(command, completion: completion)
     }
     
-    // MARK: Device settings commands
+    // MARK: - Device settings commands
     
+    /// Sends a device settings command with a result.
+    ///
+    /// - Parameters:
+    ///   - command: The command to send.
+    ///   - completion: The completion block called when the action completes.
+    /// If the error is nil, the command was successfully sent and is described in `U` parameter.
     private func sendDeviceSettingsCommand<T: OCastMessage, U: Codable>(_ command: OCastDataLayer<T>, completion: @escaping ResultHandler<U>) {
         let completionBlock: ResultHandler<U> = { result, error in
             if let error = error as? OCastReplyError {
@@ -124,7 +143,7 @@ extension Device {
         sendDeviceSettingsCommand(command, completion: completion)
     }
     
-    // MARK: Input settings commands
+    // MARK: - Input settings commands
     
     public func sendKeyEvent(_ keyEvent: SettingsKeyPressedCommand, completion: @escaping NoResultHandler) {
         let command = OCastDataLayer(name: "keyPressed", params: keyEvent)

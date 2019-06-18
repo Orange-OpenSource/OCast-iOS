@@ -21,36 +21,44 @@
 
 import Foundation
 
+/// The handler used to manage the command results.
 internal typealias CommandResult = (Result<Data?, Error>) -> ()
 
+/// The Reference device which conforms to the OCast specification.
 @objc @objcMembers
-open class Device: NSObject, DevicePublic, WebSocketDelegate {
+open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
-    public private(set) var state: DeviceState = .disconnected {
-        didSet {
-            // Reset state every time state is modified
-            if oldValue != state {
-                isApplicationRunning.synchronizedValue = false
-            }
-        }
-    }
-    public private(set) var ipAddress: String
-    public private(set) var applicationURL: String
-    public private(set) var friendlyName: String
-    private let dialService: DIALService
-
+    // MARK: - Device properties
+    
     public var applicationName: String? {
         didSet {
-            // Reset state if application is modified
             if oldValue != applicationName {
                 isApplicationRunning.synchronizedValue = false
             }
         }
     }
     
-    private var isApplicationRunning = SynchronizedValue(false)
+    public private(set) var applicationURL: String
     
-    /// Settings web socket URL
+    public private(set) var ipAddress: String
+    
+    public private(set) var friendlyName: String
+    
+    public var sslConfiguration: SSLConfiguration = SSLConfiguration(deviceCertificates: nil, clientCertificate: nil)
+    
+    public static var searchTarget: String {
+        return "urn:cast-ocast-org:service:cast:1"
+    }
+    
+    // MARK: - Private methods
+
+    /// The DIAL service.
+    private let dialService: DIALService
+    
+    /// Indicates if the application is running. This property is thread safe.
+    private var isApplicationRunning = SynchronizedValue(false)
+
+    /// The settings web socket URL.
     private var settingsWebSocketURL: String {
         let defaultSettingsWebSocketURL = "wss://\(ipAddress):4433/ocast"
         #if TEST
@@ -60,27 +68,55 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
         #endif
     }
     
-    public var sslConfiguration: SSLConfiguration = SSLConfiguration(deviceCertificates: nil, clientCertificate: nil)
-    private var websocket: WebSocketProtocol?
-    private var connectHandler: NoResultHandler?
-    private var disconnectHandler: NoResultHandler?
+    /// The web socket used to connect to the device.
+    private var webSocket: WebSocketProtocol?
+    
+    /// The connection handler to trigger when the connected is ended.
+    private var connectionHandler: NoResultHandler?
+    
+    /// The disconnection handler to trigger when the connected is ended.
+    private var disconnectionHandler: NoResultHandler?
+    
+    /// The command handlers to trigger when a command response is received.
     private var commandHandlers = SynchronizedDictionary<Int, CommandResult>()
+    
+    /// The registered event handlers to trigger when an event is received.
     private var registeredEvents = SynchronizedDictionary<String, EventHandler>()
     
-    let uuid = UUID().uuidString
+    /// The device UUID.
+    private let deviceUUID = UUID().uuidString
     
-    let sequenceQueue = DispatchQueue(label: "org.ocast.sequencequeue")
-    let semaphoreQueue = DispatchQueue(label: "org.ocast.semaphorequeue")
-    var sequenceID: Int = 0
+    /// The sequence ID.
+    private var sequenceID: Int = 0
+
+    /// The sequence queue to protect `sequenceID` from concurrent access.
+    private let sequenceQueue = DispatchQueue(label: "org.ocast.sequencequeue")
     
-    // Connect Event
+    /// The semaphore queue to avoid dead lock.
+    private let semaphoreQueue = DispatchQueue(label: "org.ocast.semaphorequeue")
+    
+    // The semaphore to synchronize the websocket connection event.
     private var semaphore: DispatchSemaphore
     
+    // MARK: - Public methods
+    
+    /// The device state.
+    public private(set) var state: DeviceState = .disconnected {
+        didSet {
+            // Reset state every time state is modified
+            if oldValue != state {
+                isApplicationRunning.synchronizedValue = false
+            }
+        }
+    }
+    
+    // MARK: - Initializer
+    
     public required init(upnpDevice: UPNPDevice) {
-        self.ipAddress = upnpDevice.ipAddress
-        self.applicationURL = upnpDevice.baseURL.absoluteString
-        self.friendlyName = upnpDevice.friendlyName
-        self.dialService = DIALService(forURL: applicationURL)
+        ipAddress = upnpDevice.ipAddress
+        applicationURL = upnpDevice.baseURL.absoluteString
+        friendlyName = upnpDevice.friendlyName
+        dialService = DIALService(forURL: applicationURL)
         semaphore = DispatchSemaphore(value: 0)
         
         super.init()
@@ -88,7 +124,8 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
         registerEvents()
     }
     
-    // MARK: Connect/disconnect
+    // MARK: - Device methods
+    
     public func connect(_ configuration: SSLConfiguration, completion: @escaping NoResultHandler) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .connected {
@@ -119,17 +156,9 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
         }
         
         state = .disconnecting
-        disconnectHandler = completion
-        websocket?.disconnect()
+        disconnectionHandler = completion
+        webSocket?.disconnect()
     }
-    
-    // MARK: Events methods
-    
-    public func registerEvent(_ name: String, withHandler handler: @escaping EventHandler) {
-        registeredEvents[name] = handler
-    }
-    
-    // MARK: DIAL methods
     
     public func startApplication(_ completion: @escaping NoResultHandler) {
         guard let applicationName = applicationName else {
@@ -193,8 +222,144 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
         }
     }
     
+    public func registerEvent(_ name: String, withHandler handler: @escaping EventHandler) {
+        registeredEvents[name] = handler
+    }
+    
+    // MARK: Private methods
+    
+    /// Computes an error depending the current state and the forbidden states.
+    ///
+    /// - Parameter forbiddenStates: The forbidden states.
+    /// - Returns: The `OCastErro` if there's an error, otherwise nil.
+    private func error(forForbiddenStates forbiddenStates: [DeviceState]) -> OCastError? {
+        guard forbiddenStates.contains(state) else { return nil }
+        
+        switch state {
+        case .connecting:
+            return .wrongStateConnecting
+        case .connected:
+            return .wrongStateConnected
+        case .disconnecting:
+            return .wrongStateDisconnecting
+        case .disconnected:
+            return .wrongStateDisconnected
+        }
+    }
+    
+    /// Register media and settings event
+    private func registerEvents() {
+        registerEvent("playbackStatus") { data in
+            if let playbackStatus = try? JSONDecoder().decode(OCastDeviceLayer<MediaPlaybackStatus>.self, from: data) {
+                NotificationCenter.default.post(name: PlaybackStatusEventNotification,
+                                                object: self, userInfo: [PlaybackStatusUserInfoKey: playbackStatus.message.data.params])
+            }
+        }
+        registerEvent("metadataChanged") { data in
+            if let metadata = try? JSONDecoder().decode(OCastDeviceLayer<MediaMetadata>.self, from: data) {
+                NotificationCenter.default.post(name: MetadataChangedEventNotification,
+                                                object: self, userInfo: [MetadataUserInfoKey: metadata.message.data.params])
+            }
+        }
+        registerEvent("updateStatus") { data in
+            if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<SettingsUpdateStatus>.self, from: data) {
+                NotificationCenter.default.post(name: UpdateStatusEventNotification,
+                                                object: self, userInfo:[UpdateStatusUserInfoKey: updateStatus.message.data.params])
+            }
+        }
+    }
+    
+    /// Connects to the device.
+    ///
+    /// - Parameters:
+    ///   - url: The websocket endpoint.
+    ///   - configuration: The `SSLConfiguration` used to perform the connection.
+    ///   - completion: The completion block called when the connection is finished.
+    /// If the error is nil, the device is connected with success.
+    private func connect(_ url: String, andSSLConfiguration configuration: SSLConfiguration, _ completion: @escaping NoResultHandler) {
+        guard let websocket = WebSocket(urlString: url,
+                                        sslConfiguration: configuration,
+                                        delegateQueue: DispatchQueue(label: "org.ocast.websocket")) else {
+                                            completion(OCastError.badApplicationURL)
+                                            return
+        }
+        
+        self.webSocket = websocket
+        self.connectionHandler = completion
+        self.state = .connecting
+        self.webSocket?.delegate = self
+        self.webSocket?.connect()
+    }
+    
+    /// Generates a new unique senquence id.
+    ///
+    /// - Returns: The new sequence id.
+    private func generateId() -> Int {
+        return sequenceQueue.sync {
+            if self.sequenceID == Int.max {
+                self.sequenceID = 0
+            }
+            self.sequenceID += 1
+            return sequenceID
+        }
+    }
+    
+    /// Handles the command replies.
+    ///
+    /// - Parameters:
+    ///   - jsonData: The JSON response.
+    ///   - deviceLayer: The response device layer.
+    private func handleReply(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {
+        guard let status = deviceLayer.status else { return }
+        
+        let commandHandler = commandHandlers[deviceLayer.id]
+        switch status {
+        case .ok:
+            if let code = deviceLayer.message.data.params.code, code != OCastDefaultResponseDataLayer.successCode {
+                DispatchQueue.main.async { commandHandler?(.failure(OCastReplyError(code: code))) }
+            } else {
+                DispatchQueue.main.async { commandHandler?(.success(jsonData)) }
+            }
+        case .error(_):
+            DispatchQueue.main.async { commandHandler?(.failure(OCastError.transportError)) }
+        }
+        
+        commandHandlers.removeItem(forKey: deviceLayer.id)
+    }
+    
+    /// Handles the connection event replies.
+    ///
+    /// - Parameter jsonData: The JSON response.
+    /// - Throws: Throws an error if the JSON can't be decoded.
+    private func handleConnectionEvent(_ jsonData: Data) throws {
+        let connectEvent = try JSONDecoder().decode(OCastDeviceLayer<WebAppConnectedStatusEvent>.self, from: jsonData)
+        if connectEvent.message.data.params.status == .connected {
+            semaphore.signal()
+        } else if connectEvent.message.data.params.status == .disconnected {
+            isApplicationRunning.synchronizedValue = false
+        }
+    }
+    
+    /// Handles the registered events replies.
+    ///
+    /// - Parameters:
+    ///   - jsonData: The JSON response.
+    ///   - deviceLayer: The response device layer.
+    private func handleRegisteredEvents(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {
+        if let eventName = deviceLayer.message.data.name,
+            let handler = registeredEvents[eventName] {
+            handler(jsonData)
+        }
+    }
+    
     // MARK: Internal methods
     
+    /// Sends a message to an application.
+    ///
+    /// - Parameters:
+    ///   - layer: The device layer.
+    ///   - completion: The completion block called when the action completes.
+    /// If the error is nil, the message was successfully sent and is described in `U` parameter.
     func sendToApplication<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping ResultHandler<U>) {
         if isApplicationRunning.synchronizedValue {
             self.send(layer: layer, completion: completion)
@@ -209,6 +374,12 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
         }
     }
     
+    /// Sends a message with a result.
+    ///
+    /// - Parameters:
+    ///   - layer: The device layer.
+    ///   - completion: The completion block called when the action completes.
+    /// If the error is nil, the message was successfully sent and is described in `U` parameter.
     func send<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping ResultHandler<U>) {
         let completionBlock: CommandResult = { result in
             switch result {
@@ -230,6 +401,12 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
         send(layer: layer, completion: completionBlock)
     }
     
+    /// Sends a message without result.
+    ///
+    /// - Parameters:
+    ///   - layer: The device layer.
+    ///   - completion: The completion block called when the action completes.
+    /// If the error is nil, the message was successfully sent.
     func send<T: Encodable>(layer: OCastDeviceLayer<T>, completion: @escaping CommandResult) {
         if let error = self.error(forForbiddenStates: [.connecting, .disconnecting, .disconnected]) {
             completion(.failure(error))
@@ -240,7 +417,7 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
             let jsonData = try JSONEncoder().encode(layer)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
                 commandHandlers[layer.id] = completion
-                let result = websocket?.send(jsonString)
+                let result = webSocket?.send(jsonString)
                 if case .failure(_)? = result {
                     completion(.failure(OCastError.unableToSendCommand))
                     commandHandlers[layer.id] = nil
@@ -253,115 +430,14 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
         }
     }
     
-    // MARK: Private methods
-    
-    private func error(forForbiddenStates forbiddenStates: [DeviceState]) -> OCastError? {
-        guard forbiddenStates.contains(state) else { return nil }
-        
-        switch state {
-        case .connecting:
-            return .wrongStateConnecting
-        case .connected:
-            return .wrongStateConnected
-        case .disconnecting:
-            return .wrongStateDisconnecting
-        case .disconnected:
-            return .wrongStateDisconnected
-        }
-    }
-    
-    private func registerEvents() {
-        registerEvent("playbackStatus") { data in
-            if let playbackStatus = try? JSONDecoder().decode(OCastDeviceLayer<MediaPlaybackStatus>.self, from: data) {
-                NotificationCenter.default.post(name: OCastPlaybackStatusEventNotification,
-                                                object: self, userInfo: [OCastPlaybackStatusUserInfoKey: playbackStatus.message.data.params])
-            }
-        }
-        registerEvent("metadataChanged") { data in
-            if let metadata = try? JSONDecoder().decode(OCastDeviceLayer<MediaMetadataChanged>.self, from: data) {
-                NotificationCenter.default.post(name: OCastMetadataChangedEventNotification,
-                                                object: self, userInfo: [OCastMetadataUserInfoKey: metadata.message.data.params])
-            }
-        }
-        registerEvent("updateStatus") { data in
-            if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<SettingsUpdateStatus>.self, from: data) {
-                NotificationCenter.default.post(name: OCastUpdateStatusEventNotification,
-                                                object: self, userInfo:[OCastUpdateStatusUserInfoKey: updateStatus.message.data.params])
-            }
-        }
-    }
-    
-    private func connect(_ url: String, andSSLConfiguration configuration: SSLConfiguration, _ completion: @escaping NoResultHandler) {
-        
-        guard let websocket = WebSocket(urlString: url,
-                                        sslConfiguration: configuration,
-                                        delegateQueue: DispatchQueue(label: "org.ocast.websocket")) else {
-                                            completion(OCastError.badApplicationURL)
-                                            return
-        }
-        
-        self.websocket = websocket
-        self.connectHandler = completion
-        self.state = .connecting
-        self.websocket?.delegate = self
-        self.websocket?.connect()
-    }
-    
-    private func generateId() -> Int {
-        // Prevent from concurrent access
-        return sequenceQueue.sync {
-            if self.sequenceID == Int.max {
-                self.sequenceID = 0
-            }
-            self.sequenceID += 1
-            return sequenceID
-        }
-    }
-    
-    private func handleReply(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {
-        guard let status = deviceLayer.status else { return }
-        
-        let commandHandler = commandHandlers[deviceLayer.id]
-        switch status {
-        case .ok:
-            if let code = deviceLayer.message.data.params.code, code != OCastDefaultResponseDataLayer.successCode {
-                DispatchQueue.main.async { commandHandler?(.failure(OCastReplyError(code: code))) }
-            } else {
-                DispatchQueue.main.async { commandHandler?(.success(jsonData)) }
-            }
-        case .error(_):
-            DispatchQueue.main.async { commandHandler?(.failure(OCastError.transportError)) }
-        }
-        
-        commandHandlers.removeItem(forKey: deviceLayer.id)
-    }
-    
-    private func handleConnectionEvent(_ jsonData: Data) throws {
-        // Connect Event
-        let connectEvent = try JSONDecoder().decode(OCastDeviceLayer<OCastWebAppConnectedStatusEvent>.self, from: jsonData)
-        if connectEvent.message.data.params.status == .connected {
-            semaphore.signal()
-        } else if connectEvent.message.data.params.status == .disconnected {
-            isApplicationRunning.synchronizedValue = false
-        }
-    }
-    
-    private func handleRegisteredEvents(_ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>, _ jsonData: Data) {
-        // Dispatch Event
-        if let eventName = deviceLayer.message.data.name,
-            let handler = registeredEvents[eventName] {
-            handler(jsonData)
-        }
-    }
-    
     // MARK: WebSocketDelegate methods
     
     func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL) {
         DispatchQueue.main.async { [weak self] in
             self?.state = .connected
             
-            self?.connectHandler?(nil)
-            self?.connectHandler = nil
+            self?.connectionHandler?(nil)
+            self?.connectionHandler = nil
         }
     }
     
@@ -375,11 +451,11 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
             self?.commandHandlers.removeAll()
             
             if let error = error {
-                if let disconnectHandler = self?.disconnectHandler {
+                if let disconnectHandler = self?.disconnectionHandler {
                     disconnectHandler(error)
-                    self?.disconnectHandler = nil
+                    self?.disconnectionHandler = nil
                 } else {
-                    NotificationCenter.default.post(name: OCastDeviceDisconnectedEventNotification, object: self, userInfo: [OCastErrorUserInfoKey: error])
+                    NotificationCenter.default.post(name: OCastDeviceDisconnectedEventNotification, object: self, userInfo: [ErrorUserInfoKey: error])
                 }
             }
         }
@@ -397,17 +473,18 @@ open class Device: NSObject, DevicePublic, WebSocketDelegate {
             case .event:
                 if deviceLayer.message.service == OCastWebAppServiceName {
                     try handleConnectionEvent(jsonData)
-                } else { handleRegisteredEvents(deviceLayer, jsonData)
+                } else { handleRegisteredEvents(from: jsonData, deviceLayer)
                 }
             }
         } catch {}
     }
 }
 
-extension Device: OCastSenderDevice {
+/// Extension to manage the custom streams.
+extension ReferenceDevice: OCastSenderDevice {
     
     public func send<T: OCastMessage>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping NoResultHandler) {
-        let deviceLayer = OCastDeviceLayer(source: uuid, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
+        let deviceLayer = OCastDeviceLayer(source: deviceUUID, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
         let completionBlock: ResultHandler<NoResult> = { _, error in
             completion(error)
         }
@@ -419,7 +496,7 @@ extension Device: OCastSenderDevice {
     }
     
     public func send<T: OCastMessage, U: Codable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping ResultHandler<U>) {
-        let deviceLayer = OCastDeviceLayer(source: uuid, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
+        let deviceLayer = OCastDeviceLayer(source: deviceUUID, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
         if domain == .browser {
             sendToApplication(layer: deviceLayer, completion: completion)
         } else {

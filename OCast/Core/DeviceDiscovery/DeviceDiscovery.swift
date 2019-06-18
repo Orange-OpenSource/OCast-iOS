@@ -113,12 +113,6 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
         self.init(searchTargets, udpSocket: UDPSocket(delegateQueue: DispatchQueue(label: "org.ocast.udpsocket")))
     }
     
-    /// Initializes the device discovery with the OCast search target.
-    /// Newly-initialized discovery begin in a suspended state, so you need to call `resume` method to start the discovery.
-    convenience override init() {
-        self.init(["urn:cast-ocast-org:service:cast:1"])
-    }
-    
     /// Initiliazes the device discovery with custom search targets and a socket object.
     ///
     /// - Parameters:

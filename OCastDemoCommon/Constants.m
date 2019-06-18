@@ -17,6 +17,6 @@
 
 #import "Constants.h"
 
-NSString * const OCastDemoDriverName = @"Orange SA";
+NSString * const OCastDemoManufacturerName = @"Orange SA";
 
 NSString * const OCastDemoApplicationName = @"Orange-DefaultReceiver-DEV";

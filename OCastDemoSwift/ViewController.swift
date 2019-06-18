@@ -18,12 +18,6 @@
 import UIKit
 import OCast
 
-
-extension Device: DeviceProtocol {
-    public static var manufacturer: String = "manufacturer"
-    public static var searchTarget: String = "urn:cast-ocast-org:service:cast:1"
-}
-
 class ViewController: UIViewController, DeviceCenterDelegate {
     
     
@@ -31,7 +25,7 @@ class ViewController: UIViewController, DeviceCenterDelegate {
     private let center = DeviceCenter()
     
     // device
-    private var device: DeviceProtocol?
+    private var device: Device?
     
     /// Indicates whether a cast is in progress
     private var isCastInProgress: Bool = false
@@ -48,7 +42,7 @@ class ViewController: UIViewController, DeviceCenterDelegate {
         resetUI()
         
         // Register the driver
-        center.registerDevice(Device.self)
+        center.registerDevice(ReferenceDevice.self, forManufacturer: OCastDemoManufacturerName)
         
         // Launch the discovery process
         center.delegate = self
@@ -91,7 +85,7 @@ class ViewController: UIViewController, DeviceCenterDelegate {
     }
     
     // MARK: DeviceCenter methods
-    func center(_ center: DeviceCenter, didAdd devices: [DeviceProtocol]) {
+    func center(_ center: DeviceCenter, didAdd devices: [Device]) {
         // Only one device (the first found)
         guard let device = devices.first, self.device == nil else { return }
         
@@ -103,7 +97,7 @@ class ViewController: UIViewController, DeviceCenterDelegate {
         })
     }
     
-    func center(_ center: DeviceCenter, didRemove devices: [DeviceProtocol]) {
+    func center(_ center: DeviceCenter, didRemove devices: [Device]) {
         for device in devices {
             if device.ipAddress == self.device?.ipAddress {
                 resetUI()

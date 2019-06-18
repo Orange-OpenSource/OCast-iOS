@@ -44,14 +44,14 @@ public let DeviceCenterErrorUserInfoKey = "DeviceCenterErrorUserInfoKey"
     /// - Parameters:
     ///   - center: The device center informing the delegate.
     ///   - device: The new device found.
-    func center(_ center: DeviceCenter, didAdd devices: [DeviceProtocol])
+    func center(_ center: DeviceCenter, didAdd devices: [Device])
     
     /// Tells the delegate that devices are lost.
     ///
     /// - Parameters:
     ///   - center: The device center informing the delegate.
     ///   - device: The device lost.
-    func center(_ center: DeviceCenter, didRemove devices: [DeviceProtocol])
+    func center(_ center: DeviceCenter, didRemove devices: [Device])
     
     /// Tells the delegate that the discovery is stopped. All the devices are removed.
     ///
@@ -66,13 +66,13 @@ public let DeviceCenterErrorUserInfoKey = "DeviceCenterErrorUserInfoKey"
 public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
 
     /// The registered devices saving the manufacturer and the device type.
-    private var registeredDevices: [String: DeviceProtocol.Type] = [:]
+    private var registeredDevices: [String: Device.Type] = [:]
     
     /// The search targets used to search the devices.
     private var searchTargets: [String] = []
     
     /// The detected devices.
-    private var detectedDevices: [String: DeviceProtocol] = [:]
+    private var detectedDevices: [String: Device] = [:]
     
     /// The delegate to receive discovery events.
     private var deviceDiscovery: DeviceDiscovery?
@@ -90,8 +90,9 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     ///
     /// - Parameters:
     ///   - deviceType: The Type of the driver class to register (for example ReferenceDevice.self)
-    public func registerDevice(_ deviceType: DeviceProtocol.Type) {
-        registeredDevices[deviceType.manufacturer] = deviceType
+    ///   - manufacturer: The device manufacturer used to identify it during the discovery.
+    public func registerDevice(_ deviceType: Device.Type, forManufacturer manufacturer: String) {
+        registeredDevices[manufacturer] = deviceType
         searchTargets.append(deviceType.searchTarget)
     }
     
@@ -136,7 +137,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     // MARK: DeviceDiscoveryDelegate methods
     
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [UPNPDevice]) {
-        var newDevices = [DeviceProtocol]()
+        var newDevices = [Device]()
         devices.forEach { device in
             if let type = registeredDevices[device.manufacturer] {
                 if detectedDevices[device.ipAddress] == nil {

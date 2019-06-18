@@ -40,42 +40,16 @@ import OCast
 
 ## Usage
 
-### 1. Create your device(s)
-
-You can use the ReferenceDevice by adding it two mandatory information (manufacturer name and the search target 
-
-```
-public class CustomDevice: Device, DeviceProtocol {
-    public static var manufacturer: String = "manufacturer"
-    public  static  var searchTarget: String = "urn:cast-ocast-org:service:cast:1"
-}
-```
-Or
-```
-extension Device: DeviceProtocol {
-    public static var manufacturer: String = "manufacturer"
-    public  static  var searchTarget: String = "urn:cast-ocast-org:service:cast:1"
-}
-```
-
-You can also develop your own Device by implementing the DeviceProtocol protocol
-
-```
-public class CustomDevice: DeviceProtocol {
-// Implements DeviceProtocol
-}
-```
-
-### 2. Register your device(s)
+### 1. Register your device(s)
 
 You have to register your device(s) to a Center
 
 ```
 let center = DeviceCenter()
-center.registerDevice(CustomDevice.self)
+center.registerDevice(ReferenceDevice.self, forManufacturer: "Manufacturer")
 ```
 
-### 3. Discovering device(s)
+### 2. Discovering device(s)
 
 Add a delegate to the center and start to discover device(s)
 
@@ -84,12 +58,12 @@ center.delegate = self
 center.startDiscovery()
 
 // DeviceCenter delegate methods
-func discovery(_ center: OCastCenter, didAddDevice device: DeviceProtocol) {
+func discovery(_ center: OCastCenter, didAddDevice device: Device) {
     self.device = device
 }
 ```
 
-### 4. Use the device
+### 3. Use the device
 
 ```
 let sslConfiguration = SSLConfiguration()
@@ -103,7 +77,7 @@ device.connect(sslConfiguration, completion: { error in
 })
 ```
 
-### 5. Send command
+### 4. Send command
 
 You can send directly  settings command :
 ```
