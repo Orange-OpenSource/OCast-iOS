@@ -18,7 +18,7 @@
 
 import Foundation
 
-typealias UPNPServiceProtocolCompletionHandler = ((Result<Device, UPNPServiceProtocolError>)) -> Void
+typealias UPNPServiceProtocolCompletionHandler = ((Result<UPNPDevice, UPNPServiceProtocolError>)) -> Void
 
 /// UPNP service errors.
 enum UPNPServiceProtocolError: Error {
@@ -105,19 +105,19 @@ class UPNPService: UPNPServiceProtocol {
     ///   - data: The data representing the response.
     ///   - httpHeaders: The HTTP response headers.
     /// - Returns: The new device or `nil` if an error occurs.
-    private func device(from data: Data?, httpHeaders: [AnyHashable: Any]) -> Device? {
+    private func device(from data: Data?, httpHeaders: [AnyHashable: Any]) -> UPNPDevice? {
         guard let data = data,
             let applicationURLString = applicationURL(fromHttpHeaders: httpHeaders),
             let applicationURL = URL(string: applicationURLString),
             let ipAddress = applicationURL.host,
-            let xmlRootElement = OCastXMLParser().parse(data: data),
+            let xmlRootElement = XMLReader().parse(data: data),
             let xmlDeviceElement = xmlRootElement["root"]?["device"],
             let friendlyName = xmlDeviceElement["friendlyName"]?.value,
             let manufacturer = xmlDeviceElement["manufacturer"]?.value,
             let modelName = xmlDeviceElement["modelName"]?.value,
             let UDN = xmlDeviceElement["UDN"]?.value else { return nil }
         
-        return Device(baseURL: applicationURL,
+        return UPNPDevice(baseURL: applicationURL,
                       ipAddress: ipAddress,
                       servicePort: UInt16(applicationURL.port ?? 80),
                       deviceID: UPNPService.extractUUID(from: UDN) ?? UDN,

@@ -18,24 +18,17 @@
 import UIKit
 import OCast
 
-class ViewController: UIViewController, DeviceDiscoveryDelegate, DeviceManagerDelegate, MediaControllerDelegate {
+class ViewController: UIViewController, DeviceCenterDelegate {
+    
     
     /// The object to discover the devices
-    private let deviceDiscovery = DeviceDiscovery([ReferenceDriver.searchTarget])
+    private let center = DeviceCenter()
     
-    /// The `DeviceManager`
-    private var deviceManager: DeviceManager?
-    
-    /// The `ApplicationController`
-    private var applicationController: ApplicationController?
-    
-    /// The state to know if a cast is in progress
-    private var playerState: PlayerState = .unknown
+    // device
+    private var device: Device?
     
     /// Indicates whether a cast is in progress
-    private var isCastInProgress: Bool {
-        return playerState != .unknown && playerState != .idle
-    }
+    private var isCastInProgress: Bool = false
     
     /// IBOutlets
     @IBOutlet weak var stickLabel: UILabel!
@@ -49,123 +42,71 @@ class ViewController: UIViewController, DeviceDiscoveryDelegate, DeviceManagerDe
         resetUI()
         
         // Register the driver
-        DeviceManager.registerDriver(ReferenceDriver.self, forManufacturer: OCastDemoDriverName)
+        center.registerDevice(ReferenceDevice.self, forManufacturer: OCastDemoManufacturerName)
         
         // Launch the discovery process
-        deviceDiscovery.delegate = self
-        deviceDiscovery.resume()
+        center.delegate = self
+        center.resumeDiscovery()
     }
     
     // MARK: Private methods
     
     @IBAction func actionButtonClicked(_ sender: Any) {
-        guard let applicationController = applicationController else { return }
-        
+
         if !isCastInProgress {
-            startCast(applicationController.mediaController)
+            startCast()
         } else {
-            stopCast(applicationController.mediaController)
+            stopCast()
         }
     }
     
     /// Starts the cast
     ///
-    /// - Parameter mediaController: The `MediaController` used to cast.
-    private func startCast(_ mediaController: MediaController) {
-        let mediaPrepapre = MediaPrepare(
-            url: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4")!,
-            frequency : 1,
-            title: "Movie sample",
-            subtitle: "Brought to you by Orange OCast",
-            logo: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/")!,
-            mediaType: .video,
-            transferMode: .buffered,
-            autoplay: true)
+    private func startCast() {
+        isCastInProgress = true
+        let command = MediaPrepareCommand(url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", frequency: 1, title: "Movie Sample", subtitle: "Brought to you", logo: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/", mediaType: .video, transferMode: .buffered, autoPlay: true)
         
-        mediaController.prepare(for: mediaPrepapre,
-                                onSuccess: {},
-                                onError: { _ in })
+        device?.prepare(command, withOptions: nil, completion: { _ in
+            
+        })
+
     }
-    
-    /// Stops the cast
-    ///
-    /// - Parameter mediaController: The `MediaController` used to stop the cast.
-    private func stopCast(_ mediaController: MediaController) {
-        mediaController.stop(onSuccess: {},
-                             onError: { _ in })
+
+    private func stopCast() {
+        isCastInProgress = false
+        device?.stop(withOptions: nil, completion: { (error) in
+            print(error ?? "no error")
+        })
     }
-    
-    /// Resets the UI
+
     private func resetUI() {
         stickLabel.text = "Stick: -"
         actionButton.isEnabled = false
     }
     
-    /// Starts the application
-    private func startApplication() {
-        applicationController?.start(onSuccess: {
-            DispatchQueue.main.async {
-                self.actionButton.isEnabled = true
-            }
-        },
-                                     onError: { _ in
-                                        DispatchQueue.main.async {
-                                            self.actionButton.isEnabled = false
-                                        }
+    // MARK: DeviceCenter methods
+    func center(_ center: DeviceCenter, didAdd devices: [Device]) {
+        // Only one device (the first found)
+        guard let device = devices.first, self.device == nil else { return }
+        
+        self.device = device
+        stickLabel.text = String(format: "Stick: %@", device.ipAddress)
+        self.device?.applicationName = "OCastDemoApplicationName"
+        self.device?.connect(SSLConfiguration(), completion: { error in
+            self.actionButton.isEnabled = error == nil
         })
     }
     
-    // MARK: DeviceDiscoveryDelegate methods
-    
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didAdd devices: [Device]) {
-        // Only one device (the first found)
-        guard deviceManager == nil, let device = devices.first else { return }
-        
-        // Create the device manager
-        deviceManager = DeviceManager(with: device, sslConfiguration: nil)
-        deviceManager?.delegate = self
-        
-        stickLabel.text = String(format: "Stick: %@", device.friendlyName)
-        
-        // Retrieve the applicationController
-        deviceManager?.applicationController(for: OCastDemoApplicationName,
-                                             onSuccess: { applicationController in
-                                                applicationController.mediaController.delegate = self
-                                                self.applicationController = applicationController
-                                                self.startApplication()
-        },
-                                             onError: { _ in })
-    }
-    
-    func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [Device]) {
-        guard let device = devices.first else { return }
-        
-        if deviceManager?.device == device {
-            deviceManager = nil
-            resetUI()
+    func center(_ center: DeviceCenter, didRemove devices: [Device]) {
+        for device in devices {
+            if device.ipAddress == self.device?.ipAddress {
+                resetUI()
+                self.device = nil
+            }
         }
     }
     
-    func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, with error: Error?) {}
-    
-    // MARK: DeviceManagerDelegate methods
-    
-    func deviceManager(_ deviceManager: DeviceManager, applicationDidDisconnectWithError error: NSError) {
-        self.deviceManager = nil
-        resetUI()
-    }
-    
-    // MARK: MediaControllerDelegate methods
-    
-    func mediaController(_ mediaController: MediaController, didReceivePlaybackStatus playbackStatus: PlaybackStatus) {
-        playerState = playbackStatus.state
-        if isCastInProgress {
-            actionButton.setTitle("Stop", for: [])
-        } else {
-            actionButton.setTitle("Play", for: [])
-        }
-    }
-    
-    func mediaController(_ mediaController: MediaController, didReceiveMetadata metadata: Metadata) {}
+    func centerDidStop(_ center: DeviceCenter, withError error: Error?) {}
+
 }
 

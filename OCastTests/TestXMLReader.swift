@@ -1,5 +1,5 @@
 //
-// TestOCastXMLParser.swift
+// TestOCastXMLReader.swift
 //
 // Copyright 2019 Orange
 //
@@ -19,8 +19,8 @@
 import XCTest
 @testable import OCast
 
-/// Tests the OCastXMLParser class.
-class TestOCastXMLParser: XCTestCase {
+/// Tests the XMLReader class.
+class TestXMLReader: XCTestCase {
     
     override func setUp() {
     }
@@ -32,7 +32,7 @@ class TestOCastXMLParser: XCTestCase {
         let foo1Value = "Foo1"
         let foo2Value = "Foo2"
         let xmlString = "<foo1>\(foo1Value)<foo2>\(foo2Value)</foo2></foo1>"
-        let xmlParser = OCastXMLParser().parse(data: xmlString.data(using: .utf8)!)
+        let xmlParser = XMLReader().parse(data: xmlString.data(using: .utf8)!)
         XCTAssertNotNil(xmlParser)
         XCTAssertEqual(foo1Value, xmlParser?["foo1"]?.value)
         XCTAssertEqual(foo2Value, xmlParser?["foo1"]?["foo2"]?.value)
@@ -44,7 +44,7 @@ class TestOCastXMLParser: XCTestCase {
         let foo2AttributeKey = "foo2attributeKey"
         let foo2Attribute = "foo2attribute"
         let xmlString = "<foo1 \(foo1AttributeKey)=\"\(foo1Attribute)\"><foo2 \(foo2AttributeKey)=\"\(foo2Attribute)\"></foo2></foo1>"
-        let xmlParser = OCastXMLParser().parse(data: xmlString.data(using: .utf8)!)
+        let xmlParser = XMLReader().parse(data: xmlString.data(using: .utf8)!)
         XCTAssertNotNil(xmlParser)
         XCTAssertEqual(foo1Attribute, xmlParser?["foo1"]?.attributes?[foo1AttributeKey])
         XCTAssertEqual(foo2Attribute, xmlParser?["foo1"]?["foo2"]?.attributes?[foo2AttributeKey])
@@ -52,7 +52,7 @@ class TestOCastXMLParser: XCTestCase {
     
     func testInvalidXML() {
         let xmlString = "<foo><foo>"
-        let xmlParser = OCastXMLParser().parse(data: xmlString.data(using: .utf8)!)
+        let xmlParser = XMLReader().parse(data: xmlString.data(using: .utf8)!)
         XCTAssertNil(xmlParser)
     }
 }

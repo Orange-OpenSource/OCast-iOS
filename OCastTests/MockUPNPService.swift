@@ -22,9 +22,9 @@ import Foundation
 /// Class to mock an UPNP service.
 class MockUPNPService: UPNPServiceProtocol {
     
-    var device: Device?
+    var device: UPNPDevice?
     
-    init(device: Device?) {
+    init(device: UPNPDevice?) {
         self.device = device
     }
     

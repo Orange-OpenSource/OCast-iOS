@@ -56,7 +56,7 @@ enum HTTPMethod: String {
 
 class HTTPRequest {
 
-    public static func launch(urlSession: URLSessionProtocol = URLSession(configuration: .default),
+    public static func launch(urlSession: URLSessionProtocol,
                               method: HTTPMethod = .GET,
                               url urlString: String,
                               httpHeaders: [String : String]? = nil,
@@ -90,6 +90,5 @@ class HTTPRequest {
         }
         
         task.resume()
-        urlSession.finishTasksAndInvalidate()
     }
 }

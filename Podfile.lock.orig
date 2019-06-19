@@ -2,9 +2,14 @@ PODS:
   - CocoaAsyncSocket (7.6.3)
   - DynamicCodable (1.0)
   - OCast (2.0.0):
-    - CocoaAsyncSocket (~> 7.6.3)
-    - DynamicCodable (~> 1.0)
-    - Starscream (~> 3.1.0)
+    - OCast/Core (= 2.0.0)
+    - OCast/Reference (= 2.0.0)
+  - OCast/Core (2.0.0):
+    - CocoaAsyncSocket (= 7.6.3)
+    - DynamicCodable (= 1.0)
+  - OCast/Reference (2.0.0):
+    - OCast/Core
+    - Starscream (= 3.1.0)
   - Starscream (3.1.0)
 
 DEPENDENCIES:
@@ -26,9 +31,14 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   CocoaAsyncSocket: eafaa68a7e0ec99ead0a7b35015e0bf25d2c8987
   DynamicCodable: 2cf558d057b3e6540552943254e1c9eeb706dde2
-  OCast: f4dc6beddcf98f4ea6477f05e32c4fa7f462141f
+<<<<<<< HEAD
+  OCast: 49aec94e7dca4931d451ca3efa7f84950eccdac1
   Starscream: 08172b481e145289c4930cb567230fb55897cfa4
+=======
+  OCast: 5266f34ffcb17f067d87e8d2f8cb88177cd969dd
+  Swifter: 2ed278fbf7b16cbe97269eb56d8e8749b1ec4042
+>>>>>>> kick v1
 
 PODFILE CHECKSUM: b9577627f5f1d4214a3ba96e2f29b729f1a9eb4b
 
-COCOAPODS: 1.7.2
+COCOAPODS: 1.6.1
