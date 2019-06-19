@@ -46,6 +46,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     public var sslConfiguration: SSLConfiguration = SSLConfiguration(deviceCertificates: nil, clientCertificate: nil)
     
+    public var manufacturer: String
+    
     public static var searchTarget: String {
         return "urn:cast-ocast-org:service:cast:1"
     }
@@ -116,6 +118,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         ipAddress = upnpDevice.ipAddress
         applicationURL = upnpDevice.baseURL.absoluteString
         friendlyName = upnpDevice.friendlyName
+        manufacturer = upnpDevice.manufacturer
         dialService = DIALService(forURL: applicationURL)
         semaphore = DispatchSemaphore(value: 0)
         

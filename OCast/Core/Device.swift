@@ -64,6 +64,9 @@ public protocol Device {
     /// The SSL configuration used if you want to perform a SSL connection.
     var sslConfiguration: SSLConfiguration { get }
     
+    /// The manufacturer.
+    var manufacturer: String { get }
+    
     /// The search target used to discover the device.
     static var searchTarget: String { get }
     
