@@ -130,7 +130,7 @@ extension ReferenceDevice {
             }
         }
         let message = OCastApplicationLayer(service: OCastDeviceSettingsServiceName, data: command)
-        send(message, completion: completionBlock)
+        send(message, on: OCastDomainName.settings, completion: completionBlock)
     }
     
     public func updateStatus(_ completion: @escaping ResultHandler<SettingsUpdateStatus>) {
@@ -148,18 +148,18 @@ extension ReferenceDevice {
     public func sendKeyEvent(_ keyEvent: SettingsKeyPressedCommand, completion: @escaping NoResultHandler) {
         let command = OCastDataLayer(name: "keyPressed", params: keyEvent)
         let message = OCastApplicationLayer(service: OCastInputSettingsServiceName, data: command)
-        send(message, completion: completion)
+        send(message, on: OCastDomainName.settings, completion: completion)
     }
     
     public func sendMouseEvent(_ mouseEvent: SettingsMouseEventCommand, completion: @escaping NoResultHandler) {
         let command = OCastDataLayer(name: "mouseEvent", params: mouseEvent)
         let message = OCastApplicationLayer(service: OCastInputSettingsServiceName, data: command)
-        send(message, completion: completion)
+        send(message, on: OCastDomainName.settings, completion: completion)
     }
     
     public func sendGamepadEvent(_ gamepadEvent: SettingsGamepadEventCommand, completion: @escaping NoResultHandler) {
         let command = OCastDataLayer(name: "gamepadEvent", params: gamepadEvent)
         let message = OCastApplicationLayer(service: OCastInputSettingsServiceName, data: command)
-        send(message, completion: completion)
+        send(message, on: OCastDomainName.settings, completion: completion)
     }
 }
