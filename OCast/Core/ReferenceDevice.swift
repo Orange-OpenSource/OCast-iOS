@@ -254,20 +254,26 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     private func registerEvents() {
         registerEvent("playbackStatus") { data in
             if let playbackStatus = try? JSONDecoder().decode(OCastDeviceLayer<MediaPlaybackStatus>.self, from: data) {
-                NotificationCenter.default.post(name: PlaybackStatusEventNotification,
-                                                object: self, userInfo: [PlaybackStatusUserInfoKey: playbackStatus.message.data.params])
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: PlaybackStatusEventNotification,
+                                                    object: self, userInfo: [PlaybackStatusUserInfoKey: playbackStatus.message.data.params])
+                }
             }
         }
         registerEvent("metadataChanged") { data in
             if let metadata = try? JSONDecoder().decode(OCastDeviceLayer<MediaMetadata>.self, from: data) {
-                NotificationCenter.default.post(name: MetadataChangedEventNotification,
-                                                object: self, userInfo: [MetadataUserInfoKey: metadata.message.data.params])
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: MetadataChangedEventNotification,
+                                                    object: self, userInfo: [MetadataUserInfoKey: metadata.message.data.params])
+                }
             }
         }
         registerEvent("updateStatus") { data in
             if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<SettingsUpdateStatus>.self, from: data) {
-                NotificationCenter.default.post(name: UpdateStatusEventNotification,
-                                                object: self, userInfo:[UpdateStatusUserInfoKey: updateStatus.message.data.params])
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: UpdateStatusEventNotification,
+                                                    object: self, userInfo:[UpdateStatusUserInfoKey: updateStatus.message.data.params])
+                }
             }
         }
     }
@@ -458,7 +464,11 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                     disconnectHandler(error)
                     self?.disconnectionHandler = nil
                 } else {
-                    NotificationCenter.default.post(name: DeviceDisconnectedEventNotification, object: self, userInfo: [ErrorUserInfoKey: error])
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: DeviceDisconnectedEventNotification,
+                                                        object: self,
+                                                        userInfo: [ErrorUserInfoKey: error])
+                    }
                 }
             }
         }
