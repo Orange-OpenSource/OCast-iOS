@@ -224,7 +224,7 @@ public protocol Device {
     ///
     /// - Parameter completion: The completion block called when the action completes.
     /// If the error is nil, the device id was successfully retrieved and is described in `SettingsDeviceID` parameter.
-    func deviceID(_ completion: @escaping ResultHandler<SettingsDeviceID>)
+    func deviceID(_ completion: @escaping ResultHandler<String>)
     
     // MARK: - Settings input commands methods
     

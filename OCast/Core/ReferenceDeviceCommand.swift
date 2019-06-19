@@ -138,9 +138,12 @@ extension ReferenceDevice {
         sendDeviceSettingsCommand(command, completion: completion)
     }
     
-    public func deviceID(_ completion: @escaping ResultHandler<SettingsDeviceID>) {
+    public func deviceID(_ completion: @escaping ResultHandler<String>) {
         let command = OCastDataLayer(name: "getDeviceID", params: SettingsGetDeviceIDCommand())
-        sendDeviceSettingsCommand(command, completion: completion)
+        let completionBlock: ResultHandler<SettingsDeviceID> = { result, error in
+            completion(result?.id, error)
+        }
+        sendDeviceSettingsCommand(command, completion: completionBlock)
     }
     
     // MARK: - Input settings commands
