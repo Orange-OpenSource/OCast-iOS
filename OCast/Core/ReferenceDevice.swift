@@ -458,7 +458,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                     disconnectHandler(error)
                     self?.disconnectionHandler = nil
                 } else {
-                    NotificationCenter.default.post(name: OCastDeviceDisconnectedEventNotification, object: self, userInfo: [ErrorUserInfoKey: error])
+                    NotificationCenter.default.post(name: DeviceDisconnectedEventNotification, object: self, userInfo: [ErrorUserInfoKey: error])
                 }
             }
         }

@@ -23,7 +23,7 @@ import Foundation
 
 /// The notification sent when the device is disconnected
 /// The userinfo `ErrorUserInfoKey` key contains error information.
-public let OCastDeviceDisconnectedEventNotification = Notification.Name("OCastDeviceDisconnectedEvent")
+public let DeviceDisconnectedEventNotification = Notification.Name("DeviceDisconnectedEvent")
 
 /// The notification user info key representing the error.
 public let ErrorUserInfoKey = Notification.Name("ErrorKey")
