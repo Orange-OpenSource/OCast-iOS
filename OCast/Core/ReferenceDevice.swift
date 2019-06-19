@@ -318,18 +318,16 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     /// - Parameters:
     ///   - jsonData: The JSON response.
     ///   - deviceLayer: The response device layer.
-    private func handleReply(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {
-        guard let status = deviceLayer.status else { return }
-        
+    private func handleReply(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {        
         let commandHandler = commandHandlers[deviceLayer.id]
-        switch status {
-        case .ok:
+        switch deviceLayer.status {
+        case .ok?:
             if let code = deviceLayer.message.data.params.code, code != OCastDefaultResponseDataLayer.successCode {
                 DispatchQueue.main.async { commandHandler?(.failure(OCastReplyError(code: code))) }
             } else {
                 DispatchQueue.main.async { commandHandler?(.success(jsonData)) }
             }
-        case .error(_):
+        case .error(_)?, .none:
             DispatchQueue.main.async { commandHandler?(.failure(OCastError.transportError)) }
         }
         
