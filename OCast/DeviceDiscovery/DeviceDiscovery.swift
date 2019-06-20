@@ -233,7 +233,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
             }
         }
         
-        let task = DispatchWorkItem { self.removeDevices(notSeenAfter: sentDate) }
+        let task = DispatchWorkItem { [weak self] in self?.removeDevices(notSeenAfter: sentDate) }
         removeDevicesTasks.append(task)
         // Add 1 second for the network round-trip time.
         DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(maxTime) + TimeInterval(1.0), execute: task)
@@ -266,7 +266,9 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
         ssdpLastSeenDevices[UUID] = Date()
 
         if discoveredDevices[UUID] == nil {
-            upnpService.device(fromLocation: mSearchResponse.location) { result in
+            upnpService.device(fromLocation: mSearchResponse.location) { [weak self] result in
+                guard let `self` = self else { return }
+                
                 switch result {
                 case .success(let device):
                     // Recheck to prevent from adding twice the same device if 2 incoming requests are received quickly

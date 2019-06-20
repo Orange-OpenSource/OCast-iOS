@@ -62,6 +62,9 @@ public let DeviceCenterErrorUserInfoKey = "DeviceCenterErrorUserInfoKey"
 }
 
 /// The center which discover OCast devices on the network.
+/// You must register a device for a manufacturer using the `registerDevice(_:forManufacturer:)` method.
+/// Then you can start the discovery with the `resumeDiscovery` method.
+/// If you want to release this object, you must call `stopDiscovery` before to avoid memory leaks.
 @objcMembers
 public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
 
@@ -122,7 +125,6 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     /// - Returns: `true` if the discovery is correctly stopped, otherwise `false`.
     @discardableResult
     public func stopDiscovery() -> Bool {
-        deviceDiscovery?.delegate = nil
         return deviceDiscovery?.stop() ?? false
     }
     

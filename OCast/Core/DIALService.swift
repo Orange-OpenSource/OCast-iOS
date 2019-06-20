@@ -94,7 +94,9 @@ class DIALService {
     ///
     /// - Parameter completion: result
     public func stop(application name: String, completion: @escaping (Result<Void, DIALError>) -> ()) {
-        info(ofApplication:name) { result in
+        info(ofApplication:name) { [weak self] result in
+            guard let `self` = self else { return }
+            
             switch result {
             case .failure(let error):
                 completion(.failure(error))

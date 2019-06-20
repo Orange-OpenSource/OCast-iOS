@@ -252,25 +252,28 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     /// Register media and settings event
     private func registerEvents() {
-        registerEvent("playbackStatus") { data in
+        registerEvent("playbackStatus") { [weak self] data in
             if let playbackStatus = try? JSONDecoder().decode(OCastDeviceLayer<MediaPlaybackStatus>.self, from: data) {
                 DispatchQueue.main.async {
+                    guard let `self` = self else { return }
                     NotificationCenter.default.post(name: PlaybackStatusEventNotification,
                                                     object: self, userInfo: [PlaybackStatusUserInfoKey: playbackStatus.message.data.params])
                 }
             }
         }
-        registerEvent("metadataChanged") { data in
+        registerEvent("metadataChanged") { [weak self] data in
             if let metadata = try? JSONDecoder().decode(OCastDeviceLayer<MediaMetadata>.self, from: data) {
                 DispatchQueue.main.async {
+                    guard let `self` = self else { return }
                     NotificationCenter.default.post(name: MetadataChangedEventNotification,
                                                     object: self, userInfo: [MetadataUserInfoKey: metadata.message.data.params])
                 }
             }
         }
-        registerEvent("updateStatus") { data in
+        registerEvent("updateStatus") { [weak self] data in
             if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<SettingsUpdateStatus>.self, from: data) {
                 DispatchQueue.main.async {
+                    guard let `self` = self else { return }
                     NotificationCenter.default.post(name: UpdateStatusEventNotification,
                                                     object: self, userInfo:[UpdateStatusUserInfoKey: updateStatus.message.data.params])
                 }
@@ -294,8 +297,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
         
         self.webSocket = websocket
-        self.connectionHandler = completion
-        self.state = .connecting
+        connectionHandler = completion
+        state = .connecting
         self.webSocket?.delegate = self
         self.webSocket?.connect()
     }
@@ -305,10 +308,10 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     /// - Returns: The new sequence id.
     private func generateId() -> Int {
         return sequenceQueue.sync {
-            if self.sequenceID == Int.max {
-                self.sequenceID = 0
+            if sequenceID == Int.max {
+                sequenceID = 0
             }
-            self.sequenceID += 1
+            sequenceID += 1
             return sequenceID
         }
     }
@@ -369,13 +372,13 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     /// If the error is nil, the message was successfully sent and is described in `U` parameter.
     func sendToApplication<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping ResultHandler<U>) {
         if isApplicationRunning.synchronizedValue {
-            self.send(layer: layer, completion: completion)
+            send(layer: layer, completion: completion)
         } else {
-            startApplication { error in
+            startApplication { [weak self] error in
                 if let error = error {
                     completion(nil, error)
                 } else {
-                    self.send(layer: layer, completion: completion)
+                    self?.send(layer: layer, completion: completion)
                 }
             }
         }
@@ -450,17 +453,19 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     func websocket(_ websocket: WebSocketProtocol, didDisconnectWith error: Error?) {
         DispatchQueue.main.async { [weak self] in
-            self?.state = .disconnected
+            guard let `self` = self else { return }
             
-            self?.commandHandlers.forEach { (_, completion) in
+            self.state = .disconnected
+            
+            self.commandHandlers.forEach { (_, completion) in
                 completion(.failure(OCastError.deviceHasBeenDisconnected))
             }
-            self?.commandHandlers.removeAll()
+            self.commandHandlers.removeAll()
             
             if let error = error {
-                if let disconnectHandler = self?.disconnectionHandler {
+                if let disconnectHandler = self.disconnectionHandler {
                     disconnectHandler(error)
-                    self?.disconnectionHandler = nil
+                    self.disconnectionHandler = nil
                 } else {
                     DispatchQueue.main.async {
                         NotificationCenter.default.post(name: DeviceDisconnectedEventNotification,

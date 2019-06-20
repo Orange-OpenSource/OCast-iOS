@@ -67,12 +67,13 @@ class UPNPService: UPNPServiceProtocol {
     ///   - completionHandler: The completion handler called at the end containing the new device.
     func device(fromLocation location: String, completionHandler: @escaping UPNPServiceProtocolCompletionHandler) {
         let headers = ["Date": dateFormatter.string(from: Date())]
-        HTTPRequest.launch(urlSession: self.urlSession, url: location, httpHeaders: headers, completion: {
-            result in
-            
+        HTTPRequest.launch(urlSession: self.urlSession,
+                           url: location,
+                           httpHeaders: headers,
+                           completion: { [weak self] result in
             switch result {
             case .success(let data, let responseHeaders):
-                if let device = self.device(from: data, httpHeaders: responseHeaders) {
+                if let device = self?.device(from: data, httpHeaders: responseHeaders) {
                     DispatchQueue.main.async {
                         completionHandler(.success(device))
                     }
