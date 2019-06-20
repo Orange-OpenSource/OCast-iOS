@@ -34,6 +34,7 @@
 		8549AD732296E83700E205A3 /* XMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD712296E83700E205A3 /* XMLReader.swift */; };
 		8549AD7A2296E94400E205A3 /* SSLConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD792296E94400E205A3 /* SSLConfiguration.swift */; };
 		8549AD95229E8E9400E205A3 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD94229E8E9400E205A3 /* WebSocket.swift */; };
+		9708176222BBB45C00F73297 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9708176122BBB45C00F73297 /* Logger.swift */; };
 		970856C32278A2B000175A1B /* TestXMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970856C22278A2B000175A1B /* TestXMLReader.swift */; };
 		976F264422B795F900C62F3F /* UPNPDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976F264322B795F900C62F3F /* UPNPDevice.swift */; };
 		9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */; };
@@ -87,6 +88,7 @@
 		8549AD792296E94400E205A3 /* SSLConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLConfiguration.swift; sourceTree = "<group>"; };
 		8549AD94229E8E9400E205A3 /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
 		8BC8721E9BC32C5BB5171BFA /* Pods-OCastTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastTests.release.xcconfig"; path = "Target Support Files/Pods-OCastTests/Pods-OCastTests.release.xcconfig"; sourceTree = "<group>"; };
+		9708176122BBB45C00F73297 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		970856C22278A2B000175A1B /* TestXMLReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestXMLReader.swift; sourceTree = "<group>"; };
 		976F264322B795F900C62F3F /* UPNPDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UPNPDevice.swift; path = OCast/Core/UPNPDevice.swift; sourceTree = SOURCE_ROOT; };
 		9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSDPMSearchResponse.swift; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 		8549AD6F2296E83700E205A3 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				9708176122BBB45C00F73297 /* Logger.swift */,
 				8549AD702296E83700E205A3 /* HTTPRequest.swift */,
 				97E21345229D4051003AAF7C /* SynchronizedDictionary.swift */,
 				97E21347229D41C5003AAF7C /* SynchronizedValue.swift */,
@@ -464,6 +467,7 @@
 				8549AD032296E82100E205A3 /* ReferenceDeviceCommand.swift in Sources */,
 				9790DFFD227C707A0031A70F /* SSDPHeader.swift in Sources */,
 				8549ACF82296E80700E205A3 /* OCastGeneral.swift in Sources */,
+				9708176222BBB45C00F73297 /* Logger.swift in Sources */,
 				8549ACFB2296E80700E205A3 /* OCastMedia.swift in Sources */,
 				8549AD732296E83700E205A3 /* XMLReader.swift in Sources */,
 				97E21346229D4051003AAF7C /* SynchronizedDictionary.swift in Sources */,
