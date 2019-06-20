@@ -147,6 +147,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
             
             return true
         } catch {
+            Logger.shared.log(logLevel: .error, "Can't open the UDP socket : \(error)")
             return false
         }
     }
@@ -229,6 +230,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
             let host = ssdpMulticastAddress + ":" + String(ssdpMulticastPort)
             guard let payload = SSDPMSearchRequest(host: host, maxTime: maxTime, searchTarget: searchTarget).data else { continue }
             for _ in 1...2 {
+                Logger.shared.log(logLevel: .debug, "Sending M-SEARCH with target \(searchTarget)")
                 udpSocket.send(payload: payload, toHost: ssdpMulticastAddress, onPort: ssdpMulticastPort)
             }
         }
@@ -245,6 +247,8 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
     @objc func removeDevices(notSeenAfter sentDate: Date) {
         guard isRunning else { return }
         
+        Logger.shared.log(logLevel: .debug, "Checking if a device is lost")
+        
         let outdatedDevices = discoveredDevices.filter({
             guard let lastSeenDate = ssdpLastSeenDevices[$0.key] else { return false }
             // A payload has been received in the meantime.
@@ -252,6 +256,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
         })
         
         if outdatedDevices.count > 0 {
+            Logger.shared.log(logLevel: .info, "Devices lost: \(outdatedDevices.values)")
             self.delegate?.deviceDiscovery(self, didRemove: Array(outdatedDevices.values))
             outdatedDevices.forEach { discoveredDevices.removeValue(forKey: $0.key) }
         }
@@ -261,7 +266,10 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
     ///
     /// - Parameter mSearchResponse: The M-SEARCH response to process.
     private func handle(_ mSearchResponse: SSDPMSearchResponse) {
-        guard isRunning, let UUID = UPNPService.extractUUID(from: mSearchResponse.USN) else { return }
+        guard isRunning, let UUID = UPNPService.extractUUID(from: mSearchResponse.USN) else {
+            Logger.shared.log(logLevel: .warning, "M-SEARCH response ignored")
+            return
+        }
         
         ssdpLastSeenDevices[UUID] = Date()
 
@@ -271,13 +279,15 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
                 
                 switch result {
                 case .success(let device):
+                    Logger.shared.log(logLevel: .debug, "Device description retrieved for \(device.friendlyName)")
                     // Recheck to prevent from adding twice the same device if 2 incoming requests are received quickly
                     // and if the discovery has been stopped.
                     if self.discoveredDevices[UUID] == nil && self.isRunning {
                         self.discoveredDevices[UUID] = device
                         self.delegate?.deviceDiscovery(self, didAdd: [device])
                     }
-                case .failure(_): break
+                case .failure(let error):
+                    Logger.shared.log(logLevel: .error, "Device description failed: \(error)")
                 }
             }
         }
@@ -289,6 +299,8 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
         guard let response = String(data: data, encoding: .utf8),
             let mSearchResponse = SSDPResponseParser().parse(response: response) else { return }
         
+        Logger.shared.log(logLevel: .debug, "Response received: \(response)")
+        
         // Update collections on the main thread to avoid safety issues.
         DispatchQueue.main.sync {
             handle(mSearchResponse)
@@ -297,6 +309,8 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
     
     func udpSocketDidClose(_ udpSocket: UDPSocketProtocol, with error: Error?) {
         guard let error = error else { return }
+        
+        Logger.shared.log(logLevel: .warning, "UDP socket closed unexpectedly")
         
         DispatchQueue.main.sync {
             self.clean(with: error)

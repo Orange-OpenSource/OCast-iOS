@@ -74,7 +74,7 @@ struct ConsoleLogger: LoggerProtocol {
 }
 
 /// The class to manage the logs. You can provide your own logger implementing the `LoggerProtocol` protocol.
-class Logger {
+public class Logger {
     
     /// The singleton instance.
     public static let shared = Logger()

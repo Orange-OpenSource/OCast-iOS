@@ -108,6 +108,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             // Reset state every time state is modified
             if oldValue != state {
                 isApplicationRunning.synchronizedValue = false
+                Logger.shared.log(logLevel: .debug, "State changed from \(oldValue.rawValue) to \(state.rawValue)")
             }
         }
     }
@@ -141,8 +142,11 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 switch result {
                 case .success(let info):
                     guard let `self` = self else { return }
+                    Logger.shared.log(logLevel: .debug,
+                                      "DIAL info request retrieved for \(applicationName): \(info.debugDescription)")
                     self.connect(info.app2appURL ?? self.settingsWebSocketURL, andSSLConfiguration: configuration, completion)
                 case .failure(let error):
+                    Logger.shared.log(logLevel: .error, "DIAL info request failed: \(error)")
                     completion(error)
                 }
             }
@@ -179,6 +183,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             
             switch result {
             case .success(let applicationInfo):
+                Logger.shared.log(logLevel: .debug,
+                                  "DIAL info request retrieved for \(applicationName): \(applicationInfo.debugDescription)")
                 self.isApplicationRunning.synchronizedValue = applicationInfo.state == .running
                 guard !self.isApplicationRunning.synchronizedValue else {
                     completion(nil)
@@ -190,6 +196,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                     
                     switch result {
                     case .success(_):
+                        Logger.shared.log(logLevel: .debug, "DIAL start request ended successfully")
                         // Do not wait on main thread
                         self.semaphoreQueue.async {
                             let dispatchResult = self.semaphore.wait(timeout: .now() + 60)
@@ -200,10 +207,12 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                             }
                         }
                     case .failure(let error):
+                        Logger.shared.log(logLevel: .error, "DIAL start request failed: \(error)")
                         completion(error)
                     }
                 })
             case .failure(let error):
+                Logger.shared.log(logLevel: .error, "DIAL info request failed: \(error)")
                 completion(error)
             }
         })
@@ -218,8 +227,10 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         dialService.stop(application: applicationName) { result in
             switch result {
             case .success(_):
+                Logger.shared.log(logLevel: .debug, "DIAL stop request ended successfully")
                 completion(nil)
             case .failure(let error):
+                Logger.shared.log(logLevel: .error, "DIAL stop request failed: \(error)")
                 completion(error)
             }
         }
@@ -259,6 +270,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                     NotificationCenter.default.post(name: PlaybackStatusEventNotification,
                                                     object: self, userInfo: [PlaybackStatusUserInfoKey: playbackStatus.message.data.params])
                 }
+            } else {
+                Logger.shared.log(logLevel: .error, "Can't decode playbackStatus event")
             }
         }
         registerEvent("metadataChanged") { [weak self] data in
@@ -268,6 +281,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                     NotificationCenter.default.post(name: MetadataChangedEventNotification,
                                                     object: self, userInfo: [MetadataUserInfoKey: metadata.message.data.params])
                 }
+            } else {
+                Logger.shared.log(logLevel: .error, "Can't decode metadataChanged event")
             }
         }
         registerEvent("updateStatus") { [weak self] data in
@@ -277,6 +292,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                     NotificationCenter.default.post(name: UpdateStatusEventNotification,
                                                     object: self, userInfo:[UpdateStatusUserInfoKey: updateStatus.message.data.params])
                 }
+            } else {
+                Logger.shared.log(logLevel: .error, "Can't decode updateStatus event")
             }
         }
     }
@@ -330,7 +347,11 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             } else {
                 DispatchQueue.main.async { commandHandler?(.success(jsonData)) }
             }
-        case .error(_)?, .none:
+        case .error(let error)?:
+            Logger.shared.log(logLevel: .error, "Can't handle reply: \(String(describing: error))")
+            DispatchQueue.main.async { commandHandler?(.failure(OCastError.transportError)) }
+        case .none:
+            Logger.shared.log(logLevel: .warning, "The status is missing in the reply")
             DispatchQueue.main.async { commandHandler?(.failure(OCastError.transportError)) }
         }
         
@@ -344,8 +365,10 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     private func handleConnectionEvent(_ jsonData: Data) throws {
         let connectEvent = try JSONDecoder().decode(OCastDeviceLayer<WebAppConnectedStatusEvent>.self, from: jsonData)
         if connectEvent.message.data.params.status == .connected {
+            Logger.shared.log(logLevel: .debug, "The connected event has been received")
             semaphore.signal()
         } else if connectEvent.message.data.params.status == .disconnected {
+            Logger.shared.log(logLevel: .debug, "The disconnected event has been received")
             isApplicationRunning.synchronizedValue = false
         }
     }
@@ -359,6 +382,9 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         if let eventName = deviceLayer.message.data.name,
             let handler = registeredEvents[eventName] {
             handler(jsonData)
+        } else {
+            Logger.shared.log(logLevel: .warning,
+                              "Unregistered event received: \(String(describing: deviceLayer.message.data.name))")
         }
     }
     
@@ -436,6 +462,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 completion(.failure(OCastError.misformedCommand))
             }
         } catch {
+            Logger.shared.log(logLevel: .error, "Can't encode command: \(error)")
             completion(.failure(error))
         }
     }
@@ -480,6 +507,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     func websocket(_ websocket: WebSocketProtocol, didReceiveMessage message: String) {
         guard let jsonData = message.data(using: .utf8) else { return }
         
+        Logger.shared.log(logLevel: .debug, "Message received: \(message)")
+        
         do {
             let deviceLayer = try JSONDecoder().decode(OCastDeviceLayer<OCastDefaultResponseDataLayer>.self, from: jsonData)
             switch deviceLayer.type {
@@ -489,7 +518,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             case .event:
                 if deviceLayer.message.service == OCastWebAppServiceName {
                     try handleConnectionEvent(jsonData)
-                } else { handleRegisteredEvents(from: jsonData, deviceLayer)
+                } else {
+                    handleRegisteredEvents(from: jsonData, deviceLayer)
                 }
             }
         } catch {}

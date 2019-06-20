@@ -35,6 +35,13 @@ struct DIALApplicationInfo {
     public let state: DIALState
 }
 
+/// Extension to manage logs.
+extension DIALApplicationInfo: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return "DIALApplicationInfo(app2appURL: \(String(describing: app2appURL)), state: \(state))"
+    }
+}
+
 class DIALService {
     
     private let baseURL: String
