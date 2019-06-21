@@ -16,17 +16,11 @@
 // limitations under the License.
 //
 
-import XCTest
 @testable import OCast
+import XCTest
 
 /// Tests the SSDPMSearchRequest structure.
 class TestSSDPMSearchRequest: XCTestCase {
-
-    override func setUp() {
-    }
-
-    override func tearDown() {
-    }
 
     func testMSearchRequest() {
         let host = "239.255.255.250:1900"

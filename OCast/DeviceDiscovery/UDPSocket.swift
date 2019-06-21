@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-import Foundation
 import CocoaAsyncSocket
+import Foundation
 
 /// Protocol for responding to socket events.
 protocol UDPSocketDelegate: class {
@@ -81,7 +81,7 @@ class UDPSocket: NSObject, UDPSocketProtocol, GCDAsyncUdpSocketDelegate {
         udpSocket.synchronouslySetDelegateQueue(delegateQueue)
     }
     
-    // MARK - UDPSocketProtocol properties & methods
+    // MARK: - UDPSocketProtocol properties & methods
 
     weak var delegate: UDPSocketDelegate?
     
@@ -104,9 +104,9 @@ class UDPSocket: NSObject, UDPSocketProtocol, GCDAsyncUdpSocketDelegate {
         udpSocket.send(payload, toHost: host, port: port, withTimeout: -1, tag: 0)
     }
     
-    // MARK - GCDAsyncUdpSocketDelegate methods
+    // MARK: - GCDAsyncUdpSocketDelegate methods
     
-    func udpSocket(_ udpSocket : GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext _: Any?) {
+    func udpSocket(_ udpSocket: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext _: Any?) {
         delegate?.udpSocket(self, didReceive: data, fromHost: GCDAsyncSocket.host(fromAddress: address))
     }
     
@@ -114,7 +114,3 @@ class UDPSocket: NSObject, UDPSocketProtocol, GCDAsyncUdpSocketDelegate {
         delegate?.udpSocketDidClose(self, with: error)
     }
 }
-
-
-
-

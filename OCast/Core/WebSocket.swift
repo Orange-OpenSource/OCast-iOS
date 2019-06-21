@@ -115,7 +115,7 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
         socket.pongDelegate = self
     }
     
-    // MARK - WebSocketProtocol properties & methods
+    // MARK: - WebSocketProtocol properties & methods
     
     weak var delegate: WebSocketDelegate?
     

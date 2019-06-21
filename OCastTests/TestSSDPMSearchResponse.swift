@@ -16,17 +16,11 @@
 // limitations under the License.
 //
 
-import XCTest
 @testable import OCast
+import XCTest
 
 /// Tests the SSDPMSearchResponse structure.
 class TestSSDPMSearchResponse: XCTestCase {
-
-    override func setUp() {
-    }
-
-    override func tearDown() {
-    }
 
     func testCorrectMSearchResponse() {
         let ssdpHeaders: SSDPHeaders = [.location: "http://foo",

@@ -44,7 +44,7 @@ extension URLSession: URLSessionProtocol {
 /// Extends URLSessionDataTask to adopt URLSessionDataTaskProtocol
 extension URLSessionDataTask: URLSessionDataTaskProtocol {}
 
-enum HTTPRequestError : Error {
+enum HTTPRequestError: Error {
     case badURL
     case failed(String)
     case badCode(Int)
@@ -59,10 +59,10 @@ class HTTPRequest {
     public static func launch(urlSession: URLSessionProtocol,
                               method: HTTPMethod = .GET,
                               url urlString: String,
-                              httpHeaders: [String : String]? = nil,
+                              httpHeaders: [String: String]? = nil,
                               body: String? = nil,
                               successCode: Int = 200,
-                              completion: ((Result<(Data?, [AnyHashable: Any]), HTTPRequestError>) -> ())?) {
+                              completion: ((Result<(Data?, [AnyHashable: Any]), HTTPRequestError>) -> Void)?) {
         
         guard let url = URL(string: urlString) else {
             completion?(.failure(HTTPRequestError.badURL))

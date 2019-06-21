@@ -119,12 +119,12 @@ class UPNPService: UPNPServiceProtocol {
             let UDN = xmlDeviceElement["UDN"]?.value else { return nil }
         
         return UPNPDevice(baseURL: applicationURL,
-                      ipAddress: ipAddress,
-                      servicePort: UInt16(applicationURL.port ?? 80),
-                      deviceID: UPNPService.extractUUID(from: UDN) ?? UDN,
-                      friendlyName: friendlyName,
-                      manufacturer: manufacturer,
-                      modelName: modelName)
+                          ipAddress: ipAddress,
+                          servicePort: UInt16(applicationURL.port ?? 80),
+                          deviceID: UPNPService.extractUUID(from: UDN) ?? UDN,
+                          friendlyName: friendlyName,
+                          manufacturer: manufacturer,
+                          modelName: modelName)
     }
     
     /// Returns the application URL from an HTTP response.

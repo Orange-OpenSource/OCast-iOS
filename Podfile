@@ -13,6 +13,7 @@ target :OCast do
     pod 'CocoaAsyncSocket', '7.6.3'
     pod 'DynamicCodable', '1.0'
     pod 'Starscream', '3.1.0'
+    pod 'SwiftLint'
 end
 
 target :OCastTests do

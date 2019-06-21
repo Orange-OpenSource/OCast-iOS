@@ -50,7 +50,7 @@ public enum UpdateStatusState: Int, RawRepresentable, Codable {
     public typealias RawValue = String
     
     public var rawValue: RawValue {
-        switch (self) {
+        switch self {
         case .notChecked: return "notChecked"
         case .upToDate: return "upToDate"
         case .newVersionFound: return "newVersionFound"
@@ -62,7 +62,7 @@ public enum UpdateStatusState: Int, RawRepresentable, Codable {
     }
     
     public init?(rawValue: RawValue) {
-        switch (rawValue) {
+        switch rawValue {
         case "notChecked": self = .notChecked
         case "upToDate": self = .upToDate
         case "newVersionFound": self = .newVersionFound
@@ -107,7 +107,7 @@ public class InputGamepadAxes: OCastMessage {
     /// The y axis (-1.0 -> 1.0).
     public let y: Float
     
-    public let num : Int
+    public let num: Int
 }
 
 // MARK: - Settings Commands

@@ -16,17 +16,11 @@
 // limitations under the License.
 //
 
-import XCTest
 @testable import OCast
+import XCTest
 
 /// Tests the XMLReader class.
 class TestXMLReader: XCTestCase {
-    
-    override func setUp() {
-    }
-
-    override func tearDown() {
-    }
 
     func testXMLValues() {
         let foo1Value = "Foo1"

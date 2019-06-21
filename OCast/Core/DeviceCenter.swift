@@ -86,7 +86,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     /// The interval in seconds to refresh the devices. The minimum value is 5 seconds.
     public var deviceDiscoveryInterval: UInt16 {
         get { return deviceDiscovery?.interval ?? 0 }
-        set { deviceDiscovery?.interval = deviceDiscoveryInterval }
+        set { deviceDiscovery?.interval = newValue }
     }
     
     /// Registers a driver to discover devices of its manufacturer.
@@ -176,4 +176,3 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
                                         userInfo: userInfo)
     }
 }
-

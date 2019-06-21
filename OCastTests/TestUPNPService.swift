@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-import XCTest
 @testable import OCast
+import XCTest
 
 /// Tests the UPNP service class.
 class TestUPNPService: XCTestCase {
@@ -71,7 +71,7 @@ class TestUPNPService: XCTestCase {
                 XCTAssertEqual("FooFacturer", device.manufacturer)
                 XCTAssertEqual("FooModel", device.modelName)
                 expectation.fulfill()
-            case .failure(_):
+            case .failure:
                 XCTFail("Device provider should success")
             }
         }
@@ -93,13 +93,13 @@ class TestUPNPService: XCTestCase {
         let expectation = self.expectation(description: "deviceDescription")
         upnpService.device(fromLocation: location) { result in
             switch result {
-            case .success(_):
+            case .success:
                 XCTFail("Device provider should fail")
             case .failure(let error):
                 switch error {
                 case .badContent:
                     expectation.fulfill()
-                case .httpRequest(_):
+                case .httpRequest:
                     XCTFail("Error should be bad content")
                 }
             }
@@ -122,13 +122,13 @@ class TestUPNPService: XCTestCase {
         let expectation = self.expectation(description: "deviceDescription")
         upnpService.device(fromLocation: location) { result in
             switch result {
-            case .success(_):
+            case .success:
                 XCTFail("Device provider should fail")
             case .failure(let error):
                 switch error {
                 case .badContent:
                     expectation.fulfill()
-                case .httpRequest(_):
+                case .httpRequest:
                     XCTFail("Error should be bad content")
                 }
             }
@@ -151,13 +151,13 @@ class TestUPNPService: XCTestCase {
         let expectation = self.expectation(description: "deviceDescription")
         upnpService.device(fromLocation: location) { result in
             switch result {
-            case .success(_):
+            case .success:
                 XCTFail("Device provider should fail")
             case .failure(let error):
                 switch error {
                 case .badContent:
                     expectation.fulfill()
-                case .httpRequest(_):
+                case .httpRequest:
                     XCTFail("Error should be bad content")
                 }
             }
@@ -180,13 +180,13 @@ class TestUPNPService: XCTestCase {
         let expectation = self.expectation(description: "deviceDescription")
         upnpService.device(fromLocation: location) { result in
             switch result {
-            case .success(_):
+            case .success:
                 XCTFail("Device provider should fail")
             case .failure(let error):
                 switch error {
                 case .badContent:
                     expectation.fulfill()
-                case .httpRequest(_):
+                case .httpRequest:
                     XCTFail("Error should be bad content")
                 }
             }
@@ -208,13 +208,13 @@ class TestUPNPService: XCTestCase {
         let expectation = self.expectation(description: "deviceDescription")
         upnpService.device(fromLocation: location) { result in
             switch result {
-            case .success(_):
+            case .success:
                 XCTFail("Device provider should fail")
             case .failure(let error):
                 switch error {
                 case .badContent:
                     expectation.fulfill()
-                case .httpRequest(_):
+                case .httpRequest:
                     XCTFail("Error should be bad content")
                 }
             }
@@ -237,13 +237,13 @@ class TestUPNPService: XCTestCase {
         let expectation = self.expectation(description: "deviceDescription")
         upnpService.device(fromLocation: location) { result in
             switch result {
-            case .success(_):
+            case .success:
                 XCTFail("Device provider should fail")
             case .failure(let error):
                 switch error {
                 case .badContent:
                     expectation.fulfill()
-                case .httpRequest(_):
+                case .httpRequest:
                     XCTFail("Error should be bad content")
                 }
             }
@@ -266,13 +266,13 @@ class TestUPNPService: XCTestCase {
         let expectation = self.expectation(description: "deviceDescription")
         upnpService.device(fromLocation: location) { result in
             switch result {
-            case .success(_):
+            case .success:
                 XCTFail("Device provider should fail")
             case .failure(let error):
                 switch error {
                 case .badContent:
                     XCTFail("Error should be http request")
-                case .httpRequest(_):
+                case .httpRequest:
                     expectation.fulfill()
                 }
             }
@@ -295,13 +295,13 @@ class TestUPNPService: XCTestCase {
         let expectation = self.expectation(description: "deviceDescription")
         upnpService.device(fromLocation: location) { result in
             switch result {
-            case .success(_):
+            case .success:
                 XCTFail("Device provider should fail")
             case .failure(let error):
                 switch error {
                 case .badContent:
                     XCTFail("Error should be http request")
-                case .httpRequest(_):
+                case .httpRequest:
                     expectation.fulfill()
                 }
             }
@@ -324,13 +324,13 @@ class TestUPNPService: XCTestCase {
         let expectation = self.expectation(description: "deviceDescription")
         upnpService.device(fromLocation: location) { result in
             switch result {
-            case .success(_):
+            case .success:
                 XCTFail("Device provider should fail")
             case .failure(let error):
                 switch error {
                 case .badContent:
                     XCTFail("Error should be http request")
-                case .httpRequest(_):
+                case .httpRequest:
                     expectation.fulfill()
                 }
             }

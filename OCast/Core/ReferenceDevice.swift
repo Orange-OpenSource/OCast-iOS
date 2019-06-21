@@ -22,7 +22,7 @@
 import Foundation
 
 /// The handler used to manage the command results.
-internal typealias CommandResult = (Result<Data?, Error>) -> ()
+internal typealias CommandResult = (Result<Data?, Error>) -> Void
 
 /// The Reference device which conforms to the OCast specification.
 @objc @objcMembers
@@ -195,7 +195,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                     guard let `self` = self else { return }
                     
                     switch result {
-                    case .success(_):
+                    case .success:
                         Logger.shared.log(logLevel: .debug, "DIAL start request ended successfully")
                         // Do not wait on main thread
                         self.semaphoreQueue.async {
@@ -226,7 +226,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         
         dialService.stop(application: applicationName) { result in
             switch result {
-            case .success(_):
+            case .success:
                 Logger.shared.log(logLevel: .debug, "DIAL stop request ended successfully")
                 completion(nil)
             case .failure(let error):
@@ -290,7 +290,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 DispatchQueue.main.async {
                     guard let `self` = self else { return }
                     NotificationCenter.default.post(name: UpdateStatusEventNotification,
-                                                    object: self, userInfo:[UpdateStatusUserInfoKey: updateStatus.message.data.params])
+                                                    object: self, userInfo: [UpdateStatusUserInfoKey: updateStatus.message.data.params])
                 }
             } else {
                 Logger.shared.log(logLevel: .error, "Can't decode updateStatus event")
@@ -338,7 +338,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     /// - Parameters:
     ///   - jsonData: The JSON response.
     ///   - deviceLayer: The response device layer.
-    private func handleReply(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {        
+    private func handleReply(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {
         let commandHandler = commandHandlers[deviceLayer.id]
         switch deviceLayer.status {
         case .ok?:
@@ -484,7 +484,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             
             self.state = .disconnected
             
-            self.commandHandlers.forEach { (_, completion) in
+            self.commandHandlers.forEach { _, completion in
                 completion(.failure(OCastError.deviceHasBeenDisconnected))
             }
             self.commandHandlers.removeAll()

@@ -6,18 +6,21 @@ PODS:
     - DynamicCodable (~> 1.0)
     - Starscream (~> 3.1.0)
   - Starscream (3.1.0)
+  - SwiftLint (0.33.0)
 
 DEPENDENCIES:
   - CocoaAsyncSocket (= 7.6.3)
   - DynamicCodable (= 1.0)
   - OCast (from `./`)
   - Starscream (= 3.1.0)
+  - SwiftLint
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - CocoaAsyncSocket
     - DynamicCodable
     - Starscream
+    - SwiftLint
 
 EXTERNAL SOURCES:
   OCast:
@@ -28,7 +31,8 @@ SPEC CHECKSUMS:
   DynamicCodable: 2cf558d057b3e6540552943254e1c9eeb706dde2
   OCast: f4dc6beddcf98f4ea6477f05e32c4fa7f462141f
   Starscream: 08172b481e145289c4930cb567230fb55897cfa4
+  SwiftLint: fed9c66336e41fc74dc48a73678380718f0c8b0e
 
-PODFILE CHECKSUM: b9577627f5f1d4214a3ba96e2f29b729f1a9eb4b
+PODFILE CHECKSUM: 282d4cc01acff22914421e2cc9c0c401c624e588
 
 COCOAPODS: 1.7.2

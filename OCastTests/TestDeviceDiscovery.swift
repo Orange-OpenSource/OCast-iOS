@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-import XCTest
 @testable import OCast
+import XCTest
 
 /// Converts a DeviceDiscoveryDelegate delegate to closure style...
 class TestDeviceDiscoveryDelegate: DeviceDiscoveryDelegate {
@@ -51,8 +51,10 @@ class TestDeviceDiscovery: XCTestCase {
     private var mockUPNPService: MockUPNPService!
     private var mockUDPSocket: MockUDPSocket!
     private var deviceDiscovery: DeviceDiscovery!
+    // swiftlint:disable weak_delegate
     private var testDeviceDiscoveryDelegate: TestDeviceDiscoveryDelegate?
     
+    // swiftlint:disable overridden_super_call
     override func setUp() {
         testDeviceDiscoveryDelegate = TestDeviceDiscoveryDelegate()
         let location = "http://127.0.0.1/dd.xml"
@@ -72,21 +74,18 @@ class TestDeviceDiscovery: XCTestCase {
         
         """
         mockDevice = UPNPDevice(baseURL: URL(string: "http://foo")!,
-                            ipAddress: "127.0.0.1",
-                            servicePort: 8080,
-                            deviceID: "DeviceID",
-                            friendlyName: "Name",
-                            manufacturer: "Manufacturer",
-                            modelName: "Model")
+                                ipAddress: "127.0.0.1",
+                                servicePort: 8080,
+                                deviceID: "DeviceID",
+                                friendlyName: "Name",
+                                manufacturer: "Manufacturer",
+                                modelName: "Model")
         mockUDPSocket = MockUDPSocket(responsePayload: mSearchResponseString)
         mockUPNPService = MockUPNPService(device: mockDevice)
         deviceDiscovery = DeviceDiscovery(["urn:foo-org:service:foo:1"],
                                           udpSocket: mockUDPSocket,
                                           upnpService: mockUPNPService)
         deviceDiscovery.delegate = testDeviceDiscoveryDelegate
-    }
-
-    override func tearDown() {
     }
 
     func testDeviceDiscoveryResume() {
