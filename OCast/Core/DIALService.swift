@@ -18,7 +18,7 @@
 
 import Foundation
 
-enum DIALError : Error {
+enum DIALError: Error {
     case httpRequest(HTTPRequestError)
     case badContentResponse
 }
@@ -57,7 +57,7 @@ class DIALService {
     /// Get application info
     ///
     /// - Parameter completion: result
-    public func info(ofApplication name: String, completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> ()) {
+    public func info(ofApplication name: String, completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> Void) {
         HTTPRequest.launch(urlSession: urlSession, method: .GET, url: "\(baseURL)/\(name)") { result in
             switch result {
             case .failure(let httpError):
@@ -86,12 +86,12 @@ class DIALService {
     /// Start the application
     ///
     /// - Parameter completion: result
-    public func start(application name: String, completion: @escaping (Result<Void, DIALError>) -> ()) {
+    public func start(application name: String, completion: @escaping (Result<Void, DIALError>) -> Void) {
         HTTPRequest.launch(urlSession: urlSession, method: .POST, url: "\(baseURL)/\(name)", successCode: 201) { result in
             switch result {
             case .failure(let httpError):
                 DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
-            case .success(_):
+            case .success:
                 DispatchQueue.main.async { completion(.success(())) }
             }
         }
@@ -100,18 +100,18 @@ class DIALService {
     /// Stop the application
     ///
     /// - Parameter completion: result
-    public func stop(application name: String, completion: @escaping (Result<Void, DIALError>) -> ()) {
-        info(ofApplication:name) { [weak self] result in
+    public func stop(application name: String, completion: @escaping (Result<Void, DIALError>) -> Void) {
+        info(ofApplication: name) { [weak self] result in
             guard let `self` = self else { return }
             
             switch result {
             case .failure(let error):
                 completion(.failure(error))
             case .success(let info):
-                var stopLink:String!
+                var stopLink: String!
                 if  let runLink = info.runLink,
                     let url = URL(string: runLink),
-                    let _ = url.host {
+                    url.host != nil {
                     stopLink = runLink
                 } else if let runLink = URL(string: self.baseURL)?.appendingPathComponent(info.runLink ?? "run").absoluteString {
                     stopLink = runLink
@@ -123,7 +123,7 @@ class DIALService {
                     switch result {
                     case .failure(let httpError):
                         DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
-                    case .success(_):
+                    case .success:
                         DispatchQueue.main.async { completion(.success(())) }
                     }
                 })

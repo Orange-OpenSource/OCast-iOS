@@ -16,17 +16,11 @@
 // limitations under the License.
 //
 
-import XCTest
 @testable import OCast
+import XCTest
 
 /// Tests the SSDPResponseParser class.
 class TestSSDPResponseParser: XCTestCase {
-
-    override func setUp() {
-    }
-
-    override func tearDown() {
-    }
 
     func testCorrectSSDPResponse() {
         let location = "http://127.0.0.1/dd.xml"

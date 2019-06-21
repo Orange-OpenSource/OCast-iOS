@@ -35,13 +35,13 @@ public enum DeviceState: Int {
 }
 
 /// The handler used to manage a result or an error.
-public typealias ResultHandler<T> = (_ result: T?, _ error: Error?) -> ()
+public typealias ResultHandler<T> = (_ result: T?, _ error: Error?) -> Void
 
 /// The handler used to manage an error.
-public typealias NoResultHandler = (_ error: Error?) -> ()
+public typealias NoResultHandler = (_ error: Error?) -> Void
 
 /// The event handler used to manage custom events.
-public typealias EventHandler = (_ data: Data) -> ()
+public typealias EventHandler = (_ data: Data) -> Void
 
 /// The device representing the remote OCast device.
 @objc

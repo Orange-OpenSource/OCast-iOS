@@ -91,7 +91,7 @@ class XMLReader: NSObject, XMLParserDelegate {
                 didStartElement elementName: String,
                 namespaceURI: String?,
                 qualifiedName qName: String?,
-                attributes attributeDict: [String : String]) {
+                attributes attributeDict: [String: String]) {
         // Create a new element and associate it to the parent
         currentElement = XMLElement(name: elementName, attributes: attributeDict)
         currentElement?.parent = currentParent

@@ -15,11 +15,10 @@
 // See the License for the specific language governing permissions and
 //
 
-import UIKit
 import OCast
+import UIKit
 
 class ViewController: UIViewController, DeviceCenterDelegate {
-    
     
     /// The object to discover the devices
     private let center = DeviceCenter()
@@ -74,7 +73,7 @@ class ViewController: UIViewController, DeviceCenterDelegate {
 
     private func stopCast() {
         isCastInProgress = false
-        device?.stop(withOptions: nil, completion: { (error) in
+        device?.stop(withOptions: nil, completion: { error in
             print(error ?? "no error")
         })
     }
@@ -98,15 +97,12 @@ class ViewController: UIViewController, DeviceCenterDelegate {
     }
     
     func center(_ center: DeviceCenter, didRemove devices: [Device]) {
-        for device in devices {
-            if device.ipAddress == self.device?.ipAddress {
-                resetUI()
-                self.device = nil
-            }
+        for device in devices where device.ipAddress == self.device?.ipAddress {
+            resetUI()
+            self.device = nil
         }
     }
     
     func centerDidStop(_ center: DeviceCenter, withError error: Error?) {}
 
 }
-

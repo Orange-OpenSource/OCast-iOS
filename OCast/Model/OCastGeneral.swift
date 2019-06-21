@@ -82,8 +82,7 @@ public typealias OCastMessage = NSObject & Codable
 /// - browser: Browser.
 /// - settings: Settings.
 public enum OCastDomainName: String {
-    case browser = "browser"
-    case settings = "settings"
+    case browser, settings
 }
 
 /// The device layer message type.
@@ -150,7 +149,7 @@ class OCastDeviceLayer<T: Codable>: OCastMessage {
     /// The message
     public let message: OCastApplicationLayer<T>
     
-    private enum CodingKeys : String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case source = "src", destination = "dst", id, status, type, message
     }
     

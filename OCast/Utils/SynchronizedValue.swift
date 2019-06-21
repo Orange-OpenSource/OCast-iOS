@@ -53,7 +53,7 @@ class SynchronizedValue<T> {
     /// Performs a write concurrent access.
     ///
     /// - Parameter block: The block to execute.
-    func write(_ block: @escaping (inout T)-> Void) {
+    func write(_ block: @escaping (inout T) -> Void) {
         queue.async(flags: .barrier) {
             block(&self.value)
         }

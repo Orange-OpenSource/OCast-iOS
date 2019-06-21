@@ -27,7 +27,7 @@ class MockUDPSocket: UDPSocketProtocol {
     var responseDelay: Double
     
     private(set) var isOpen: Bool = false
-    var delegate: UDPSocketDelegate?
+    weak var delegate: UDPSocketDelegate?
     
     init(responsePayload: String, responseDelay: Double = 1.0) {
         self.responsePayload = responsePayload

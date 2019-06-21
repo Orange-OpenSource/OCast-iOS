@@ -58,7 +58,7 @@ public enum MediaType: Int, RawRepresentable, Codable {
     }
     
     public init?(rawValue: RawValue) {
-        switch (rawValue) {
+        switch rawValue {
         case "audio": self = .audio
         case "video": self = .video
         case "image": self = .image
@@ -89,7 +89,7 @@ public enum MediaTrackType: Int, RawRepresentable, Codable {
     }
     
     public init?(rawValue: RawValue) {
-        switch (rawValue) {
+        switch rawValue {
         case "audio": self = .audio
         case "video": self = .video
         case "text": self = .subtitle
@@ -117,7 +117,7 @@ public enum MediaTransferMode: Int, RawRepresentable, Codable {
     }
     
     public init?(rawValue: RawValue) {
-        switch (rawValue) {
+        switch rawValue {
         case "buffered": self = .buffered
         case "streamed": self = .streamed
         default: return nil
@@ -177,7 +177,7 @@ public class MediaPlaybackStatus: OCastMessage {
     /// The media duration in seconds.
     public var duration: Double { return _duration ?? 0.0 }
     
-    enum CodingKeys : String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case _volume = "volume", _mute = "mute", state = "state", _position = "position", _duration = "duration"
     }
 }
@@ -209,7 +209,7 @@ public class MediaMetadata: OCastMessage {
     /// The video tracks. See `MediaTrack`.
     public let videoTracks: [MediaTrack]
     
-    enum CodingKeys : String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case title = "title", subtitle = "subtitle", logo = "logo", _mediaType = "mediaType", subtitleTracks = "textTracks", audioTracks = "audioTracks", videoTracks = "videoTracks"
     }
 }
