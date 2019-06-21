@@ -69,7 +69,7 @@ public protocol LoggerProtocol {
 struct ConsoleLogger: LoggerProtocol {
     
     func log(logLevel: LoggerLevel, _ message: () -> String, file: String, line: Int, function: String) {
-        print("(\(Date()))\(logLevel) @ \((file as NSString).lastPathComponent) line \(line) in \(function): \(message())")
+        print("\(Date())(\(logLevel)) \((file as NSString).lastPathComponent):\(line) \(function): \(message())")
     }
 }
 
@@ -83,11 +83,11 @@ public class Logger {
     public var logger: LoggerProtocol = ConsoleLogger()
     
     /// The minimum level (by default debug in debug mode, none in release mode).
-    public var minimumLogLevel:LoggerLevel
+    public var minimumLogLevel: LoggerLevel
     
     private init() {
         #if DEBUG
-        minimumLogLevel = .debug
+        minimumLogLevel = .warning
         #else
         minimumLogLevel = .none
         #endif
