@@ -19,7 +19,7 @@
 import Foundation
 
 /// Class to synchronized a value to share it between threads.
-class SynchronizedValue<T> {
+public class SynchronizedValue<T> {
     
     /// The dispatch queue to manage the concurrency.
     private let queue: DispatchQueue
@@ -27,7 +27,7 @@ class SynchronizedValue<T> {
     /// The value to synchronize.
     private var value: T
     
-    init(_ value: T) {
+    public init(_ value: T) {
         queue = DispatchQueue(label: "org.ocast.syncronizedvalue-" + UUID().uuidString, qos: .default, attributes: .concurrent)
         self.value = value
     }

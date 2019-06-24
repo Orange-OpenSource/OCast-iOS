@@ -71,7 +71,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     }
     
     /// The web socket used to connect to the device.
-    private var webSocket: WebSocketProtocol?
+    public var webSocket: WebSocketProtocol?
     
     /// The connection handler to trigger when the connected is ended.
     private var connectionHandler: NoResultHandler?
@@ -130,7 +130,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     // MARK: - Device methods
     
-    public func connect(_ configuration: SSLConfiguration, completion: @escaping NoResultHandler) {
+    open func connect(_ configuration: SSLConfiguration, completion: @escaping NoResultHandler) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .connected {
             completion(error)
@@ -155,7 +155,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    public func disconnect(_ completion: @escaping NoResultHandler) {
+    open func disconnect(_ completion: @escaping NoResultHandler) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .disconnected {
             completion(error)
@@ -246,7 +246,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     ///
     /// - Parameter forbiddenStates: The forbidden states.
     /// - Returns: The `OCastErro` if there's an error, otherwise nil.
-    private func error(forForbiddenStates forbiddenStates: [DeviceState]) -> OCastError? {
+    public func error(forForbiddenStates forbiddenStates: [DeviceState]) -> OCastError? {
         guard forbiddenStates.contains(state) else { return nil }
         
         switch state {
@@ -469,7 +469,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     // MARK: WebSocketDelegate methods
     
-    func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL) {
+    open func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL) {
         DispatchQueue.main.async { [weak self] in
             self?.state = .connected
             
@@ -478,7 +478,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    func websocket(_ websocket: WebSocketProtocol, didDisconnectWith error: Error?) {
+    open func websocket(_ websocket: WebSocketProtocol, didDisconnectWith error: Error?) {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
             
@@ -504,7 +504,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    func websocket(_ websocket: WebSocketProtocol, didReceiveMessage message: String) {
+    open func websocket(_ websocket: WebSocketProtocol, didReceiveMessage message: String) {
         guard let jsonData = message.data(using: .utf8) else { return }
         
         Logger.shared.log(logLevel: .debug, "Message received: \(message)")

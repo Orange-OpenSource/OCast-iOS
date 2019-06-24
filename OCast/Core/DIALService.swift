@@ -18,16 +18,16 @@
 
 import Foundation
 
-enum DIALError: Error {
+public enum DIALError: Error {
     case httpRequest(HTTPRequestError)
     case badContentResponse
 }
 
-enum DIALState: String {
+public enum DIALState: String {
     case running, stopped, hidden
 }
 
-struct DIALApplicationInfo {
+public struct DIALApplicationInfo {
     public let app2appURL: String?
     public let version: String?
     public let runLink: String?
@@ -37,12 +37,12 @@ struct DIALApplicationInfo {
 
 /// Extension to manage logs.
 extension DIALApplicationInfo: CustomDebugStringConvertible {
-    var debugDescription: String {
+    public var debugDescription: String {
         return "DIALApplicationInfo(app2appURL: \(String(describing: app2appURL)), state: \(state))"
     }
 }
 
-class DIALService {
+public class DIALService {
     
     private let baseURL: String
     

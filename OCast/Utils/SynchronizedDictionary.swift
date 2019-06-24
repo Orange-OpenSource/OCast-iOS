@@ -19,7 +19,7 @@
 import Foundation
 
 /// Class to synchronize a dictionary.
-struct SynchronizedDictionary<T: Hashable, U> {
+public struct SynchronizedDictionary<T: Hashable, U> {
     
     /// The synchronized dictionary.
     private var synchronizedDictionary = SynchronizedValue([T: U]())
