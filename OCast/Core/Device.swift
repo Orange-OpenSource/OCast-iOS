@@ -64,6 +64,9 @@ public protocol Device {
     /// The SSL configuration used if you want to perform a SSL connection.
     var sslConfiguration: SSLConfiguration { get }
     
+    /// The device state.
+    var state: DeviceState { get }
+    
     /// The manufacturer.
     var manufacturer: String { get }
     
@@ -91,7 +94,7 @@ public protocol Device {
     ///
     /// - Parameter completion: The completion block called when the disconnection is finished.
     /// If the error is nil, the device is disconnected with success.
-    func disconnect(_ completion: @escaping NoResultHandler)
+    func disconnect(_ completion: NoResultHandler?)
         
     // MARK: - Application methods
     
@@ -220,10 +223,10 @@ public protocol Device {
     /// If the error is nil, the update status was successfully retrieved and is described in `SettingsUpdateStatus` parameter.
     func updateStatus(_ completion: @escaping ResultHandler<SettingsUpdateStatus>)
     
-    /// Retrieves the device id.
+    /// Retrieves the device identifier.
     ///
     /// - Parameter completion: The completion block called when the action completes.
-    /// If the error is nil, the device id was successfully retrieved and is described in `SettingsDeviceID` parameter.
+    /// If the error is nil, the device id was successfully retrieved and is described in `String` parameter.
     func deviceID(_ completion: @escaping ResultHandler<String>)
     
     // MARK: - Settings input commands methods
@@ -278,25 +281,51 @@ public protocol OCastSenderDevice {
 /// Extension to manage default parameter values (forbidden in a protocol).
 public extension Device {
     
-    func prepare(_ prepare: MediaPrepareCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {}
+    func disconnect(_ completion: NoResultHandler? = nil) {
+        disconnect(completion)
+    }
     
-    func setTrack(_ track: MediaTrackCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {}
+    func prepare(_ prepareCommand: MediaPrepareCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        prepare(prepareCommand, withOptions: options, completion: completion)
+    }
     
-    func play(at position: Double, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {}
+    func setTrack(_ trackCommand: MediaTrackCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        setTrack(trackCommand, withOptions: options, completion: completion)
+    }
     
-    func stop(withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {}
+    func play(at position: Double, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        play(at: position, withOptions: options, completion: completion)
+    }
     
-    func resume(withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {}
+    func stop(withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        stop(withOptions: options, completion: completion)
+    }
     
-    func setVolume(_ volume: Float, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {}
+    func resume(withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        resume(withOptions: options, completion: completion)
+    }
     
-    func pause(withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {}
+    func setVolume(_ volume: Float, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        setVolume(volume, withOptions: options, completion: completion)
+    }
     
-    func seek(to position: Double, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {}
+    func pause(withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        pause(withOptions: options, completion: completion)
+    }
     
-    func metadata(withOptions options: [String: Any]? = nil, completion: @escaping ResultHandler<MediaMetadata>) {}
+    func seek(to position: Double, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        seek(to: position, withOptions: options, completion: completion)
+    }
     
-    func playbackStatus(withOptions options: [String: Any]? = nil, completion: @escaping ResultHandler<MediaPlaybackStatus>) {}
+    func metadata(withOptions options: [String: Any]? = nil, completion: @escaping ResultHandler<MediaMetadata>) {
+        metadata(withOptions: options, completion: completion)
+    }
     
-    func mute(_ flag: Bool, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {}
+    func playbackStatus(withOptions options: [String: Any]? = nil, completion: @escaping ResultHandler<MediaPlaybackStatus>) {
+        playbackStatus(withOptions: options, completion: completion)
+    }
+    
+    func mute(_ flag: Bool, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        mute(flag, withOptions: options, completion: completion)
+    }
 }
