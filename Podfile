@@ -24,11 +24,13 @@ end
 target :OCastDemoSwift do
     platform :ios, '8.0'
     pod 'OCast', :path => "./"
+    pod 'ReachabilitySwift'
     project 'OCastDemo.xcodeproj'
 end
 
 target :OCastDemoObjC do
     platform :ios, '8.0'
     pod 'OCast', :path => "./"
+    pod 'AppleReachability'
     project 'OCastDemo.xcodeproj'
 end
