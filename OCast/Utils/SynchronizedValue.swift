@@ -25,7 +25,7 @@ public class SynchronizedValue<T> {
     private let queue: DispatchQueue
     
     /// The value to synchronize.
-    private var value: T
+    public private(set) var value: T
     
     public init(_ value: T) {
         queue = DispatchQueue(label: "org.ocast.syncronizedvalue-" + UUID().uuidString, qos: .default, attributes: .concurrent)
@@ -33,7 +33,7 @@ public class SynchronizedValue<T> {
     }
     
     /// The synchronized value.
-    var synchronizedValue: T {
+    public var synchronizedValue: T {
         get {
             return queue.sync { value }
         }

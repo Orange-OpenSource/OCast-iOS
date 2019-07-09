@@ -18,24 +18,6 @@
 
 import Foundation
 
-/// The notification sent each time new devices is discovered.
-/// The userinfo `DeviceCenterDevicesUserInfoKey` key contains an array with the new devices.
-public let DeviceCenterAddDevicesNotification = Notification.Name("DeviceCenterAddDevices")
-
-/// The notification sent each time devices has been removed.
-/// The userinfo `DeviceCenterDevicesUserInfoKey` key contains an array with the devices removed.
-public let DeviceCenterRemoveDevicesNotification = Notification.Name("DeviceCenterRemoveDevices")
-
-/// Notification sent each time an error has occured during discovery.
-/// The userinfo `DeviceCenterErrorUserInfoKey` key contains an error if it occurs.
-public let DeviceCenterDeviceDiscoveryErrorNotification = Notification.Name("DeviceCenterDeviceDiscoveryError")
-
-/// The notification user info key representing the devices.
-public let DeviceCenterDevicesUserInfoKey = "DeviceCenterDevicesUserInfoKey"
-
-/// The notification user info key representing the error when the discovery is stopped.
-public let DeviceCenterErrorUserInfoKey = "DeviceCenterErrorUserInfoKey"
-
 /// Protocol for responding to device discovery events.
 @objc public protocol DeviceCenterDelegate {
     
@@ -132,7 +114,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     ///
     /// - Returns: `true` if the discovery is correctly paused, otherwise `false`.
     @discardableResult
-    func pauseDiscovery() -> Bool {
+    public func pauseDiscovery() -> Bool {
         return deviceDiscovery?.pause() ?? false
     }
     
@@ -149,18 +131,20 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
                 }
             }
         }
-        delegate?.center(self, didAdd: newDevices)
-        NotificationCenter.default.post(name: DeviceCenterAddDevicesNotification,
-                                        object: self,
-                                        userInfo: [DeviceCenterDevicesUserInfoKey: newDevices])
+        if !newDevices.isEmpty {
+            delegate?.center(self, didAdd: newDevices)
+            NotificationCenter.default.post(name: .deviceCenterAddDevicesNotification,
+                                            object: self,
+                                            userInfo: [DeviceCenterUserInfoKey.deviceCenterDevicesUserInfoKey: newDevices])
+        }
     }
     
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [UPNPDevice]) {
         let ocastDevices = devices.compactMap({ return detectedDevices[$0.ipAddress] })
         delegate?.center(self, didRemove: ocastDevices)
-        NotificationCenter.default.post(name: DeviceCenterRemoveDevicesNotification,
+        NotificationCenter.default.post(name: .deviceCenterRemoveDevicesNotification,
                                         object: self,
-                                        userInfo: [DeviceCenterDevicesUserInfoKey: ocastDevices])
+                                        userInfo: [DeviceCenterUserInfoKey.deviceCenterDevicesUserInfoKey: ocastDevices])
         ocastDevices.forEach { detectedDevices.removeValue(forKey: $0.ipAddress) }
     }
     
@@ -169,9 +153,9 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         
         var userInfo: [String: Any]?
         if let error = error {
-            userInfo = [DeviceCenterErrorUserInfoKey: error]
+            userInfo = [DeviceCenterUserInfoKey.deviceCenterErrorUserInfoKey: error]
         }
-        NotificationCenter.default.post(name: DeviceCenterDeviceDiscoveryErrorNotification,
+        NotificationCenter.default.post(name: .deviceCenterDeviceDiscoveryErrorNotification,
                                         object: self,
                                         userInfo: userInfo)
     }

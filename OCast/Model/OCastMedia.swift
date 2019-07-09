@@ -22,20 +22,6 @@ import Foundation
 /// The media service name
 public let OCastMediaServiceName = "org.ocast.media"
 
-/// The notification sent when a playback status event is received.
-/// The userinfo `PlaybackStatusUserInfoKey` key contains playback status information.
-public let PlaybackStatusEventNotification = Notification.Name("PlaybackStatusEvent")
-
-/// The notification sent when a metadata event is received.
-/// The userinfo `MetadataUserInfoKey` key contains metadata information.
-public let MetadataChangedEventNotification = Notification.Name("MetadataChangedEvent")
-
-/// The notification user info key representing the playback status.
-public let PlaybackStatusUserInfoKey = Notification.Name("PlaybackStatusKey")
-
-/// The notification user info key representing the metadata.
-public let MetadataUserInfoKey = Notification.Name("MetadataKey")
-
 // MARK: - Media objects
 
 /// The media type.
@@ -184,6 +170,7 @@ public class MediaPlaybackStatus: OCastMessage {
 
 /// The media metadata.
 @objc
+@objcMembers
 public class MediaMetadata: OCastMessage {
     
     private let _mediaType: String
@@ -216,6 +203,7 @@ public class MediaMetadata: OCastMessage {
 
 /// The media track.
 @objc
+@objcMembers
 public class MediaTrack: OCastMessage {
     
     /// The track identifier.
@@ -341,10 +329,12 @@ public class MediaPlayCommand: OCastMessage {
 
 /// The command to stop a media.
 @objc
+@objcMembers
 public class MediaStopCommand: OCastMessage {}
 
 /// The command to resume a media.
 @objc
+@objcMembers
 public class MediaResumeCommand: OCastMessage {}
 
 /// The command to set the volume of a media
@@ -362,6 +352,7 @@ public class MediaVolumeCommand: OCastMessage {
 
 /// The command to pause a media.
 @objc
+@objcMembers
 public class MediaPauseCommand: OCastMessage {}
 
 /// The command to seek a media.
@@ -379,10 +370,12 @@ public class MediaSeekCommand: OCastMessage {
 
 /// The command to retrieve the media playback status.
 @objc
+@objcMembers
 public class MediaGetPlaybackStatusCommand: OCastMessage {}
 
 /// The command to retrieve the media metadata.
 @objc
+@objcMembers
 public class MediaGetMetadataCommand: OCastMessage {}
 
 /// The command to mute a media.

@@ -21,13 +21,6 @@
 import DynamicCodable
 import Foundation
 
-/// The notification sent when the device is disconnected
-/// The userinfo `ErrorUserInfoKey` key contains error information.
-public let DeviceDisconnectedEventNotification = Notification.Name("DeviceDisconnectedEvent")
-
-/// The notification user info key representing the error.
-public let ErrorUserInfoKey = Notification.Name("ErrorKey")
-
 /// The OCast errors.
 ///
 /// - wrongStateDisconnected: The operation can be performed because the device is disconnected.
@@ -237,4 +230,4 @@ public class OCastDefaultResponseDataLayer: OCastMessage {
 }
 
 /// A codable struct to manage commands without result.
-struct NoResult: Codable {}
+public struct NoResult: Codable {}
