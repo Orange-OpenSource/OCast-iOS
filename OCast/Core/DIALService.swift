@@ -18,21 +18,41 @@
 
 import Foundation
 
+/// The DIAL states.
+///
+/// - httpRequest: A HTTP error.
+/// - badContentResponse: A bad content error when the DIAL response is not correct.
 enum DIALError: Error {
     case httpRequest(HTTPRequestError)
     case badContentResponse
 }
 
+/// The DIAL states.
+///
+/// - running: The application is already running.
+/// - stopped: The application is stopped.
+/// - hidden: The application is hidden (not in foreground).
 enum DIALState: String {
     case running, stopped, hidden
 }
 
+/// The DIAL application informations.
 struct DIALApplicationInfo {
-    public let app2appURL: String?
-    public let version: String?
-    public let runLink: String?
+    
+    /// The application name.
     public let name: String
+    
+    /// The application state.
     public let state: DIALState
+    
+    /// The OCast websocket URL.
+    public let app2appURL: String?
+    
+    /// The OCast version.
+    public let version: String?
+    
+    /// The​ ​resource​ ​name​ ​of​ ​the​ ​running application.
+    public let runLink: String?
 }
 
 /// Extension to manage logs.
@@ -42,28 +62,47 @@ extension DIALApplicationInfo: CustomDebugStringConvertible {
     }
 }
 
+/// Class to manage DIAL requests.
 class DIALService {
     
+    /// The base URL.
     private let baseURL: String
     
     /// The URLSession used to launch the requests.
     private let urlSession: URLSessionProtocol
+    
+    // MARK: - Initializer
     
     public init(forURL url: String, urlSession: URLSessionProtocol = URLSession(configuration: .default)) {
         baseURL = url
         self.urlSession = urlSession
     }
     
-    /// Get application info
+    // MARK: - Private methods
+    
+    /// Builds the application URL from an application name.
     ///
-    /// - Parameter completion: result
+    /// - Parameter applicationName: The application name.
+    /// - Returns: The application URL.
+    private func applicationURL(from applicationName: String) -> String {
+        return "\(baseURL)/\(applicationName)"
+    }
+    
+    // MARK: - Public methods
+    
+    /// Retrieves the application information
+    ///
+    /// - Parameters:
+    ///   - name: The application name to query.
+    ///   - completion: The completion block called when the action completes.
+    /// If the `DIALError` is nil, the information were successfully retrieved and are described in `DIALApplicationInfo` parameter.
     public func info(ofApplication name: String, completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> Void) {
-        HTTPRequest.launch(urlSession: urlSession, method: .GET, url: "\(baseURL)/\(name)") { result in
+        HTTPRequest.launch(urlSession: urlSession, method: .GET, url: applicationURL(from: name)) { result in
             switch result {
             case .failure(let httpError):
                 DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
                 return
-            case .success((let data, _)): // success
+            case .success((let data, _)):
                 guard let data = data,
                     let element = XMLReader().parse(data: data)?["service"],
                     let appName = element["name"]?.value,
@@ -77,17 +116,20 @@ class DIALService {
                 let version = element["additionalData"]?["ocast:X_OCAST_Version"]?.value
                 let runLink = element["link"]?.attributes?["href"]
                 
-                let info = DIALApplicationInfo(app2appURL: app2app, version: version, runLink: runLink, name: appName, state: state)
+                let info = DIALApplicationInfo(name: appName, state: state, app2appURL: app2app, version: version, runLink: runLink)
                 DispatchQueue.main.async { completion(.success(info)) }
             }
         }
     }
     
-    /// Start the application
+    /// Starts the given application.
     ///
-    /// - Parameter completion: result
+    /// - Parameters:
+    ///   - name: The application name to start.
+    ///   - completion: The completion block called when the action completes.
+    /// If the `DIALError` is nil, the application was successfully started.
     public func start(application name: String, completion: @escaping (Result<Void, DIALError>) -> Void) {
-        HTTPRequest.launch(urlSession: urlSession, method: .POST, url: "\(baseURL)/\(name)", successCode: 201) { result in
+        HTTPRequest.launch(urlSession: urlSession, method: .POST, url: applicationURL(from: name), successCode: 201) { result in
             switch result {
             case .failure(let httpError):
                 DispatchQueue.main.async { completion(.failure(.httpRequest(httpError))) }
@@ -97,9 +139,12 @@ class DIALService {
         }
     }
     
-    /// Stop the application
+    /// Stops the given application.
     ///
-    /// - Parameter completion: result
+    /// - Parameters:
+    ///   - name: The application name to stop.
+    ///   - completion: The completion block called when the action completes.
+    /// If the `DIALError` is nil, the application was successfully stopped.
     public func stop(application name: String, completion: @escaping (Result<Void, DIALError>) -> Void) {
         info(ofApplication: name) { [weak self] result in
             guard let `self` = self else { return }
@@ -113,7 +158,7 @@ class DIALService {
                     let url = URL(string: runLink),
                     url.host != nil {
                     stopLink = runLink
-                } else if let runLink = URL(string: self.baseURL)?.appendingPathComponent(info.runLink ?? "run").absoluteString {
+                } else if let runLink = URL(string: self.applicationURL(from: name))?.appendingPathComponent(info.runLink ?? "run").absoluteString {
                     stopLink = runLink
                 } else {
                     completion(.failure(.badContentResponse))

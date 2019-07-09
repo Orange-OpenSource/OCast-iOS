@@ -25,13 +25,6 @@ public let OCastDeviceSettingsServiceName = "org.ocast.settings.device"
 /// The input setttings service name.
 public let OCastInputSettingsServiceName = "org.ocast.settings.input"
 
-/// The notification sent when an update status event is received.
-/// The userinfo `UpdateStatusUserInfoKey` key contains update status information.
-public let UpdateStatusEventNotification = Notification.Name("UpdateStatusEvent")
-
-/// The notification user info key representing the update status.
-public let UpdateStatusUserInfoKey = Notification.Name("UpdateStatusKey")
-
 // MARK: - Settings objects
 
 /// The update status state.
@@ -77,6 +70,7 @@ public enum UpdateStatusState: Int, RawRepresentable, Codable {
 
 /// The update status.
 @objc
+@objcMembers
 public class SettingsUpdateStatus: OCastMessage {
     
     /// The state. See `UpdateStatusState`
@@ -91,6 +85,7 @@ public class SettingsUpdateStatus: OCastMessage {
 
 /// The device identifier.
 @objc
+@objcMembers
 public class SettingsDeviceID: OCastMessage {
     
     /// The identifier.
@@ -99,6 +94,7 @@ public class SettingsDeviceID: OCastMessage {
 
 /// The input gamepad axes.
 @objc
+@objcMembers
 public class InputGamepadAxes: OCastMessage {
     
     /// The x axis (-1.0 -> 1.0).
@@ -113,10 +109,14 @@ public class InputGamepadAxes: OCastMessage {
 // MARK: - Settings Commands
 
 /// The update status command.
-@objc public class SettingsGetUpdateStatusCommand: OCastMessage {}
+@objc
+@objcMembers
+public class SettingsGetUpdateStatusCommand: OCastMessage {}
 
 /// The device id command.
-@objc public class SettingsGetDeviceIDCommand: OCastMessage {}
+@objc
+@objcMembers
+public class SettingsGetDeviceIDCommand: OCastMessage {}
 
 /// The location of a key.
 ///
@@ -138,6 +138,7 @@ public enum DOMKeyLocation: Int, Codable {
 
 /// The command to send a key.
 @objc
+@objcMembers
 public class SettingsKeyPressedCommand: OCastMessage {
     
     /// The key value.
@@ -164,6 +165,7 @@ public class SettingsKeyPressedCommand: OCastMessage {
 
 /// The command to send a mouse event.
 @objc
+@objcMembers
 public class SettingsMouseEventCommand: OCastMessage {
     
     /// The x coordinate of the mouse pointer in local coordinates.
@@ -180,6 +182,7 @@ public class SettingsMouseEventCommand: OCastMessage {
 
 /// The command to send a gamepad event.
 @objc
+@objcMembers
 public class SettingsGamepadEventCommand: OCastMessage {
     
     /// The axes.

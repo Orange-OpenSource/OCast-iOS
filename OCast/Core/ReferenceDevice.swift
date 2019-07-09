@@ -34,6 +34,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         didSet {
             if oldValue != applicationName {
                 isApplicationRunning.synchronizedValue = false
+                // Release the semaphore if the application is starting
+                semaphore?.signal()
             }
         }
     }
@@ -98,7 +100,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     private let semaphoreQueue = DispatchQueue(label: "org.ocast.semaphorequeue")
     
     // The semaphore to synchronize the websocket connection event.
-    private var semaphore: DispatchSemaphore
+    private var semaphore: DispatchSemaphore?
     
     // MARK: - Public methods
     
@@ -108,6 +110,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             // Reset state every time state is modified
             if oldValue != state {
                 isApplicationRunning.synchronizedValue = false
+                // Release the semaphore if the application is starting
+                semaphore?.signal()
                 Logger.shared.log(logLevel: .debug, "State changed from \(oldValue.rawValue) to \(state.rawValue)")
             }
         }
@@ -121,7 +125,6 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         friendlyName = upnpDevice.friendlyName
         manufacturer = upnpDevice.manufacturer
         dialService = DIALService(forURL: applicationURL)
-        semaphore = DispatchSemaphore(value: 0)
         
         super.init()
         
@@ -155,10 +158,10 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    public func disconnect(_ completion: @escaping NoResultHandler) {
+    public func disconnect(_ completion: NoResultHandler?) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .disconnected {
-            completion(error)
+            completion?(error)
             return
         }
         
@@ -191,26 +194,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                     return
                 }
                 
-                self.dialService.start(application: applicationName, completion: { [weak self] result in
-                    guard let `self` = self else { return }
-                    
-                    switch result {
-                    case .success:
-                        Logger.shared.log(logLevel: .debug, "DIAL start request ended successfully")
-                        // Do not wait on main thread
-                        self.semaphoreQueue.async {
-                            let dispatchResult = self.semaphore.wait(timeout: .now() + 60)
-                            if dispatchResult == .success {
-                                DispatchQueue.main.async { completion(nil) }
-                            } else {
-                                DispatchQueue.main.async { completion(OCastError.websocketConnectionEventNotReceived) }
-                            }
-                        }
-                    case .failure(let error):
-                        Logger.shared.log(logLevel: .error, "DIAL start request failed: \(error)")
-                        completion(error)
-                    }
-                })
+                self.startApplication(applicationName, completion: completion)
             case .failure(let error):
                 Logger.shared.log(logLevel: .error, "DIAL info request failed: \(error)")
                 completion(error)
@@ -228,6 +212,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             switch result {
             case .success:
                 Logger.shared.log(logLevel: .debug, "DIAL stop request ended successfully")
+                self.isApplicationRunning.synchronizedValue = false
                 completion(nil)
             case .failure(let error):
                 Logger.shared.log(logLevel: .error, "DIAL stop request failed: \(error)")
@@ -267,8 +252,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             if let playbackStatus = try? JSONDecoder().decode(OCastDeviceLayer<MediaPlaybackStatus>.self, from: data) {
                 DispatchQueue.main.async {
                     guard let `self` = self else { return }
-                    NotificationCenter.default.post(name: PlaybackStatusEventNotification,
-                                                    object: self, userInfo: [PlaybackStatusUserInfoKey: playbackStatus.message.data.params])
+                    NotificationCenter.default.post(name: .playbackStatusEventNotification,
+                                                    object: self, userInfo: [DeviceUserInfoKey.playbackStatusUserInfoKey: playbackStatus.message.data.params])
                 }
             } else {
                 Logger.shared.log(logLevel: .error, "Can't decode playbackStatus event")
@@ -278,8 +263,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             if let metadata = try? JSONDecoder().decode(OCastDeviceLayer<MediaMetadata>.self, from: data) {
                 DispatchQueue.main.async {
                     guard let `self` = self else { return }
-                    NotificationCenter.default.post(name: MetadataChangedEventNotification,
-                                                    object: self, userInfo: [MetadataUserInfoKey: metadata.message.data.params])
+                    NotificationCenter.default.post(name: .metadataChangedEventNotification,
+                                                    object: self, userInfo: [DeviceUserInfoKey.metadataUserInfoKey: metadata.message.data.params])
                 }
             } else {
                 Logger.shared.log(logLevel: .error, "Can't decode metadataChanged event")
@@ -289,8 +274,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<SettingsUpdateStatus>.self, from: data) {
                 DispatchQueue.main.async {
                     guard let `self` = self else { return }
-                    NotificationCenter.default.post(name: UpdateStatusEventNotification,
-                                                    object: self, userInfo: [UpdateStatusUserInfoKey: updateStatus.message.data.params])
+                    NotificationCenter.default.post(name: .updateStatusEventNotification,
+                                                    object: self, userInfo: [DeviceUserInfoKey.updateStatusUserInfoKey: updateStatus.message.data.params])
                 }
             } else {
                 Logger.shared.log(logLevel: .error, "Can't decode updateStatus event")
@@ -333,6 +318,37 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
+    /// Starts the application identified by the given application name.
+    ///
+    /// - Parameters:
+    ///   - applicationName: The application name.
+    ///   - completion: The completion block called when the action completes.
+    /// If the error is nil, the application is started.
+    private func startApplication(_ applicationName: String, completion: @escaping NoResultHandler) {
+        self.dialService.start(application: applicationName, completion: { [weak self] result in
+            guard let `self` = self else { return }
+            
+            switch result {
+            case .success:
+                Logger.shared.log(logLevel: .debug, "DIAL start request ended successfully")
+                self.semaphore = DispatchSemaphore(value: 0)
+                // Do not wait on main thread
+                self.semaphoreQueue.async {
+                    let dispatchResult = self.semaphore?.wait(timeout: .now() + 60)
+                    // If the application name has changed or the device is not connected, an error callback is triggered
+                    if dispatchResult == .success && self.applicationName == applicationName && self.state == .connected {
+                        DispatchQueue.main.async { completion(nil) }
+                    } else {
+                        DispatchQueue.main.async { completion(OCastError.websocketConnectionEventNotReceived) }
+                    }
+                }
+            case .failure(let error):
+                Logger.shared.log(logLevel: .error, "DIAL start request failed: \(error)")
+                completion(error)
+            }
+        })
+    }
+    
     /// Handles the command replies.
     ///
     /// - Parameters:
@@ -366,7 +382,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         let connectEvent = try JSONDecoder().decode(OCastDeviceLayer<WebAppConnectedStatusEvent>.self, from: jsonData)
         if connectEvent.message.data.params.status == .connected {
             Logger.shared.log(logLevel: .debug, "The connected event has been received")
-            semaphore.signal()
+            isApplicationRunning.synchronizedValue = true
+            semaphore?.signal()
         } else if connectEvent.message.data.params.status == .disconnected {
             Logger.shared.log(logLevel: .debug, "The disconnected event has been received")
             isApplicationRunning.synchronizedValue = false
@@ -489,16 +506,14 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             }
             self.commandHandlers.removeAll()
             
-            if let error = error {
-                if let disconnectHandler = self.disconnectionHandler {
-                    disconnectHandler(error)
-                    self.disconnectionHandler = nil
-                } else {
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: DeviceDisconnectedEventNotification,
-                                                        object: self,
-                                                        userInfo: [ErrorUserInfoKey: error])
-                    }
+            if let disconnectHandler = self.disconnectionHandler {
+                disconnectHandler(error)
+                self.disconnectionHandler = nil
+            } else if let error = error {
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .deviceDisconnectedEventNotification,
+                                                    object: self,
+                                                    userInfo: [DeviceUserInfoKey.errorUserInfoKey: error])
                 }
             }
         }

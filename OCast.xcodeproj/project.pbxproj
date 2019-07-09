@@ -37,6 +37,7 @@
 		9708176222BBB45C00F73297 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9708176122BBB45C00F73297 /* Logger.swift */; };
 		970856C32278A2B000175A1B /* TestXMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970856C22278A2B000175A1B /* TestXMLReader.swift */; };
 		976F264422B795F900C62F3F /* UPNPDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976F264322B795F900C62F3F /* UPNPDevice.swift */; };
+		978A6DE222C3B2A7005C4119 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978A6DE122C3B2A7005C4119 /* Notification.swift */; };
 		9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */; };
 		9790DFF8227C707A0031A70F /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF1227C707A0031A70F /* DeviceDiscovery.swift */; };
 		9790DFF9227C707A0031A70F /* UPNPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF2227C707A0031A70F /* UPNPService.swift */; };
@@ -91,6 +92,7 @@
 		9708176122BBB45C00F73297 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		970856C22278A2B000175A1B /* TestXMLReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestXMLReader.swift; sourceTree = "<group>"; };
 		976F264322B795F900C62F3F /* UPNPDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UPNPDevice.swift; path = OCast/Core/UPNPDevice.swift; sourceTree = SOURCE_ROOT; };
+		978A6DE122C3B2A7005C4119 /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSDPMSearchResponse.swift; sourceTree = "<group>"; };
 		9790DFF1227C707A0031A70F /* DeviceDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
 		9790DFF2227C707A0031A70F /* UPNPService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UPNPService.swift; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 		8549ACF02296E80700E205A3 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				978A6DE122C3B2A7005C4119 /* Notification.swift */,
 				8549ACF12296E80700E205A3 /* OCastGeneral.swift */,
 				8549ACF22296E80700E205A3 /* OCastSettings.swift */,
 				8549ACF32296E80700E205A3 /* OCastWebApp.swift */,
@@ -494,6 +497,7 @@
 				8549ACF92296E80700E205A3 /* OCastSettings.swift in Sources */,
 				9790DFF8227C707A0031A70F /* DeviceDiscovery.swift in Sources */,
 				9790DFFC227C707A0031A70F /* UDPSocket.swift in Sources */,
+				978A6DE222C3B2A7005C4119 /* Notification.swift in Sources */,
 				9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */,
 				976F264422B795F900C62F3F /* UPNPDevice.swift in Sources */,
 				8549ACFC2296E80700E205A3 /* DeviceCenter.swift in Sources */,
