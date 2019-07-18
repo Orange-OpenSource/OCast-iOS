@@ -45,6 +45,7 @@ class TestDeviceDiscoveryDelegate: DeviceDiscoveryDelegate {
     }
 }
 
+/// Tests the device discovery.
 class TestDeviceDiscovery: XCTestCase {
 
     private var mockDevice: UPNPDevice!

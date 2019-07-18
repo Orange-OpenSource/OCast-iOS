@@ -36,7 +36,10 @@
 		8549AD95229E8E9400E205A3 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8549AD94229E8E9400E205A3 /* WebSocket.swift */; };
 		9708176222BBB45C00F73297 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9708176122BBB45C00F73297 /* Logger.swift */; };
 		970856C32278A2B000175A1B /* TestXMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970856C22278A2B000175A1B /* TestXMLReader.swift */; };
+		9710CA8F22DDB19800DA1937 /* MockDIALService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9710CA8E22DDB19800DA1937 /* MockDIALService.swift */; };
+		9710CA9122DDB66100DA1937 /* TestReferenceDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9710CA9022DDB66100DA1937 /* TestReferenceDevice.swift */; };
 		976F264422B795F900C62F3F /* UPNPDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976F264322B795F900C62F3F /* UPNPDevice.swift */; };
+		977EEB6122DC705F00F31D76 /* MockWebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 977EEB6022DC705F00F31D76 /* MockWebSocket.swift */; };
 		978A6DE222C3B2A7005C4119 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978A6DE122C3B2A7005C4119 /* Notification.swift */; };
 		9790DFF7227C707A0031A70F /* SSDPMSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */; };
 		9790DFF8227C707A0031A70F /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DFF1227C707A0031A70F /* DeviceDiscovery.swift */; };
@@ -91,7 +94,10 @@
 		8BC8721E9BC32C5BB5171BFA /* Pods-OCastTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OCastTests.release.xcconfig"; path = "Target Support Files/Pods-OCastTests/Pods-OCastTests.release.xcconfig"; sourceTree = "<group>"; };
 		9708176122BBB45C00F73297 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		970856C22278A2B000175A1B /* TestXMLReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestXMLReader.swift; sourceTree = "<group>"; };
+		9710CA8E22DDB19800DA1937 /* MockDIALService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDIALService.swift; sourceTree = "<group>"; };
+		9710CA9022DDB66100DA1937 /* TestReferenceDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestReferenceDevice.swift; sourceTree = "<group>"; };
 		976F264322B795F900C62F3F /* UPNPDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UPNPDevice.swift; path = OCast/Core/UPNPDevice.swift; sourceTree = SOURCE_ROOT; };
+		977EEB6022DC705F00F31D76 /* MockWebSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockWebSocket.swift; sourceTree = "<group>"; };
 		978A6DE122C3B2A7005C4119 /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		9790DFF0227C707A0031A70F /* SSDPMSearchResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSDPMSearchResponse.swift; sourceTree = "<group>"; };
 		9790DFF1227C707A0031A70F /* DeviceDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
@@ -240,15 +246,18 @@
 			isa = PBXGroup;
 			children = (
 				97AF814820EA0EAD00C502D5 /* Info.plist */,
+				9710CA8E22DDB19800DA1937 /* MockDIALService.swift */,
 				9790E003227C70930031A70F /* MockUDPSocket.swift */,
 				9790E004227C70940031A70F /* MockUPNPService.swift */,
 				9790DFFF227C70930031A70F /* MockURLSession.swift */,
+				977EEB6022DC705F00F31D76 /* MockWebSocket.swift */,
 				9790E005227C70940031A70F /* TestDeviceDiscovery.swift */,
-				970856C22278A2B000175A1B /* TestXMLReader.swift */,
+				9710CA9022DDB66100DA1937 /* TestReferenceDevice.swift */,
 				9790DFFE227C70930031A70F /* TestSSDPMSearchRequest.swift */,
 				9790E000227C70930031A70F /* TestSSDPMSearchResponse.swift */,
 				9790E001227C70930031A70F /* TestSSDPResponseParser.swift */,
 				9790E002227C70930031A70F /* TestUPNPService.swift */,
+				970856C22278A2B000175A1B /* TestXMLReader.swift */,
 			);
 			path = OCastTests;
 			sourceTree = "<group>";
@@ -514,10 +523,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				9790E008227C70940031A70F /* TestSSDPMSearchResponse.swift in Sources */,
+				9710CA8F22DDB19800DA1937 /* MockDIALService.swift in Sources */,
 				9790E009227C70940031A70F /* TestSSDPResponseParser.swift in Sources */,
+				9710CA9122DDB66100DA1937 /* TestReferenceDevice.swift in Sources */,
 				9790E00B227C70940031A70F /* MockUDPSocket.swift in Sources */,
 				9790E00A227C70940031A70F /* TestUPNPService.swift in Sources */,
 				9790E00D227C70940031A70F /* TestDeviceDiscovery.swift in Sources */,
+				977EEB6122DC705F00F31D76 /* MockWebSocket.swift in Sources */,
 				9790E007227C70940031A70F /* MockURLSession.swift in Sources */,
 				970856C32278A2B000175A1B /* TestXMLReader.swift in Sources */,
 				9790E00C227C70940031A70F /* MockUPNPService.swift in Sources */,

@@ -21,6 +21,7 @@ import Foundation
 
 /// Class to mock an UDP socket.
 class MockUDPSocket: UDPSocketProtocol {
+    
     private(set) var sendCalled = false
     private let dispatchQueue = DispatchQueue(label: "org.ocast.mockudpsocket")
     var responsePayload: String

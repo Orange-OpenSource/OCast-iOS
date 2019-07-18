@@ -27,7 +27,7 @@ protocol WebSocketDelegate: class {
     /// - Parameters:
     ///   - websocket: The web socket connected.
     ///   - url: The host URL.
-    func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL)
+    func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL?)
     
     /// Tells the delegate that the web socket has been disconnected from the host.
     ///
@@ -60,9 +60,12 @@ protocol WebSocketProtocol {
     
     /// Connects the web socket to a remote host.
     ///
+    /// - Parameters:
+    ///   - url: The web socket URL.
+    ///   - sslConfiguration: The SSL configuration used to perform the connection.
     /// - Returns: `true` if the connection is performed, `false` if the the socket is already connected.
     @discardableResult
-    func connect() -> Bool
+    func connect(url: URL, sslConfiguration: SSLConfiguration?) -> Bool
     
     /// Disconnects the web socket from the remote host.
     ///
@@ -81,7 +84,10 @@ protocol WebSocketProtocol {
 class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.WebSocketPongDelegate {
     
     /// The websocket to manage the connection.
-    private let socket: Starscream.WebSocket
+    private var socket: Starscream.WebSocket?
+    
+    /// The delegate queue to dispatch events.
+    private let delegateQueue: DispatchQueue
     
     /// The timer which manages the ping pong process.
     private var pingPongTimer: Timer?
@@ -98,21 +104,14 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     /// The maximum payload size.
     private let maxPayloadSize: Int = 4096
     
-    /// Parameterized initializer. If the URL is not valid, the initializer will fail.
-    ///
-    /// - Parameters:
-    ///   - urlString: The URL used to perform the connection.
-    ///   - sslConfiguration: The SSL configuration for secure connections.
-    ///   - Parameter delegateQueue: The queue on which a delegate is called (Default: main).
-    init?(urlString: String, sslConfiguration: SSLConfiguration?, delegateQueue: DispatchQueue = DispatchQueue.main) {
-        guard let url = URL(string: urlString) else { return nil }
+    private var isConnected: Bool {
+        guard let socket = socket else { return false }
         
-        socket = Starscream.WebSocket(url: url)
-        socket.callbackQueue = delegateQueue
-        
-        setup(sslConfiguration: sslConfiguration)
-        socket.delegate = self
-        socket.pongDelegate = self
+        return socket.isConnected
+    }
+    
+    init(delegateQueue: DispatchQueue = DispatchQueue.main) {
+        self.delegateQueue = delegateQueue
     }
     
     // MARK: - WebSocketProtocol properties & methods
@@ -120,31 +119,43 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     weak var delegate: WebSocketDelegate?
     
     @discardableResult
-    func connect() -> Bool {
-        guard !socket.isConnected else { return false }
+    func connect(url: URL, sslConfiguration: SSLConfiguration?) -> Bool {
+        guard !isConnected else { return false }
+        
+        if socket?.currentURL != url {
+            socket?.disconnect()
+            socket = nil
+        }
+        
+        socket = Starscream.WebSocket(url: url)
+        socket?.callbackQueue = delegateQueue
+        
+        setup(sslConfiguration: sslConfiguration)
+        socket?.delegate = self
+        socket?.pongDelegate = self
         
         stopPingPongTimer()
-        socket.connect()
+        socket?.connect()
         
         return true
     }
     
     @discardableResult
     func disconnect() -> Bool {
-        guard socket.isConnected else { return false }
+        guard isConnected else { return false }
         
         stopPingPongTimer()
-        socket.disconnect()
+        socket?.disconnect()
         
         return true
     }
     
     @discardableResult
     func send(_ message: String) -> Result<Void, WebSocketSendError> {
-        guard socket.isConnected else { return .failure(.notConnected) }
+        guard isConnected else { return .failure(.notConnected) }
         guard message.count <= maxPayloadSize else { return .failure(.maximumPayloadReached) }
-
-        socket.write(string: message)
+        
+        socket?.write(string: message)
         
         return .success(())
     }
@@ -161,12 +172,12 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
                 let sslSecurity = SSLSecurity(certs: certificates, usePublicKeys: false)
                 sslSecurity.validatedDN = sslConfiguration.validatesHost
                 sslSecurity.validateEntireChain = sslConfiguration.validatesCertificateChain
-                socket.security = sslSecurity
+                socket?.security = sslSecurity
             }
-            socket.disableSSLCertValidation = sslConfiguration.disablesSSLCertificateValidation
+            socket?.disableSSLCertValidation = sslConfiguration.disablesSSLCertificateValidation
             if let clientCertificate = sslConfiguration.clientCertificate {
-                socket.sslClientCertificate = try? SSLClientCertificate(pkcs12Url: clientCertificate.certificate,
-                                                                        password: clientCertificate.password)
+                socket?.sslClientCertificate = try? SSLClientCertificate(pkcs12Url: clientCertificate.certificate,
+                                                                         password: clientCertificate.password)
             }
         }
     }
@@ -176,9 +187,9 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     /// - Returns: `true` if the send is performed, `false` if the web socket is not connected.
     @discardableResult
     private func sendPing() -> Bool {
-        guard socket.isConnected else { return false }
+        guard isConnected else { return false }
         
-        socket.write(ping: Data())
+        socket?.write(ping: Data())
         
         return true
     }
@@ -186,7 +197,7 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     @objc func pingPongTimerExpiry(timer _: Timer) {
         if pingPongTimerRetry >= pingPongTimerMaxRetry {
             // Force to close the socket without sending the frame to the server to be notified earlier
-            socket.disconnect(forceTimeout: 0)
+            socket?.disconnect(forceTimeout: 0)
         } else {
             pingPongTimerRetry += 1
             startPingPongTimer()
@@ -219,7 +230,7 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     }
     
     func websocketDidConnect(socket: WebSocketClient) {
-        delegate?.websocket(self, didConnectTo: self.socket.currentURL)
+        delegate?.websocket(self, didConnectTo: self.socket?.currentURL)
         DispatchQueue.main.async { self.startPingPongTimer() }
     }
     
