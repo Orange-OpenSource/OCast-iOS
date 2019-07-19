@@ -1,4 +1,6 @@
 //
+// Device.swift
+//
 // Copyright 2019 Orange
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,11 +13,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-//
-//  OCastDevice.swift
-//  OCast
-//
-//  Created by Christophe Azemar on 06/12/2018.
+// limitations under the License.
 //
 
 import Foundation
@@ -49,11 +47,11 @@ public protocol Device {
     
     // MARK: - Properties
     
-    /// The application name. This property must be set to use media commands and events.
+    /// The application name. This property must be set to use the media API.
     var applicationName: String? { get set }
     
-    /// The device IP address.
-    var ipAddress: String { get }
+    /// The UPNP device ID.
+    var upnpID: String { get }
     
     /// The device name.
     var friendlyName: String { get }
@@ -110,112 +108,102 @@ public protocol Device {
     ///
     /// - Parameters:
     ///   - name: The event name.
-    ///   - handler: The block called when the given events is received.
-    func registerEvent(_ name: String, withHandler handler: @escaping EventHandler)
+    ///   - completion: The completion block called when the given events is received.
+    func registerEvent(_ name: String, completion: @escaping EventHandler)
     
-    // MARK: - Media commands
+    // MARK: - Media methods
     
     /// Prepares to play a media.
     ///
     /// - Parameters:
-    ///   - prepareCommand: The prepare parameters. See `MediaPrepareCommand`.
-    ///   - options: The command options (metadata, ...).
+    ///   - params: The prepare parameters. See `MediaPrepareCommandParams`.
+    ///   - options: The options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the media was successfully prepared.
-    func prepare(_ prepareCommand: MediaPrepareCommand, withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func prepareMedia(_ params: MediaPrepareCommandParams, withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
     
     /// Sets a specific track.
     ///
     /// - Parameters:
-    ///   - trackCommand: The track parameters. See `MediaTrackCommand`.
-    ///   - options: The command options (metadata, ...).
+    ///   - params: The track parameters. See `MediaTrackCommandParams`.
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the track was successfully set.
-    func setTrack(_ trackCommand: MediaTrackCommand, withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func setMediaTrack(_ params: MediaTrackCommandParams, completion: @escaping NoResultHandler)
     
     /// Plays a media at a specific position.
     ///
     /// - Parameters:
     ///   - position: The position in seconds.
-    ///   - options: The command options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the media was successfully played.
-    func play(at position: Double, withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func playMedia(at position: Double, completion: @escaping NoResultHandler)
     
     /// Stops the current media.
     ///
     /// - Parameters:
-    ///   - options: The command options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the media was successfully stopped.
-    func stop(withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func stopMedia(completion: @escaping NoResultHandler)
     
     /// Resumes the current media.
     ///
     /// - Parameters:
-    ///   - options: The command options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the media was successfully resumed.
-    func resume(withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func resumeMedia(completion: @escaping NoResultHandler)
     
     /// Sets the volume.
     ///
     /// - Parameters:
     ///   - volume: The volume level between 0 and 1.
-    ///   - options: The command options (metadata, ...).
     ///   - completion:  The completion block called when the action completes.
     /// If the error is nil, the volume was successfully set.
-    func setVolume(_ volume: Float, withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func setMediaVolume(_ volume: Float, completion: @escaping NoResultHandler)
     
     /// Pauses the current media.
     ///
     /// - Parameters:
-    ///   - options: The command options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the media was successfully paused.
-    func pause(withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func pauseMedia(completion: @escaping NoResultHandler)
     
     /// Seeks the current media to a specified position.
     ///
     /// - Parameters:
     ///   - position: The position to which to seek.
-    ///   - options: The command options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the media was successfully seeked.
-    func seek(to position: Double, withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func seekMedia(to position: Double, completion: @escaping NoResultHandler)
     
     /// Retrieves the current media metadata.
     ///
     /// - Parameters:
-    ///   - options: The command options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the metadata was successfully retrieved and is described in `MediaMetadata` parameter.
-    func metadata(withOptions options: [String: Any]?, completion: @escaping ResultHandler<MediaMetadata>)
+    func mediaMetadata(completion: @escaping ResultHandler<MediaMetadata>)
     
     /// Retrieves the current media playback status.
     ///
     /// - Parameters:
-    ///   - options: The command options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the playback status was successfully retrieved and is described in `MediaPlaybackStatus` parameter.
-    func playbackStatus(withOptions options: [String: Any]?, completion: @escaping ResultHandler<MediaPlaybackStatus>)
+    func mediaPlaybackStatus(completion: @escaping ResultHandler<MediaPlaybackStatus>)
     
     /// Mutes or unmutes the current media.
     ///
     /// - Parameters:
     ///   - flag: `true` to mute the current media, `false` to unmute.
-    ///   - options: The command options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the media was successfully muted.
-    func mute(_ flag: Bool, withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func muteMedia(_ flag: Bool, completion: @escaping NoResultHandler)
     
-    // MARK: - Settings commands methods
+    // MARK: - Settings methods
     
     /// Retrieves the device update status.
     ///
     /// - Parameter completion: The completion block called when the action completes.
-    /// If the error is nil, the update status was successfully retrieved and is described in `SettingsUpdateStatus` parameter.
-    func updateStatus(_ completion: @escaping ResultHandler<SettingsUpdateStatus>)
+    /// If the error is nil, the update status was successfully retrieved and is described in `UpdateStatus` parameter.
+    func updateStatus(_ completion: @escaping ResultHandler<UpdateStatus>)
     
     /// Retrieves the device identifier.
     ///
@@ -223,35 +211,35 @@ public protocol Device {
     /// If the error is nil, the device id was successfully retrieved and is described in `String` parameter.
     func deviceID(_ completion: @escaping ResultHandler<String>)
     
-    // MARK: - Settings input commands methods
+    // MARK: - Settings input methods
     
     /// Sends a key event.
     ///
     /// - Parameters:
-    ///   - keyEvent: The key event parameter. See `SettingsKeyPressedCommand`.
+    ///   - params: The key event parameters. See `KeyEventCommandParams`.
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the key event was successfully sent.
-    func sendKeyEvent(_ keyEvent: SettingsKeyPressedCommand, completion: @escaping NoResultHandler)
+    func sendKeyEvent(_ params: KeyEventCommandParams, completion: @escaping NoResultHandler)
     
     /// Sends a mouse event.
     ///
     /// - Parameters:
-    ///   - mouseEvent: The mouse event parameter. See `SettingsKeyPressedCommand`.
+    ///   - params: The mouse event parameters. See `MouseEventCommandParams`.
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the mouse event was successfully sent.
-    func sendMouseEvent(_ mouseEvent: SettingsMouseEventCommand, completion: @escaping NoResultHandler)
+    func sendMouseEvent(_ params: MouseEventCommandParams, completion: @escaping NoResultHandler)
     
     /// Sends a gamepad event.
     ///
     /// - Parameters:
-    ///   - gamepadEvent: The gamepad event parameter. See `SettingsGamepadEventCommand`.
+    ///   - params: The gamepad event parameters. See `GamepadEventCommandParams`.
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the gamepad event was successfully sent.
-    func sendGamepadEvent(_ gamepadEvent: SettingsGamepadEventCommand, completion: @escaping NoResultHandler)
+    func sendGamepadEvent(_ params: GamepadEventCommandParams, completion: @escaping NoResultHandler)
 }
 
-/// Extension to manage the custom streams.
-public protocol OCastSenderDevice {
+/// Extension to send custom commands.
+public protocol SenderDevice {
     
     /// Sends a message without a response to a specified domain.
     ///
@@ -279,47 +267,7 @@ public extension Device {
         disconnect(completion)
     }
     
-    func prepare(_ prepareCommand: MediaPrepareCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        prepare(prepareCommand, withOptions: options, completion: completion)
-    }
-    
-    func setTrack(_ trackCommand: MediaTrackCommand, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        setTrack(trackCommand, withOptions: options, completion: completion)
-    }
-    
-    func play(at position: Double, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        play(at: position, withOptions: options, completion: completion)
-    }
-    
-    func stop(withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        stop(withOptions: options, completion: completion)
-    }
-    
-    func resume(withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        resume(withOptions: options, completion: completion)
-    }
-    
-    func setVolume(_ volume: Float, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        setVolume(volume, withOptions: options, completion: completion)
-    }
-    
-    func pause(withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        pause(withOptions: options, completion: completion)
-    }
-    
-    func seek(to position: Double, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        seek(to: position, withOptions: options, completion: completion)
-    }
-    
-    func metadata(withOptions options: [String: Any]? = nil, completion: @escaping ResultHandler<MediaMetadata>) {
-        metadata(withOptions: options, completion: completion)
-    }
-    
-    func playbackStatus(withOptions options: [String: Any]? = nil, completion: @escaping ResultHandler<MediaPlaybackStatus>) {
-        playbackStatus(withOptions: options, completion: completion)
-    }
-    
-    func mute(_ flag: Bool, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
-        mute(flag, withOptions: options, completion: completion)
+    func prepareMedia(_ params: MediaPrepareCommandParams, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+        prepareMedia(params, withOptions: options, completion: completion)
     }
 }

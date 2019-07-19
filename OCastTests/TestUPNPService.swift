@@ -64,9 +64,7 @@ class TestUPNPService: XCTestCase {
             case .success(let device):
                 XCTAssertNotNil(device)
                 XCTAssertEqual("4f8a97dd-c6ec-4469-9e27-0009743924a1", device.deviceID)
-                XCTAssertEqual(URL(string: applicationURL), device.baseURL)
-                XCTAssertEqual("127.0.0.1", device.ipAddress)
-                XCTAssertEqual(80, device.servicePort)
+                XCTAssertEqual(URL(string: applicationURL), device.dialURL)
                 XCTAssertEqual("Foo", device.friendlyName)
                 XCTAssertEqual("FooFacturer", device.manufacturer)
                 XCTAssertEqual("FooModel", device.modelName)

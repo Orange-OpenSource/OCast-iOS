@@ -86,11 +86,7 @@ class RootViewController: UITableViewController, DeviceCenterDelegate {
     }
     
     func center(_ center: DeviceCenter, didRemove devices: [Device]) {
-        devices.forEach { device in
-            if let index = self.devices.firstIndex(where: { $0.ipAddress == device.ipAddress }) {
-                self.devices.remove(at: index)
-            }
-        }
+        self.devices = center.devices
         tableView.reloadData()
     }
     

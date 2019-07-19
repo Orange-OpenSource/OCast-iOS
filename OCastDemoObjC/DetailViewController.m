@@ -120,7 +120,7 @@
     __weak DetailViewController * weakSelf = self;
     [self ensureConnected:^(BOOL connected) {
         if (connected) {
-            [weakSelf.device playbackStatusWithOptions:nil completion:^(MediaPlaybackStatus * _Nullable playbackStatus, NSError * _Nullable error) {
+            [weakSelf.device mediaPlaybackStatusWithCompletion:^(MediaPlaybackStatus * _Nullable playbackStatus, NSError * _Nullable error) {
                 if (error != nil) {
                     [weakSelf show:error beforeControllerDismissed:NO];
                 } else {
@@ -134,8 +134,8 @@
 - (void)updateUI {
     if (self.currentPlaybackStatus != nil) {
         switch (self.currentPlaybackStatus.state) {
-            case MediaPlaybackStatusStateIdle:
-            case MediaPlaybackStatusStateUnknown:
+            case MediaPlaybackStateIdle:
+            case MediaPlaybackStateUnknown:
                 self.castButton.enabled = YES;
                 self.stopButton.enabled = NO;
                 self.pauseResumeButton.enabled = NO;
@@ -149,13 +149,13 @@
                 self.titleLabel.text = @"-";
                 self.subtitleLabel.text = @"-";
                 break;
-            case MediaPlaybackStatusStateBuffering:
-            case MediaPlaybackStatusStatePlaying:
-            case MediaPlaybackStatusStatePaused:
+            case MediaPlaybackStateBuffering:
+            case MediaPlaybackStatePlaying:
+            case MediaPlaybackStatePaused:
                 self.castButton.enabled = NO;
                 self.stopButton.enabled = YES;
                 self.pauseResumeButton.enabled = YES;
-                NSString * buttonTitle = self.currentPlaybackStatus.state == MediaPlaybackStatusStatePaused ? @"Resume" : @"Pause";
+                NSString * buttonTitle = self.currentPlaybackStatus.state == MediaPlaybackStatePaused ? @"Resume" : @"Pause";
                 [self.pauseResumeButton setTitle:buttonTitle forState:UIControlStateNormal];
                 self.progressionSlider.enabled = YES;
                 [self.progressionSlider setValue:self.currentPlaybackStatus.position / self.currentPlaybackStatus.duration animated:YES];
@@ -172,18 +172,18 @@
 // MARK: - UI events methods
 
 - (IBAction)castButtonClicked:(id)sender {
-    MediaPrepareCommand * mediaPrepareCommand = [[MediaPrepareCommand alloc] initWithUrl:OCastDemoMovieURLString
-                                                                               frequency:1
-                                                                                   title:@"Movie Sample"
-                                                                                subtitle:@"OCast"
-                                                                                    logo:@""
-                                                                               mediaType:MediaTypeVideo
-                                                                            transferMode:MediaTransferModeBuffered
-                                                                                autoPlay:YES];
+    MediaPrepareCommandParams * params = [[MediaPrepareCommandParams alloc] initWithUrl:OCastDemoMovieURLString
+                                                                              frequency:1
+                                                                                  title:@"Movie Sample"
+                                                                               subtitle:@"OCast"
+                                                                                   logo:@""
+                                                                              mediaType:MediaTypeVideo
+                                                                           transferMode:MediaTransferModeBuffered
+                                                                               autoPlay:YES];
     __weak DetailViewController * weakSelf = self;
     [self ensureConnected:^(BOOL connected) {
         if (connected) {
-            [weakSelf.device prepare:mediaPrepareCommand withOptions:nil completion:^(NSError * _Nullable error) {
+            [weakSelf.device prepareMedia:params withOptions:nil completion:^(NSError * _Nullable error) {
                 if (error != nil) {
                     [weakSelf show:error beforeControllerDismissed:NO];
                 }
@@ -196,7 +196,7 @@
     __weak DetailViewController * weakSelf = self;
     [self ensureConnected:^(BOOL connected) {
         if (connected) {
-            [weakSelf.device stopWithOptions:nil completion:^(NSError * _Nullable error) {
+            [weakSelf.device stopMediaWithCompletion:^(NSError * _Nullable error) {
                 if (error != nil) {
                     [weakSelf show:error beforeControllerDismissed:NO];
                 }
@@ -209,14 +209,14 @@
     __weak DetailViewController * weakSelf = self;
     [self ensureConnected:^(BOOL connected) {
         if (connected) {
-            if (weakSelf.currentPlaybackStatus.state == MediaPlaybackStatusStatePaused) {
-                [weakSelf.device resumeWithOptions:nil completion:^(NSError * _Nullable error) {
+            if (weakSelf.currentPlaybackStatus.state == MediaPlaybackStatePaused) {
+                [weakSelf.device resumeMediaWithCompletion:^(NSError * _Nullable error) {
                     if (error != nil) {
                         [weakSelf show:error beforeControllerDismissed:NO];
                     }
                 }];
             } else {
-                [weakSelf.device pauseWithOptions:nil completion:^(NSError * _Nullable error) {
+                [weakSelf.device pauseMediaWithCompletion:^(NSError * _Nullable error) {
                     if (error != nil) {
                         [weakSelf show:error beforeControllerDismissed:NO];
                     }
@@ -232,7 +232,7 @@
         [self ensureConnected:^(BOOL connected) {
             if (connected) {
                 double position = weakSelf.progressionSlider.value * weakSelf.currentPlaybackStatus.duration;
-                [weakSelf.device seekTo:position withOptions:nil completion:^(NSError * _Nullable error) {
+                [weakSelf.device seekMediaTo:position completion:^(NSError * _Nullable error) {
                     if (error != nil) {
                         [weakSelf show:error beforeControllerDismissed:NO];
                     }
@@ -245,7 +245,7 @@
     __weak DetailViewController * weakSelf = self;
     [self ensureConnected:^(BOOL connected) {
         if (connected) {
-            [weakSelf.device setVolume:weakSelf.volumeSlider.value withOptions:nil completion:^(NSError * _Nullable error) {
+            [weakSelf.device setMediaVolume:weakSelf.volumeSlider.value completion:^(NSError * _Nullable error) {
                 if (error != nil) {
                     [weakSelf show:error beforeControllerDismissed:NO];
                 }
@@ -258,15 +258,14 @@
     __weak DetailViewController * weakSelf = self;
     [self ensureConnected:^(BOOL connected) {
         if (connected) {
-            [self.device metadataWithOptions:nil
-                                  completion:^(MediaMetadata * _Nullable metadata, NSError * _Nullable error) {
-                                      if (error != nil) {
-                                          [weakSelf show:error beforeControllerDismissed:NO];
-                                      } else {
-                                          weakSelf.titleLabel.text = [NSString stringWithFormat:@"Titre: %@", metadata.title];
-                                          weakSelf.subtitleLabel.text = [NSString stringWithFormat:@"Sous-titre: %@", metadata.subtitle];
-                                      }
-                                  }];
+            [self.device mediaMetadataWithCompletion:^(MediaMetadata * _Nullable metadata, NSError * _Nullable error) {
+                if (error != nil) {
+                    [weakSelf show:error beforeControllerDismissed:NO];
+                } else {
+                    weakSelf.titleLabel.text = [NSString stringWithFormat:@"Titre: %@", metadata.title];
+                    weakSelf.subtitleLabel.text = [NSString stringWithFormat:@"Sous-titre: %@", metadata.subtitle];
+                }
+            }];
         }
     }];
 }

@@ -1,4 +1,8 @@
 //
+// OCastMedia.swift
+//
+// Copyright 2019 Orange
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -9,12 +13,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-//
-//  OCastMedia.swift
-//  OCast
-//
-//  Created by Christophe Azemar on 28/03/2019.
-//  Copyright © 2019 Orange. All rights reserved.
+// limitations under the License.
 //
 
 import Foundation
@@ -111,14 +110,14 @@ public enum MediaTransferMode: Int, RawRepresentable, Codable {
     }
 }
 
-/// The media playback status state.
+/// The media playback state.
 ///
 /// - idle: No media is running.
 /// - buffering: A media is buffering.
 /// - playing: A media is playing.
 /// - paused: A media is paused.
 @objc
-public enum MediaPlaybackStatusState: Int, Codable {
+public enum MediaPlaybackState: Int, Codable {
     
     case unknown, idle, playing, paused, buffering
     
@@ -155,7 +154,7 @@ public class MediaPlaybackStatus: OCastMessage {
     public var mute: Bool { return _mute ?? false }
     
     /// The media state.
-    public let state: MediaPlaybackStatusState
+    public let state: MediaPlaybackState
     
     // The media position in seconds.
     public var position: Double { return _position ?? 0.0 }
@@ -250,12 +249,12 @@ public class MediaTrack: OCastMessage {
     case invalidErrorCode = 9999
 }
 
-// MARK: - Media Commands
+// MARK: - Media parameters
 
-/// The command to prepare a media.
+/// The parameters to prepare a media.
 @objc
 @objcMembers
-public class MediaPrepareCommand: OCastMessage {
+public class MediaPrepareCommandParams: OCastMessage {
     
     //// The media URL to launch.
     public let url: String
@@ -293,10 +292,10 @@ public class MediaPrepareCommand: OCastMessage {
     }
 }
 
-/// The command to set a media track.
+/// The parameters to set a media track.
 @objc
 @objcMembers
-public class MediaTrackCommand: OCastMessage {
+public class MediaTrackCommandParams: OCastMessage {
     
     /// The track identifier.
     public let trackId: String
@@ -314,10 +313,10 @@ public class MediaTrackCommand: OCastMessage {
     }
 }
 
-/// The command to play a media.
+/// The parameters to play a media.
 @objc
 @objcMembers
-public class MediaPlayCommand: OCastMessage {
+public class MediaPlayCommandParams: OCastMessage {
     
     /// The position in seconds.
     public let position: Double
@@ -327,20 +326,20 @@ public class MediaPlayCommand: OCastMessage {
     }
 }
 
-/// The command to stop a media.
+/// The parameters to stop a media.
 @objc
 @objcMembers
-public class MediaStopCommand: OCastMessage {}
+public class MediaStopCommandParams: OCastMessage {}
 
-/// The command to resume a media.
+/// The parameters to resume a media.
 @objc
 @objcMembers
-public class MediaResumeCommand: OCastMessage {}
+public class MediaResumeCommandParams: OCastMessage {}
 
-/// The command to set the volume of a media
+/// The parameters to set the volume of a media
 @objc
 @objcMembers
-public class MediaVolumeCommand: OCastMessage {
+public class MediaVolumeCommandParams: OCastMessage {
     
     // The volume level between 0 and 1.
     public let volume: Float
@@ -350,15 +349,15 @@ public class MediaVolumeCommand: OCastMessage {
     }
 }
 
-/// The command to pause a media.
+/// The parameters to pause a media.
 @objc
 @objcMembers
-public class MediaPauseCommand: OCastMessage {}
+public class MediaPauseCommandParams: OCastMessage {}
 
-/// The command to seek a media.
+/// The parameters to seek a media.
 @objc
 @objcMembers
-public class MediaSeekCommand: OCastMessage {
+public class MediaSeekCommandParams: OCastMessage {
     
     // The position which to seek in seconds.
     public let position: Double
@@ -368,20 +367,20 @@ public class MediaSeekCommand: OCastMessage {
     }
 }
 
-/// The command to retrieve the media playback status.
+/// The parameters to retrieve the media playback status.
 @objc
 @objcMembers
-public class MediaGetPlaybackStatusCommand: OCastMessage {}
+public class MediaPlaybackStatusCommandParams: OCastMessage {}
 
-/// The command to retrieve the media metadata.
+/// The parameters to retrieve the media metadata.
 @objc
 @objcMembers
-public class MediaGetMetadataCommand: OCastMessage {}
+public class MediaMetadataCommandParams: OCastMessage {}
 
-/// The command to mute a media.
+/// The parameters to mute a media.
 @objc
 @objcMembers
-public class MediaMuteCommand: OCastMessage {
+public class MediaMuteCommandParams: OCastMessage {
     
     /// `true`to mute the media, `false` to unmute it.
     public let mute: Bool

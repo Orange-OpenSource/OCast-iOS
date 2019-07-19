@@ -31,7 +31,7 @@ public extension Notification.Name {
     
     /// Notification sent each time an error has occured during discovery.
     /// The userinfo `DeviceCenterErrorUserInfoKey` key contains an error if it occurs.
-    static let deviceCenterDeviceDiscoveryErrorNotification = Notification.Name("OCastDeviceCenterDeviceDiscoveryError")
+    static let deviceCenterDiscoveryErrorNotification = Notification.Name("OCastDeviceCenterDiscoveryError")
     
     /// The notification sent when the device is disconnected
     /// The userinfo `ErrorUserInfoKey` key contains error information.
@@ -64,7 +64,7 @@ public extension NSNotification {
     
     /// Notification sent each time an error has occured during discovery.
     /// The userinfo `DeviceCenterErrorUserInfoKey` key contains an error if it occurs.
-    static let deviceCenterDeviceDiscoveryErrorNotification = Notification.Name.deviceCenterDeviceDiscoveryErrorNotification
+    static let deviceCenterDiscoveryErrorNotification = Notification.Name.deviceCenterDiscoveryErrorNotification
     
     /// The notification sent when the device is disconnected
     /// The userinfo `ErrorUserInfoKey` key contains error information.

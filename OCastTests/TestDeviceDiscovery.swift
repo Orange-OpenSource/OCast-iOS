@@ -74,9 +74,7 @@ class TestDeviceDiscovery: XCTestCase {
         BOOTID.UPNP.ORG: 1\r
         
         """
-        mockDevice = UPNPDevice(baseURL: URL(string: "http://foo")!,
-                                ipAddress: "127.0.0.1",
-                                servicePort: 8080,
+        mockDevice = UPNPDevice(dialURL: URL(string: "http://foo")!,
                                 deviceID: "DeviceID",
                                 friendlyName: "Name",
                                 manufacturer: "Manufacturer",

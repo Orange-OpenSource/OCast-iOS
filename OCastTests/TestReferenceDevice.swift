@@ -22,7 +22,7 @@ import XCTest
 /// Tests the ReferenceDevice class.
 class TestReferenceDevice: XCTestCase {
     
-    private class TestParams: OCastMessage {
+    private class TestCommandParams: OCastMessage {
         let test = "testValue"
     }
     
@@ -42,9 +42,7 @@ class TestReferenceDevice: XCTestCase {
     
     // swiftlint:disable overridden_super_call
     override func setUp() {
-        let upnpDevice = UPNPDevice(baseURL: URL(string: "http://127.0.0.1/apps")!,
-                                    ipAddress: "127.0.0.1",
-                                    servicePort: 80,
+        let upnpDevice = UPNPDevice(dialURL: URL(string: "http://127.0.0.1/apps")!,
                                     deviceID: "DeviceID",
                                     friendlyName: "Name",
                                     manufacturer: "Manufacturer",
@@ -52,7 +50,7 @@ class TestReferenceDevice: XCTestCase {
         mockWebSocket = MockWebSocket(urlString: "ws://127.0.0.1", sslConfiguration: nil)
         dialApplicationInfo = DIALApplicationInfo(name: "MyApp",
                                                   state: .stopped,
-                                                  app2appURL: "http://127.0.0.1/apps/MyApp",
+                                                  webSocketURL: "http://127.0.0.1/apps/MyApp",
                                                   version: "1.0",
                                                   runLink: nil)
         mockDialService = MockDIALService(applicationInfo: dialApplicationInfo)
@@ -235,7 +233,7 @@ class TestReferenceDevice: XCTestCase {
     func testStartApplicationAlreadyStarted() {
         let dialApplicationInfo = DIALApplicationInfo(name: "MyApp",
                                                       state: .running,
-                                                      app2appURL: "http://127.0.0.1/apps/MyApp",
+                                                      webSocketURL: "http://127.0.0.1/apps/MyApp",
                                                       version: "1.0",
                                                       runLink: nil)
         
@@ -257,7 +255,7 @@ class TestReferenceDevice: XCTestCase {
         let startAppExpectation2 = XCTestExpectation(description: "startAppExpectation2")
         referenceDevice.connect(nil) { error in
             XCTAssertNil(error)
-            self.mockWebSocket.triggerIncomingMessage(self.connectionEvent, after: 2.0)
+            self.mockWebSocket.triggerIncomingMessage(self.connectionEvent, after: 1.5)
             self.referenceDevice.startApplication { error in
                 XCTAssertNil(error)
                 startAppExpectation.fulfill()
@@ -459,7 +457,7 @@ class TestReferenceDevice: XCTestCase {
         testStartApplication()
         let name = "TestMessage"
         let serviceName = "org.ocast.testService"
-        let data = OCastDataLayer(name: name, params: TestParams(), options: nil)
+        let data = OCastDataLayer(name: name, params: TestCommandParams(), options: nil)
         let message = OCastApplicationLayer(service: serviceName, data: data)
         let sendExpectation = XCTestExpectation(description: "sendExpectation")
         let reply = """
@@ -479,7 +477,7 @@ class TestReferenceDevice: XCTestCase {
         let name = "TestMessage"
         let serviceName = "org.ocast.testService"
         let testValue = "TestValue"
-        let data = OCastDataLayer(name: name, params: TestParams(), options: nil)
+        let data = OCastDataLayer(name: name, params: TestCommandParams(), options: nil)
         let message = OCastApplicationLayer(service: serviceName, data: data)
         let sendExpectation = XCTestExpectation(description: "sendExpectation")
         let reply = """
@@ -500,7 +498,7 @@ class TestReferenceDevice: XCTestCase {
     func testSendMessageDisconnected() {
         let name = "TestMessage"
         let serviceName = "org.ocast.testService"
-        let data = OCastDataLayer(name: name, params: TestParams(), options: nil)
+        let data = OCastDataLayer(name: name, params: TestCommandParams(), options: nil)
         let message = OCastApplicationLayer(service: serviceName, data: data)
         let sendExpectation = XCTestExpectation(description: "sendExpectation")
         referenceDevice.send(message, on: .browser) { error in
@@ -516,7 +514,7 @@ class TestReferenceDevice: XCTestCase {
         testConnect()
         let name = "TestMessage"
         let serviceName = "org.ocast.testService"
-        let data = OCastDataLayer(name: name, params: TestParams(), options: nil)
+        let data = OCastDataLayer(name: name, params: TestCommandParams(), options: nil)
         let message = OCastApplicationLayer(service: serviceName, data: data)
         let sendExpectation = XCTestExpectation(description: "sendExpectation")
         let reply = """
@@ -537,7 +535,7 @@ class TestReferenceDevice: XCTestCase {
         testStartApplication()
         let name = "TestMessage"
         let serviceName = "org.ocast.testService"
-        let data = OCastDataLayer(name: name, params: TestParams(), options: nil)
+        let data = OCastDataLayer(name: name, params: TestCommandParams(), options: nil)
         let message = OCastApplicationLayer(service: serviceName, data: data)
         let sendExpectation = XCTestExpectation(description: "sendExpectation")
         mockWebSocket.sendError = .maximumPayloadReached
