@@ -52,17 +52,11 @@ public protocol Device {
     /// The application name. This property must be set to use media commands and events.
     var applicationName: String? { get set }
     
-    /// The application URL.
-    var applicationURL: String { get }
-    
     /// The device IP address.
     var ipAddress: String { get }
     
     /// The device name.
     var friendlyName: String { get }
-    
-    /// The SSL configuration used if you want to perform a SSL connection.
-    var sslConfiguration: SSLConfiguration { get }
     
     /// The device state.
     var state: DeviceState { get }
@@ -85,10 +79,10 @@ public protocol Device {
     /// Connects to the device.
     ///
     /// - Parameters:
-    ///   - configuration: The `SSLConfiguration` to parameter certificates.
+    ///   - sslConfiguration: The `SSLConfiguration` to parameter certificates if you use a secure websocket.
     ///   - completion: The completion block called when the connection is finished.
     /// If the error is nil, the device is connected with success.
-    func connect(_ configuration: SSLConfiguration, completion: @escaping NoResultHandler)
+    func connect(_ sslConfiguration: SSLConfiguration?, completion: @escaping NoResultHandler)
     
     /// Disconnects from the device.
     ///

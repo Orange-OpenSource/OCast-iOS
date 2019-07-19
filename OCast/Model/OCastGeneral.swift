@@ -42,6 +42,7 @@ public enum OCastError: Int, Error {
     case wrongStateConnected
     case wrongStateDisconnecting
     case applicationNameNotSet
+    case dialError
     case badApplicationURL
     case websocketConnectionEventNotReceived
     case emptyReplyReceived
@@ -50,6 +51,8 @@ public enum OCastError: Int, Error {
     case unableToSendCommand
     case transportError
     case deviceHasBeenDisconnected
+    case webSocketConnectionFailed
+    case webSocketDisconnectionFailed
 }
 
 /// Due to Objective-C restrictions (lack of enumeration with associated value),

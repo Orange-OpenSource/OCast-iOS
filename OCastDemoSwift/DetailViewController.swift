@@ -118,12 +118,8 @@ class DetailViewController: UIViewController {
     private func updatePlaybackStatus() {
         ensureConnected { [weak self] connected in
             if connected {
-                self?.device.playbackStatus(completion: { playbackStatus, error in
-                    if let error = error {
-                        self?.show(error)
-                    } else {
-                        self?.currentPlaybackStatus = playbackStatus
-                    }
+                self?.device.playbackStatus(completion: { playbackStatus, _ in
+                    self?.currentPlaybackStatus = playbackStatus
                 })
             }
         }

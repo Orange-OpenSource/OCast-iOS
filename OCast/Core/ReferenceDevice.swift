@@ -40,13 +40,9 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    public private(set) var applicationURL: String
-    
     public private(set) var ipAddress: String
     
     public private(set) var friendlyName: String
-    
-    public var sslConfiguration: SSLConfiguration = SSLConfiguration(deviceCertificates: nil, clientCertificate: nil)
     
     public var manufacturer: String
     
@@ -55,13 +51,16 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     }
     
     // MARK: - Private methods
-
+    
+    /// The web socket used to connect to the device.
+    private var webSocket: WebSocketProtocol
+    
     /// The DIAL service.
-    private let dialService: DIALService
+    private let dialService: DIALServiceProtocol
     
     /// Indicates if the application is running. This property is thread safe.
     private var isApplicationRunning = SynchronizedValue(false)
-
+    
     /// The settings web socket URL.
     private var settingsWebSocketURL: String {
         let defaultSettingsWebSocketURL = "wss://\(ipAddress):4433/ocast"
@@ -71,9 +70,6 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         return defaultSettingsWebSocketURL
         #endif
     }
-    
-    /// The web socket used to connect to the device.
-    private var webSocket: WebSocketProtocol?
     
     /// The connection handler to trigger when the connected is ended.
     private var connectionHandler: NoResultHandler?
@@ -92,15 +88,18 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     /// The sequence ID.
     private var sequenceID: Int = 0
-
+    
     /// The sequence queue to protect `sequenceID` from concurrent access.
     private let sequenceQueue = DispatchQueue(label: "org.ocast.sequencequeue")
     
     /// The semaphore queue to avoid dead lock.
     private let semaphoreQueue = DispatchQueue(label: "org.ocast.semaphorequeue")
     
-    // The semaphore to synchronize the websocket connection event.
+    /// The semaphore to synchronize the websocket connection event.
     private var semaphore: DispatchSemaphore?
+    
+    /// The max interval to wait for the connection event.
+    private let connectionEventTimeout: TimeInterval
     
     // MARK: - Public methods
     
@@ -119,42 +118,62 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     // MARK: - Initializer
     
-    public required init(upnpDevice: UPNPDevice) {
+    public required convenience init(upnpDevice: UPNPDevice) {
+        self.init(upnpDevice: upnpDevice,
+                  webSocket: WebSocket(delegateQueue: DispatchQueue(label: "org.ocast.websocket")),
+                  dialService: DIALService(forURL: upnpDevice.baseURL.absoluteString),
+                  connectionEventTimeout: 60.0)
+    }
+    
+    /// Creates a new device from an UPNP device and configuring its dependencies.
+    ///
+    /// - Parameters:
+    ///   - upnpDevice: The `UPNPDevice`.
+    ///   - webSocket: The web socket to use.
+    ///   - dialService: The DIAL service to use.
+    ///   - connectionEventTimeout: The timeout for waiting the connection event.
+    init(upnpDevice: UPNPDevice, webSocket: WebSocketProtocol, dialService: DIALServiceProtocol, connectionEventTimeout: TimeInterval) {
         ipAddress = upnpDevice.ipAddress
-        applicationURL = upnpDevice.baseURL.absoluteString
         friendlyName = upnpDevice.friendlyName
         manufacturer = upnpDevice.manufacturer
-        dialService = DIALService(forURL: applicationURL)
+        self.webSocket = webSocket
+        self.dialService = dialService
+        self.connectionEventTimeout = connectionEventTimeout
         
         super.init()
         
+        self.webSocket.delegate = self
         registerEvents()
     }
     
     // MARK: - Device methods
     
-    public func connect(_ configuration: SSLConfiguration, completion: @escaping NoResultHandler) {
+    public func connect(_ sslConfiguration: SSLConfiguration?, completion: @escaping NoResultHandler) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .connected {
             completion(error)
             return
         }
         
+        state = .connecting
+        
         if let applicationName = applicationName {
             dialService.info(ofApplication: applicationName) { [weak self] result in
+                guard let `self` = self else { return }
+                
                 switch result {
                 case .success(let info):
-                    guard let `self` = self else { return }
                     Logger.shared.log(logLevel: .debug,
                                       "DIAL info request retrieved for \(applicationName): \(info.debugDescription)")
-                    self.connect(info.app2appURL ?? self.settingsWebSocketURL, andSSLConfiguration: configuration, completion)
+                    self.connect(to: info.app2appURL ?? self.settingsWebSocketURL, sslConfiguration: sslConfiguration, completion)
                 case .failure(let error):
                     Logger.shared.log(logLevel: .error, "DIAL info request failed: \(error)")
-                    completion(error)
+                    self.state = .disconnected
+                    completion(OCastError.dialError)
                 }
             }
         } else {
-            connect(settingsWebSocketURL, andSSLConfiguration: configuration, completion)
+            connect(to: settingsWebSocketURL, sslConfiguration: sslConfiguration, completion)
         }
     }
     
@@ -167,7 +186,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         
         state = .disconnecting
         disconnectionHandler = completion
-        webSocket?.disconnect()
+        webSocket.disconnect()
     }
     
     public func startApplication(_ completion: @escaping NoResultHandler) {
@@ -197,7 +216,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 self.startApplication(applicationName, completion: completion)
             case .failure(let error):
                 Logger.shared.log(logLevel: .error, "DIAL info request failed: \(error)")
-                completion(error)
+                completion(OCastError.dialError)
             }
         })
     }
@@ -216,7 +235,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 completion(nil)
             case .failure(let error):
                 Logger.shared.log(logLevel: .error, "DIAL stop request failed: \(error)")
-                completion(error)
+                completion(OCastError.dialError)
             }
         }
     }
@@ -286,23 +305,17 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     /// Connects to the device.
     ///
     /// - Parameters:
-    ///   - url: The websocket endpoint.
-    ///   - configuration: The `SSLConfiguration` used to perform the connection.
+    ///   - urlString: The web socket url.
+    ///   - sslConfiguration: The `SSLConfiguration` used to perform the connection.
     ///   - completion: The completion block called when the connection is finished.
     /// If the error is nil, the device is connected with success.
-    private func connect(_ url: String, andSSLConfiguration configuration: SSLConfiguration, _ completion: @escaping NoResultHandler) {
-        guard let websocket = WebSocket(urlString: url,
-                                        sslConfiguration: configuration,
-                                        delegateQueue: DispatchQueue(label: "org.ocast.websocket")) else {
-                                            completion(OCastError.badApplicationURL)
-                                            return
+    private func connect(to urlString: String, sslConfiguration: SSLConfiguration?, _ completion: @escaping NoResultHandler) {
+        guard let url = URL(string: urlString) else {
+            completion(OCastError.badApplicationURL)
+            return
         }
-        
-        self.webSocket = websocket
         connectionHandler = completion
-        state = .connecting
-        self.webSocket?.delegate = self
-        self.webSocket?.connect()
+        webSocket.connect(url: url, sslConfiguration: sslConfiguration)
     }
     
     /// Generates a new unique senquence id.
@@ -334,7 +347,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 self.semaphore = DispatchSemaphore(value: 0)
                 // Do not wait on main thread
                 self.semaphoreQueue.async {
-                    let dispatchResult = self.semaphore?.wait(timeout: .now() + 60)
+                    let dispatchResult = self.semaphore?.wait(timeout: .now() + self.connectionEventTimeout)
                     // If the application name has changed or the device is not connected, an error callback is triggered
                     if dispatchResult == .success && self.applicationName == applicationName && self.state == .connected {
                         DispatchQueue.main.async { completion(nil) }
@@ -344,7 +357,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 }
             case .failure(let error):
                 Logger.shared.log(logLevel: .error, "DIAL start request failed: \(error)")
-                completion(error)
+                completion(OCastError.dialError)
             }
         })
     }
@@ -470,8 +483,9 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             let jsonData = try JSONEncoder().encode(layer)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
                 commandHandlers[layer.id] = completion
-                let result = webSocket?.send(jsonString)
-                if case .failure(_)? = result {
+                Logger.shared.log(logLevel: .debug, jsonString)
+                let result = webSocket.send(jsonString)
+                if case .failure(_) = result {
                     completion(.failure(OCastError.unableToSendCommand))
                     commandHandlers[layer.id] = nil
                 }
@@ -480,13 +494,13 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             }
         } catch {
             Logger.shared.log(logLevel: .error, "Can't encode command: \(error)")
-            completion(.failure(error))
+            completion(.failure(OCastError.misformedCommand))
         }
     }
     
     // MARK: WebSocketDelegate methods
     
-    func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL) {
+    func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL?) {
         DispatchQueue.main.async { [weak self] in
             self?.state = .connected
             
@@ -507,8 +521,11 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             self.commandHandlers.removeAll()
             
             if let disconnectHandler = self.disconnectionHandler {
-                disconnectHandler(error)
+                disconnectHandler(error != nil ? OCastError.webSocketDisconnectionFailed : nil)
                 self.disconnectionHandler = nil
+            } else if let connectionHandler = self.connectionHandler {
+                connectionHandler(error != nil ? OCastError.webSocketConnectionFailed : nil)
+                self.connectionHandler = nil
             } else if let error = error {
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(name: .deviceDisconnectedEventNotification,
@@ -537,7 +554,9 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                     handleRegisteredEvents(from: jsonData, deviceLayer)
                 }
             }
-        } catch {}
+        } catch {
+            Logger.shared.log(logLevel: .error, "A bad incoming message has been received: \(error)")
+        }
     }
 }
 
