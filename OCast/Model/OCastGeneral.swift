@@ -55,8 +55,8 @@ public enum OCastError: Int, Error {
 
 /// Due to Objective-C restrictions (lack of enumeration with associated value),
 /// this struct is used to store the application layer code when an error occurs.
-struct OCastReplyError: Error {
-    let code: Int
+public struct OCastReplyError: Error {
+    public let code: Int
 }
 
 /// The OCast transport errors.
@@ -230,4 +230,4 @@ public class OCastDefaultResponseDataLayer: OCastMessage {
 }
 
 /// A codable struct to manage commands without result.
-struct NoResult: Codable {}
+public struct NoResult: Codable {}

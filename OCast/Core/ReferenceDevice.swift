@@ -122,7 +122,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     ///   - webSocket: The web socket to use.
     ///   - dialService: The DIAL service to use.
     ///   - connectionEventTimeout: The timeout for waiting the connection event.
-    init(upnpDevice: UPNPDevice, webSocket: WebSocketProtocol, dialService: DIALServiceProtocol, connectionEventTimeout: TimeInterval) {
+    public init(upnpDevice: UPNPDevice, webSocket: WebSocketProtocol, dialService: DIALServiceProtocol, connectionEventTimeout: TimeInterval) {
         upnpID = upnpDevice.deviceID
         friendlyName = upnpDevice.friendlyName
         manufacturer = upnpDevice.manufacturer
@@ -496,7 +496,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     // MARK: WebSocketDelegate methods
     
-    func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL?) {
+    public func websocket(_ websocket: WebSocketProtocol, didConnectTo url: URL?) {
         DispatchQueue.main.async { [weak self] in
             self?.state = .connected
             
@@ -505,7 +505,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    func websocket(_ websocket: WebSocketProtocol, didDisconnectWith error: Error?) {
+    public func websocket(_ websocket: WebSocketProtocol, didDisconnectWith error: Error?) {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
             
@@ -532,7 +532,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    func websocket(_ websocket: WebSocketProtocol, didReceiveMessage message: String) {
+    public func websocket(_ websocket: WebSocketProtocol, didReceiveMessage message: String) {
         guard let jsonData = message.data(using: .utf8) else { return }
         
         Logger.shared.log(logLevel: .debug, "Message received: \(message)")
