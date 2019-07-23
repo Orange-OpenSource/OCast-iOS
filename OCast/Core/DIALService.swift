@@ -22,7 +22,7 @@ import Foundation
 ///
 /// - httpRequest: A HTTP error.
 /// - badContentResponse: A bad content error when the DIAL response is not correct.
-enum DIALError: Error {
+public enum DIALError: Error {
     case httpRequest(HTTPRequestError)
     case badContentResponse
 }
@@ -32,12 +32,12 @@ enum DIALError: Error {
 /// - running: The application is already running.
 /// - stopped: The application is stopped.
 /// - hidden: The application is hidden (not in foreground).
-enum DIALState: String {
+public enum DIALState: String {
     case running, stopped, hidden
 }
 
 /// The DIAL application informations.
-struct DIALApplicationInfo {
+public struct DIALApplicationInfo {
     
     /// The application name.
     public let name: String
@@ -57,12 +57,12 @@ struct DIALApplicationInfo {
 
 /// Extension to manage logs.
 extension DIALApplicationInfo: CustomDebugStringConvertible {
-    var debugDescription: String {
+    public var debugDescription: String {
         return "DIALApplicationInfo(app2appURL: \(String(describing: app2appURL)), state: \(state))"
     }
 }
 
-protocol DIALServiceProtocol {
+public protocol DIALServiceProtocol {
     
     func info(ofApplication name: String, completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> Void)
     

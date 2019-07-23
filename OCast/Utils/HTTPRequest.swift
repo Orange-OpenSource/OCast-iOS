@@ -44,7 +44,7 @@ extension URLSession: URLSessionProtocol {
 /// Extends URLSessionDataTask to adopt URLSessionDataTaskProtocol
 extension URLSessionDataTask: URLSessionDataTaskProtocol {}
 
-enum HTTPRequestError: Error {
+public enum HTTPRequestError: Error {
     case badURL
     case failed(String)
     case badCode(Int)

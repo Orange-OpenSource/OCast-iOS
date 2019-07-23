@@ -20,7 +20,7 @@ import Foundation
 import Starscream
 
 /// Protocol for responding to web socket events.
-protocol WebSocketDelegate: class {
+public protocol WebSocketDelegate: class {
     
     /// Tells the delegate that the web socket is connected.
     ///
@@ -48,12 +48,12 @@ protocol WebSocketDelegate: class {
 ///
 /// - notConnected: The web socket is not connected.
 /// - maximumPayloadReached: The payload is too long.
-enum WebSocketSendError: Error {
+public enum WebSocketSendError: Error {
     case notConnected, maximumPayloadReached
 }
 
 /// Protocol to abstract the web socket behavior.
-protocol WebSocketProtocol {
+public protocol WebSocketProtocol {
     
     /// The delegate.
     var delegate: WebSocketDelegate? { get set }
