@@ -19,14 +19,14 @@
 import Foundation
 
 /// Protocol to represent an URLSession.
-protocol URLSessionProtocol {
+public protocol URLSessionProtocol {
     
     func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol
     func finishTasksAndInvalidate()
 }
 
 /// Protocol to represent an URLSessionDataTask.
-protocol URLSessionDataTaskProtocol {
+public protocol URLSessionDataTaskProtocol {
     
     func resume()
 }
@@ -34,7 +34,7 @@ protocol URLSessionDataTaskProtocol {
 /// Extends URLSession to adopt URLSesionProtocol.
 extension URLSession: URLSessionProtocol {
     
-    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
+    public func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
         return (dataTask(with: request, completionHandler: completionHandler) as URLSessionDataTask) as URLSessionDataTaskProtocol
     }
 }

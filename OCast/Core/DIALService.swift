@@ -72,7 +72,7 @@ public protocol DIALServiceProtocol {
 }
 
 /// Class to manage DIAL requests.
-class DIALService: DIALServiceProtocol {
+public class DIALService: DIALServiceProtocol {
     
     /// The base URL.
     private let baseURL: String
@@ -97,7 +97,7 @@ class DIALService: DIALServiceProtocol {
         return "\(baseURL)/\(applicationName)"
     }
     
-    // MARK: - Internal methods
+    // MARK: - Public methods
     
     /// Retrieves the application information
     ///
@@ -105,7 +105,7 @@ class DIALService: DIALServiceProtocol {
     ///   - name: The application name to query.
     ///   - completion: The completion block called when the action completes.
     /// If the `DIALError` is nil, the information were successfully retrieved and are described in `DIALApplicationInfo` parameter.
-    func info(ofApplication name: String, completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> Void) {
+    public func info(ofApplication name: String, completion: @escaping (Result<DIALApplicationInfo, DIALError>) -> Void) {
         HTTPRequest.launch(urlSession: urlSession, method: .GET, url: applicationURL(from: name)) { result in
             switch result {
             case .failure(let httpError):
@@ -137,7 +137,7 @@ class DIALService: DIALServiceProtocol {
     ///   - name: The application name to start.
     ///   - completion: The completion block called when the action completes.
     /// If the `DIALError` is nil, the application was successfully started.
-    func start(application name: String, completion: @escaping (Result<Void, DIALError>) -> Void) {
+    public func start(application name: String, completion: @escaping (Result<Void, DIALError>) -> Void) {
         HTTPRequest.launch(urlSession: urlSession, method: .POST, url: applicationURL(from: name), successCode: 201) { result in
             switch result {
             case .failure(let httpError):
@@ -154,7 +154,7 @@ class DIALService: DIALServiceProtocol {
     ///   - name: The application name to stop.
     ///   - completion: The completion block called when the action completes.
     /// If the `DIALError` is nil, the application was successfully stopped.
-    func stop(application name: String, completion: @escaping (Result<Void, DIALError>) -> Void) {
+    public func stop(application name: String, completion: @escaping (Result<Void, DIALError>) -> Void) {
         info(ofApplication: name) { [weak self] result in
             guard let `self` = self else { return }
             

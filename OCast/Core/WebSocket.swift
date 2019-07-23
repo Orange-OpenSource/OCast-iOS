@@ -81,7 +81,7 @@ public protocol WebSocketProtocol {
     func send(_ message: String) -> Result<Void, WebSocketSendError>
 }
 
-class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.WebSocketPongDelegate {
+public class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.WebSocketPongDelegate {
     
     /// The websocket to manage the connection.
     private var socket: Starscream.WebSocket?
@@ -110,16 +110,16 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
         return socket.isConnected
     }
     
-    init(delegateQueue: DispatchQueue = DispatchQueue.main) {
+    public init(delegateQueue: DispatchQueue = DispatchQueue.main) {
         self.delegateQueue = delegateQueue
     }
     
     // MARK: - WebSocketProtocol properties & methods
     
-    weak var delegate: WebSocketDelegate?
+    weak public var delegate: WebSocketDelegate?
     
     @discardableResult
-    func connect(url: URL, sslConfiguration: SSLConfiguration?) -> Bool {
+    public func connect(url: URL, sslConfiguration: SSLConfiguration?) -> Bool {
         guard !isConnected else { return false }
         
         if socket?.currentURL != url {
@@ -141,7 +141,7 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     }
     
     @discardableResult
-    func disconnect() -> Bool {
+    public func disconnect() -> Bool {
         guard isConnected else { return false }
         
         stopPingPongTimer()
@@ -151,7 +151,7 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     }
     
     @discardableResult
-    func send(_ message: String) -> Result<Void, WebSocketSendError> {
+    public func send(_ message: String) -> Result<Void, WebSocketSendError> {
         guard isConnected else { return .failure(.notConnected) }
         guard message.count <= maxPayloadSize else { return .failure(.maximumPayloadReached) }
         
@@ -222,19 +222,19 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     
     // MARK: - WebSocketDelegate methods
     
-    func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
+    public func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
         delegate?.websocket(self, didReceiveMessage: text)
     }
     
-    func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
+    public func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
     }
     
-    func websocketDidConnect(socket: WebSocketClient) {
+    public func websocketDidConnect(socket: WebSocketClient) {
         delegate?.websocket(self, didConnectTo: self.socket?.currentURL)
         DispatchQueue.main.async { self.startPingPongTimer() }
     }
     
-    func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
+    public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         DispatchQueue.main.async { self.stopPingPongTimer() }
         
         var socketError = error
@@ -246,7 +246,7 @@ class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.Web
     
     // MARK: - WebSocketPongDelegate methods
     
-    func websocketDidReceivePong(socket: WebSocketClient, data: Data?) {
+    public func websocketDidReceivePong(socket: WebSocketClient, data: Data?) {
         DispatchQueue.main.async { self.pingPongTimerRetry = 0 }
     }
 }
