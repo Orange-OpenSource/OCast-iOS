@@ -101,7 +101,7 @@ public class Logger {
     ///   - file: The file.
     ///   - line: The line.
     ///   - function: The function.
-    func log(logLevel: LoggerLevel, _ message: @autoclosure () -> String, file: String = #file, line: Int = #line, function: String = #function) {
+    public func log(logLevel: LoggerLevel, _ message: @autoclosure () -> String, file: String = #file, line: Int = #line, function: String = #function) {
         if logLevel >= minimumLogLevel {
             logger.log(logLevel: logLevel, message(), file: file, line: line, function: function)
         }

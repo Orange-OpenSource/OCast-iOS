@@ -84,7 +84,7 @@ public enum OCastDomainName: String {
 /// - command: Command message.
 /// - reply: Reply message.
 /// - event: Event message.
-enum OCastDeviceLayerType: String, Codable {
+public enum OCastDeviceLayerType: String, Codable {
     case command, reply, event
 }
 
@@ -92,7 +92,7 @@ enum OCastDeviceLayerType: String, Codable {
 ///
 /// - ok: The command successed.
 /// - error: The command failed (with the string error).
-enum OCastStatusType: Codable, Equatable {
+public enum OCastStatusType: Codable, Equatable {
     case ok, error(String)
     
     public init(from decoder: Decoder) throws {
@@ -123,7 +123,7 @@ enum OCastStatusType: Codable, Equatable {
 }
 
 /// The OCast device layer.
-class OCastDeviceLayer<T: Codable>: OCastMessage {
+public class OCastDeviceLayer<T: Codable>: OCastMessage {
     
     /// The message identifier.
     public let id: Int
@@ -147,7 +147,7 @@ class OCastDeviceLayer<T: Codable>: OCastMessage {
         case source = "src", destination = "dst", id, status, type, message
     }
     
-    init(source: String, destination: String, id: Int, status: OCastStatusType?, type: OCastDeviceLayerType, message: OCastApplicationLayer<T>) {
+    public init(source: String, destination: String, id: Int, status: OCastStatusType?, type: OCastDeviceLayerType, message: OCastApplicationLayer<T>) {
         self.source = source
         self.destination = destination
         self.id = id
@@ -156,11 +156,11 @@ class OCastDeviceLayer<T: Codable>: OCastMessage {
         self.message = message
     }
     
-    convenience init(source: String, destination: String, id: Int, status: OCastStatusType?, type: OCastDeviceLayerType, service: String, name: String, params: T) {
+    public convenience init(source: String, destination: String, id: Int, status: OCastStatusType?, type: OCastDeviceLayerType, service: String, name: String, params: T) {
         self.init(source: source, destination: destination, id: id, status: status, type: type, service: service, name: name, params: params, options: nil)
     }
     
-    convenience init(source: String, destination: String, id: Int, status: OCastStatusType?, type: OCastDeviceLayerType, service: String, name: String, params: T, options: [String: Any]?) {
+    public convenience init(source: String, destination: String, id: Int, status: OCastStatusType?, type: OCastDeviceLayerType, service: String, name: String, params: T, options: [String: Any]?) {
         let reference = OCastDataLayer(name: name, params: params, options: options)
         let application = OCastApplicationLayer(service: service, data: reference)
         self.init(source: source, destination: destination, id: id, status: status, type: type, message: application)
