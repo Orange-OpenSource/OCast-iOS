@@ -220,7 +220,7 @@ public class OCastDataLayer<T: Codable>: OCastMessage {
 }
 
 /// The default response containing the code.
-class OCastDefaultResponseDataLayer: OCastMessage {
+public class OCastDefaultResponseDataLayer: OCastMessage {
     
     /// The code.
     public let code: Int?
