@@ -48,7 +48,7 @@
 }
 
 - (void)dealloc {
-    [self.device disconnect:nil];
+    [self.device disconnectWithCompletion:nil];
 }
 
 - (void)viewDidLoad {
@@ -172,7 +172,7 @@
 // MARK: - UI events methods
 
 - (IBAction)castButtonClicked:(id)sender {
-    MediaPrepareCommandParams * params = [[MediaPrepareCommandParams alloc] initWithUrl:OCastDemoMovieURLString
+    PrepareMediaCommandParams * params = [[PrepareMediaCommandParams alloc] initWithUrl:OCastDemoMovieURLString
                                                                               frequency:1
                                                                                   title:@"Movie Sample"
                                                                                subtitle:@"OCast"
@@ -277,7 +277,7 @@
 }
 
 - (void)applicationDidEnterBackground {
-    [self.device disconnect:nil];
+    [self.device disconnectWithCompletion:nil];
 }
 
 - (void)applicationWillEnterForeground {

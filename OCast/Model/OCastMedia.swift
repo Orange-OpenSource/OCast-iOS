@@ -254,7 +254,7 @@ public class MediaTrack: OCastMessage {
 /// The parameters to prepare a media.
 @objc
 @objcMembers
-public class MediaPrepareCommandParams: OCastMessage {
+public class PrepareMediaCommandParams: OCastMessage {
     
     //// The media URL to launch.
     public let url: String
@@ -295,7 +295,7 @@ public class MediaPrepareCommandParams: OCastMessage {
 /// The parameters to set a media track.
 @objc
 @objcMembers
-public class MediaTrackCommandParams: OCastMessage {
+public class SetMediaTrackCommandParams: OCastMessage {
     
     /// The track identifier.
     public let trackId: String
@@ -316,7 +316,7 @@ public class MediaTrackCommandParams: OCastMessage {
 /// The parameters to play a media.
 @objc
 @objcMembers
-public class MediaPlayCommandParams: OCastMessage {
+public class PlayMediaCommandParams: OCastMessage {
     
     /// The position in seconds.
     public let position: Double
@@ -329,22 +329,22 @@ public class MediaPlayCommandParams: OCastMessage {
 /// The parameters to stop a media.
 @objc
 @objcMembers
-public class MediaStopCommandParams: OCastMessage {}
+public class StopMediaCommandParams: OCastMessage {}
 
 /// The parameters to resume a media.
 @objc
 @objcMembers
-public class MediaResumeCommandParams: OCastMessage {}
+public class ResumeMediaCommandParams: OCastMessage {}
 
 /// The parameters to set the volume of a media
 @objc
 @objcMembers
-public class MediaVolumeCommandParams: OCastMessage {
+public class SetMediaVolumeCommandParams: OCastMessage {
     
     // The volume level between 0 and 1.
-    public let volume: Float
+    public let volume: Double
     
-    public init(volume: Float) {
+    public init(volume: Double) {
         self.volume = volume
     }
 }
@@ -352,12 +352,12 @@ public class MediaVolumeCommandParams: OCastMessage {
 /// The parameters to pause a media.
 @objc
 @objcMembers
-public class MediaPauseCommandParams: OCastMessage {}
+public class PauseMediaCommandParams: OCastMessage {}
 
 /// The parameters to seek a media.
 @objc
 @objcMembers
-public class MediaSeekCommandParams: OCastMessage {
+public class SeekMediaCommandParams: OCastMessage {
     
     // The position which to seek in seconds.
     public let position: Double
@@ -380,7 +380,7 @@ public class MediaMetadataCommandParams: OCastMessage {}
 /// The parameters to mute a media.
 @objc
 @objcMembers
-public class MediaMuteCommandParams: OCastMessage {
+public class MuteMediaCommandParams: OCastMessage {
     
     /// `true`to mute the media, `false` to unmute it.
     public let mute: Bool

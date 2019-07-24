@@ -39,7 +39,11 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     public private(set) var upnpID: String
     
+    public private(set) var host: String
+    
     public private(set) var friendlyName: String
+    
+    public private(set) var modelName: String
     
     public var manufacturer: String
     
@@ -124,12 +128,14 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     ///   - connectionEventTimeout: The timeout for waiting the connection event.
     public init(upnpDevice: UPNPDevice, webSocket: WebSocketProtocol, dialService: DIALServiceProtocol, connectionEventTimeout: TimeInterval) {
         upnpID = upnpDevice.deviceID
+        host = upnpDevice.dialURL.host ?? ""
         friendlyName = upnpDevice.friendlyName
+        modelName = upnpDevice.modelName
         manufacturer = upnpDevice.manufacturer
         self.webSocket = webSocket
         self.dialService = dialService
         self.connectionEventTimeout = connectionEventTimeout
-        let defaultSettingsWebSocketURL = "wss://\(upnpDevice.dialURL.host ?? ""):4433/ocast"
+        let defaultSettingsWebSocketURL = "wss://\(host):4433/ocast"
         #if TEST
         settingsWebSocketURL = ProcessInfo.processInfo.environment["SETTINGSWEBSOCKET"] ?? defaultSettingsWebSocketURL
         #else
@@ -173,7 +179,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    public func disconnect(_ completion: NoResultHandler?) {
+    public func disconnect(completion: NoResultHandler?) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .disconnected {
             completion?(error)
@@ -185,7 +191,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         webSocket.disconnect()
     }
     
-    public func startApplication(_ completion: @escaping NoResultHandler) {
+    public func startApplication(completion: @escaping NoResultHandler) {
         guard let applicationName = applicationName else {
             completion(OCastError.applicationNameNotSet)
             return
@@ -217,7 +223,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         })
     }
     
-    public func stopApplication(_ completion: @escaping NoResultHandler) {
+    public func stopApplication(completion: @escaping NoResultHandler) {
         guard let applicationName = applicationName else {
             completion(OCastError.applicationNameNotSet)
             return

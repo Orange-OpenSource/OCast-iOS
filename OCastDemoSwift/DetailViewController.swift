@@ -160,7 +160,7 @@ class DetailViewController: UIViewController {
     // MARK: - UI events methods
     
     @IBAction func castButtonClicked(_ sender: Any) {
-        let params = MediaPrepareCommandParams(url: OCastDemoMovieURLString,
+        let params = PrepareMediaCommandParams(url: OCastDemoMovieURLString,
                                                frequency: 1,
                                                title: "Movie Sample",
                                                subtitle: "OCast",
@@ -230,7 +230,7 @@ class DetailViewController: UIViewController {
         ensureConnected { [weak self] connected in
             guard let `self` = self else { return }
             if connected {
-                self.device.setMediaVolume(self.volumeSlider.value, completion: { error in
+                self.device.setMediaVolume(Double(self.volumeSlider.value), completion: { error in
                     if let error = error {
                         self.show(error)
                     }

@@ -18,7 +18,7 @@
 
 import Foundation
 
-/// Describes the device state.
+/// The device states.
 ///
 /// - disconnected: The device is disconnected.
 /// - connecting: The device is connecting.
@@ -53,8 +53,14 @@ public protocol Device {
     /// The UPNP device ID.
     var upnpID: String { get }
     
+    /// The host or the IP address.
+    var host: String { get }
+    
     /// The device name.
     var friendlyName: String { get }
+    
+    /// The model name.
+    var modelName: String { get }
     
     /// The device state.
     var state: DeviceState { get }
@@ -77,7 +83,7 @@ public protocol Device {
     /// Connects to the device.
     ///
     /// - Parameters:
-    ///   - sslConfiguration: The `SSLConfiguration` to parameter certificates if you use a secure websocket.
+    ///   - sslConfiguration: The `SSLConfiguration` parameter certificates if you use a secure websocket.
     ///   - completion: The completion block called when the connection is finished.
     /// If the error is nil, the device is connected with success.
     func connect(_ sslConfiguration: SSLConfiguration?, completion: @escaping NoResultHandler)
@@ -86,7 +92,7 @@ public protocol Device {
     ///
     /// - Parameter completion: The completion block called when the disconnection is finished.
     /// If the error is nil, the device is disconnected with success.
-    func disconnect(_ completion: NoResultHandler?)
+    func disconnect(completion: NoResultHandler?)
         
     // MARK: - Application methods
     
@@ -94,13 +100,13 @@ public protocol Device {
     ///
     /// - Parameter completion: The completion block called when the action completes.
     /// If the error is nil, the application is started.
-    func startApplication(_ completion: @escaping NoResultHandler)
+    func startApplication(completion: @escaping NoResultHandler)
     
     /// Stops the application identified by `applicationName`.
     ///
     /// - Parameter completion: The completion block called when the action completes.
     /// If the error is nil, the application is stopped.
-    func stopApplication(_ completion: @escaping NoResultHandler)
+    func stopApplication(completion: @escaping NoResultHandler)
     
     // MARK: - Events methods
     
@@ -116,19 +122,19 @@ public protocol Device {
     /// Prepares to play a media.
     ///
     /// - Parameters:
-    ///   - params: The prepare parameters. See `MediaPrepareCommandParams`.
+    ///   - params: The prepare parameters. See `PrepareMediaCommandParams`.
     ///   - options: The options (metadata, ...).
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the media was successfully prepared.
-    func prepareMedia(_ params: MediaPrepareCommandParams, withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
+    func prepareMedia(_ params: PrepareMediaCommandParams, withOptions options: [String: Any]?, completion: @escaping NoResultHandler)
     
     /// Sets a specific track.
     ///
     /// - Parameters:
-    ///   - params: The track parameters. See `MediaTrackCommandParams`.
+    ///   - params: The track parameters. See `SetMediaTrackCommandParams`.
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the track was successfully set.
-    func setMediaTrack(_ params: MediaTrackCommandParams, completion: @escaping NoResultHandler)
+    func setMediaTrack(_ params: SetMediaTrackCommandParams, completion: @escaping NoResultHandler)
     
     /// Plays a media at a specific position.
     ///
@@ -158,7 +164,7 @@ public protocol Device {
     ///   - volume: The volume level between 0 and 1.
     ///   - completion:  The completion block called when the action completes.
     /// If the error is nil, the volume was successfully set.
-    func setMediaVolume(_ volume: Float, completion: @escaping NoResultHandler)
+    func setMediaVolume(_ volume: Double, completion: @escaping NoResultHandler)
     
     /// Pauses the current media.
     ///
@@ -203,39 +209,39 @@ public protocol Device {
     ///
     /// - Parameter completion: The completion block called when the action completes.
     /// If the error is nil, the update status was successfully retrieved and is described in `UpdateStatus` parameter.
-    func updateStatus(_ completion: @escaping ResultHandler<UpdateStatus>)
+    func updateStatus(completion: @escaping ResultHandler<UpdateStatus>)
     
     /// Retrieves the device identifier.
     ///
     /// - Parameter completion: The completion block called when the action completes.
     /// If the error is nil, the device id was successfully retrieved and is described in `String` parameter.
-    func deviceID(_ completion: @escaping ResultHandler<String>)
+    func deviceID(completion: @escaping ResultHandler<String>)
     
     // MARK: - Settings input methods
     
     /// Sends a key event.
     ///
     /// - Parameters:
-    ///   - params: The key event parameters. See `KeyEventCommandParams`.
+    ///   - params: The key event parameters. See `SendKeyEventCommandParams`.
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the key event was successfully sent.
-    func sendKeyEvent(_ params: KeyEventCommandParams, completion: @escaping NoResultHandler)
+    func sendKeyEvent(_ params: SendKeyEventCommandParams, completion: @escaping NoResultHandler)
     
     /// Sends a mouse event.
     ///
     /// - Parameters:
-    ///   - params: The mouse event parameters. See `MouseEventCommandParams`.
+    ///   - params: The mouse event parameters. See `SendMouseEventCommandParams`.
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the mouse event was successfully sent.
-    func sendMouseEvent(_ params: MouseEventCommandParams, completion: @escaping NoResultHandler)
+    func sendMouseEvent(_ params: SendMouseEventCommandParams, completion: @escaping NoResultHandler)
     
     /// Sends a gamepad event.
     ///
     /// - Parameters:
-    ///   - params: The gamepad event parameters. See `GamepadEventCommandParams`.
+    ///   - params: The gamepad event parameters. See `SendGamepadEventCommandParams`.
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the gamepad event was successfully sent.
-    func sendGamepadEvent(_ params: GamepadEventCommandParams, completion: @escaping NoResultHandler)
+    func sendGamepadEvent(_ params: SendGamepadEventCommandParams, completion: @escaping NoResultHandler)
 }
 
 /// Extension to send custom commands.
@@ -253,7 +259,7 @@ public protocol SenderDevice {
     /// Sends a message with a response to a specified domain.
     ///
     /// - Parameters:
-    ///   - message: The message to send
+    ///   - message: The message to send.
     ///   - domain: The domain.
     ///   - completion: The completion block called when the action completes.
     /// If the error is nil, the message was successfully sent and is described in `U` parameter.
@@ -263,11 +269,11 @@ public protocol SenderDevice {
 /// Extension to manage default parameter values (forbidden in a protocol).
 public extension Device {
     
-    func disconnect(_ completion: NoResultHandler? = nil) {
-        disconnect(completion)
+    func disconnect(completion: NoResultHandler? = nil) {
+        disconnect(completion: completion)
     }
     
-    func prepareMedia(_ params: MediaPrepareCommandParams, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+    func prepareMedia(_ params: PrepareMediaCommandParams, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
         prepareMedia(params, withOptions: options, completion: completion)
     }
 }

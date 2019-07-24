@@ -54,43 +54,43 @@ extension ReferenceDevice {
         send(message, completion: completionBlock)
     }
     
-    public func prepareMedia(_ params: MediaPrepareCommandParams, withOptions options: [String: Any]? = nil, completion: @escaping NoResultHandler) {
+    public func prepareMedia(_ params: PrepareMediaCommandParams, withOptions options: [String: Any]?, completion: @escaping NoResultHandler) {
         let data = OCastDataLayer(name: "prepare", params: params, options: options)
         sendMediaMessage(from: data, completion: completion)
     }
     
-    public func setMediaTrack(_ params: MediaTrackCommandParams, completion: @escaping NoResultHandler) {
+    public func setMediaTrack(_ params: SetMediaTrackCommandParams, completion: @escaping NoResultHandler) {
         let data = OCastDataLayer(name: "track", params: params, options: nil)
         sendMediaMessage(from: data, completion: completion)
     }
     
     public func playMedia(at position: Double, completion: @escaping NoResultHandler) {
-        let data = OCastDataLayer(name: "play", params: MediaPlayCommandParams(position: position), options: nil)
+        let data = OCastDataLayer(name: "play", params: PlayMediaCommandParams(position: position), options: nil)
         sendMediaMessage(from: data, completion: completion)
     }
     
     public func stopMedia(completion: @escaping NoResultHandler) {
-        let data = OCastDataLayer(name: "stop", params: MediaStopCommandParams(), options: nil)
+        let data = OCastDataLayer(name: "stop", params: StopMediaCommandParams(), options: nil)
         sendMediaMessage(from: data, completion: completion)
     }
     
     public func resumeMedia(completion: @escaping NoResultHandler) {
-        let data = OCastDataLayer(name: "resume", params: MediaResumeCommandParams(), options: nil)
+        let data = OCastDataLayer(name: "resume", params: ResumeMediaCommandParams(), options: nil)
         sendMediaMessage(from: data, completion: completion)
     }
     
-    public func setMediaVolume(_ volume: Float, completion: @escaping NoResultHandler) {
-        let data = OCastDataLayer(name: "volume", params: MediaVolumeCommandParams(volume: volume), options: nil)
+    public func setMediaVolume(_ volume: Double, completion: @escaping NoResultHandler) {
+        let data = OCastDataLayer(name: "volume", params: SetMediaVolumeCommandParams(volume: volume), options: nil)
         sendMediaMessage(from: data, completion: completion)
     }
     
     public func pauseMedia(completion: @escaping NoResultHandler) {
-        let data = OCastDataLayer(name: "pause", params: MediaPauseCommandParams(), options: nil)
+        let data = OCastDataLayer(name: "pause", params: PauseMediaCommandParams(), options: nil)
         sendMediaMessage(from: data, completion: completion)
     }
     
     public func seekMedia(to position: Double, completion: @escaping NoResultHandler) {
-        let data = OCastDataLayer(name: "seek", params: MediaSeekCommandParams(position: position), options: nil)
+        let data = OCastDataLayer(name: "seek", params: SeekMediaCommandParams(position: position), options: nil)
         sendMediaMessage(from: data, completion: completion)
     }
     
@@ -105,7 +105,7 @@ extension ReferenceDevice {
     }
     
     public func muteMedia(_ flag: Bool, completion: @escaping NoResultHandler) {
-        let data = OCastDataLayer(name: "mute", params: MediaMuteCommandParams(mute: flag), options: nil)
+        let data = OCastDataLayer(name: "mute", params: MuteMediaCommandParams(mute: flag), options: nil)
         sendMediaMessage(from: data, completion: completion)
     }
     
@@ -129,12 +129,12 @@ extension ReferenceDevice {
         send(message, on: OCastDomainName.settings, completion: completionBlock)
     }
     
-    public func updateStatus(_ completion: @escaping ResultHandler<UpdateStatus>) {
+    public func updateStatus(completion: @escaping ResultHandler<UpdateStatus>) {
         let data = OCastDataLayer(name: "getUpdateStatus", params: UpdateStatusCommandParams())
         sendDeviceSettingsMessage(from: data, completion: completion)
     }
     
-    public func deviceID(_ completion: @escaping ResultHandler<String>) {
+    public func deviceID(completion: @escaping ResultHandler<String>) {
         let data = OCastDataLayer(name: "getDeviceID", params: DeviceIDCommandParams())
         let completionBlock: ResultHandler<DeviceID> = { result, error in
             completion(result?.id, error)
@@ -144,19 +144,19 @@ extension ReferenceDevice {
     
     // MARK: - Input settings methods
     
-    public func sendKeyEvent(_ params: KeyEventCommandParams, completion: @escaping NoResultHandler) {
+    public func sendKeyEvent(_ params: SendKeyEventCommandParams, completion: @escaping NoResultHandler) {
         let data = OCastDataLayer(name: "keyPressed", params: params)
         let message = OCastApplicationLayer(service: OCastInputSettingsServiceName, data: data)
         send(message, on: OCastDomainName.settings, completion: completion)
     }
     
-    public func sendMouseEvent(_ params: MouseEventCommandParams, completion: @escaping NoResultHandler) {
+    public func sendMouseEvent(_ params: SendMouseEventCommandParams, completion: @escaping NoResultHandler) {
         let data = OCastDataLayer(name: "mouseEvent", params: params)
         let message = OCastApplicationLayer(service: OCastInputSettingsServiceName, data: data)
         send(message, on: OCastDomainName.settings, completion: completion)
     }
     
-    public func sendGamepadEvent(_ params: GamepadEventCommandParams, completion: @escaping NoResultHandler) {
+    public func sendGamepadEvent(_ params: SendGamepadEventCommandParams, completion: @escaping NoResultHandler) {
         let data = OCastDataLayer(name: "gamepadEvent", params: params)
         let message = OCastApplicationLayer(service: OCastInputSettingsServiceName, data: data)
         send(message, on: OCastDomainName.settings, completion: completion)

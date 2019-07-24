@@ -134,7 +134,7 @@ public enum DOMKeyLocation: Int, Codable {
 /// The parameters to send a key event.
 @objc
 @objcMembers
-public class KeyEventCommandParams: OCastMessage {
+public class SendKeyEventCommandParams: OCastMessage {
     
     /// The key value.
     public let key: String
@@ -161,7 +161,7 @@ public class KeyEventCommandParams: OCastMessage {
 /// The parameters to send a mouse event.
 @objc
 @objcMembers
-public class MouseEventCommandParams: OCastMessage {
+public class SendMouseEventCommandParams: OCastMessage {
     
     /// The x coordinate of the mouse pointer in local coordinates.
     public let x: Int
@@ -178,7 +178,7 @@ public class MouseEventCommandParams: OCastMessage {
 /// The parameters to send a gamepad event.
 @objc
 @objcMembers
-public class GamepadEventCommandParams: OCastMessage {
+public class SendGamepadEventCommandParams: OCastMessage {
     
     /// The axes.
     public let axes: [GamepadAxes]

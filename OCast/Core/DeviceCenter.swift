@@ -25,14 +25,14 @@ import Foundation
     ///
     /// - Parameters:
     ///   - center: The device center informing the delegate.
-    ///   - devices: The new device found.
+    ///   - devices: The new devices found.
     func center(_ center: DeviceCenter, didAdd devices: [Device])
     
     /// Tells the delegate that devices are lost.
     ///
     /// - Parameters:
     ///   - center: The device center informing the delegate.
-    ///   - devices: The device lost.
+    ///   - devices: The devices lost.
     func center(_ center: DeviceCenter, didRemove devices: [Device])
     
     /// Tells the delegate that the discovery is stopped. All the devices are removed.
@@ -76,10 +76,10 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         return Array(discoveredDevices.values)
     }
     
-    /// Registers a driver to discover devices of its manufacturer.
+    /// Registers a device type to discover devices of its manufacturer.
     ///
     /// - Parameters:
-    ///   - deviceType: The Type of the driver class to register (for example ReferenceDevice.self)
+    ///   - deviceType: The Type of the device class to register (for example ReferenceDevice.self)
     ///   - manufacturer: The device manufacturer used to identify it during the discovery.
     public func registerDevice(_ deviceType: Device.Type, forManufacturer manufacturer: String) {
         registeredDevices[manufacturer] = deviceType
@@ -87,9 +87,9 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     }
     
     /// Resumes the discovery process to found devices on the local network.
-    /// When a new devices are found the `DeviceCenterAddDevicesNotification` notification
+    /// When a new devices are found the `deviceCenterAddDevicesNotification` notification
     /// and the `center(_:didAdd:)` method are trigerred.
-    /// When devices are lost the `DeviceCenterRemoveDevicesNotification` notification
+    /// When devices are lost the `deviceCenterRemoveDevicesNotification` notification
     /// and the `center(_:didRemove:)` method are trigerred.
     ///
     /// - Returns: `true` if the discovery is correctly started, otherwise `false`.
@@ -104,7 +104,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         return deviceDiscovery?.resume() ?? false
     }
     
-    /// Stops to discovery process. The devices are removed so the `DeviceCenterRemoveDevicesNotification`
+    /// Stops to discovery process. The devices are removed so the `deviceCenterRemoveDevicesNotification`
     /// notification and the `center(_:didRemove:)` method will be triggered.
     /// This method will alse trigger the `deviceCenterDiscoveryErrorNotification` notification
     /// and the `deviceDiscoveryDidStop(_:withError:)` method.
@@ -142,7 +142,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
             delegate?.center(self, didAdd: newDevices)
             NotificationCenter.default.post(name: .deviceCenterAddDevicesNotification,
                                             object: self,
-                                            userInfo: [DeviceCenterUserInfoKey.deviceCenterDevicesUserInfoKey: newDevices])
+                                            userInfo: [DeviceCenterUserInfoKey.devicesUserInfoKey: newDevices])
         }
     }
     
@@ -152,7 +152,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         delegate?.center(self, didRemove: removedDevices)
         NotificationCenter.default.post(name: .deviceCenterRemoveDevicesNotification,
                                         object: self,
-                                        userInfo: [DeviceCenterUserInfoKey.deviceCenterDevicesUserInfoKey: removedDevices])
+                                        userInfo: [DeviceCenterUserInfoKey.devicesUserInfoKey: removedDevices])
     }
     
     func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, with error: Error?) {
@@ -160,7 +160,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         
         var userInfo: [String: Any]?
         if let error = error {
-            userInfo = [DeviceCenterUserInfoKey.deviceCenterErrorUserInfoKey: error]
+            userInfo = [DeviceCenterUserInfoKey.errorUserInfoKey: error]
         }
         NotificationCenter.default.post(name: .deviceCenterDiscoveryErrorNotification,
                                         object: self,
