@@ -9,3 +9,6 @@ Originally created by Robbie Hanson
 Updated and maintained by Deusty LLC and the Apple development community.
 Licensed under the BSD license
 
+AnyCodable/DynamicCodable - https://github.com/levantAJ/AnyCodable
+Copyright (c) 2019 levantAJ.
+MIT License
