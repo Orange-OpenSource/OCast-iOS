@@ -1,4 +1,8 @@
 //
+// DIALService.swift
+//
+// Copyright 2019 Orange
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -9,11 +13,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-//
-//  DIALService.swift
-//  OCast
-//
-//  Created by Christophe Azemar on 12/12/2018.
+// limitations under the License.
 //
 
 import Foundation
@@ -46,7 +46,7 @@ public struct DIALApplicationInfo {
     public let state: DIALState
     
     /// The OCast websocket URL.
-    public let app2appURL: String?
+    public let webSocketURL: String?
     
     /// The OCast version.
     public let version: String?
@@ -58,7 +58,7 @@ public struct DIALApplicationInfo {
 /// Extension to manage logs.
 extension DIALApplicationInfo: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "DIALApplicationInfo(app2appURL: \(String(describing: app2appURL)), state: \(state))"
+        return "DIALApplicationInfo(webSocketURL: \(String(describing: webSocketURL)), state: \(state))"
     }
 }
 
@@ -125,7 +125,7 @@ public class DIALService: DIALServiceProtocol {
                 let version = element["additionalData"]?["ocast:X_OCAST_Version"]?.value
                 let runLink = element["link"]?.attributes?["href"]
                 
-                let info = DIALApplicationInfo(name: appName, state: state, app2appURL: app2app, version: version, runLink: runLink)
+                let info = DIALApplicationInfo(name: appName, state: state, webSocketURL: app2app, version: version, runLink: runLink)
                 DispatchQueue.main.async { completion(.success(info)) }
             }
         }

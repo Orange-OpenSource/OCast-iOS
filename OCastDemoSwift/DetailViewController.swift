@@ -19,7 +19,7 @@ import OCast
 import UIKit
 
 class DetailViewController: UIViewController {
-
+    
     @IBOutlet weak var castButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
     @IBOutlet weak var pauseResumeButton: UIButton!
@@ -118,7 +118,7 @@ class DetailViewController: UIViewController {
     private func updatePlaybackStatus() {
         ensureConnected { [weak self] connected in
             if connected {
-                self?.device.playbackStatus(completion: { playbackStatus, _ in
+                self?.device.mediaPlaybackStatus(completion: { playbackStatus, _ in
                     self?.currentPlaybackStatus = playbackStatus
                 })
             }
@@ -160,17 +160,17 @@ class DetailViewController: UIViewController {
     // MARK: - UI events methods
     
     @IBAction func castButtonClicked(_ sender: Any) {
-        let mediaPrepareCommand = MediaPrepareCommand(url: OCastDemoMovieURLString,
-                                                      frequency: 1,
-                                                      title: "Movie Sample",
-                                                      subtitle: "OCast",
-                                                      logo: "",
-                                                      mediaType: .video,
-                                                      transferMode: .buffered,
-                                                      autoPlay: true)
+        let params = PrepareMediaCommandParams(url: OCastDemoMovieURLString,
+                                               frequency: 1,
+                                               title: "Movie Sample",
+                                               subtitle: "OCast",
+                                               logo: "",
+                                               mediaType: .video,
+                                               transferMode: .buffered,
+                                               autoPlay: true)
         ensureConnected { [weak self] connected in
             if connected {
-                self?.device.prepare(mediaPrepareCommand, completion: { error in
+                self?.device.prepareMedia(params, completion: { error in
                     if let error = error {
                         self?.show(error)
                     }
@@ -182,7 +182,7 @@ class DetailViewController: UIViewController {
     @IBAction func stopButtonClicked(_ sender: Any) {
         ensureConnected { [weak self] connected in
             if connected {
-                self?.device.stop(completion: { error in
+                self?.device.stopMedia(completion: { error in
                     if let error = error {
                         self?.show(error)
                     }
@@ -195,13 +195,13 @@ class DetailViewController: UIViewController {
         ensureConnected { [weak self] connected in
             if connected {
                 if self?.currentPlaybackStatus?.state == .paused {
-                    self?.device.resume(completion: { error in
+                    self?.device.resumeMedia(completion: { error in
                         if let error = error {
                             self?.show(error)
                         }
                     })
                 } else {
-                    self?.device.pause(completion: { error in
+                    self?.device.pauseMedia(completion: { error in
                         if let error = error {
                             self?.show(error)
                         }
@@ -218,7 +218,7 @@ class DetailViewController: UIViewController {
             guard let `self` = self else { return }
             if connected {
                 let position = Double(self.progressionSlider.value) * currentPlaybackStatus.duration
-                self.device.seek(to: position, completion: { error in
+                self.device.seekMedia(to: position, completion: { error in
                     if let error = error {
                         self.show(error)
                     }
@@ -230,7 +230,7 @@ class DetailViewController: UIViewController {
         ensureConnected { [weak self] connected in
             guard let `self` = self else { return }
             if connected {
-                self.device.setVolume(self.volumeSlider.value, completion: { error in
+                self.device.setMediaVolume(Double(self.volumeSlider.value), completion: { error in
                     if let error = error {
                         self.show(error)
                     }
@@ -242,7 +242,7 @@ class DetailViewController: UIViewController {
     @IBAction func metadataButtonClicked(_ sender: Any) {
         ensureConnected { [weak self] connected in
             if connected {
-                self?.device.metadata(completion: { metadata, error in
+                self?.device.mediaMetadata(completion: { metadata, error in
                     if let error = error {
                         self?.show(error)
                     } else if let metadata = metadata {

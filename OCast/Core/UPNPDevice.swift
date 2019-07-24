@@ -21,14 +21,8 @@ import Foundation
 /// Class to represent a device found on the local network.
 @objc public final class UPNPDevice: NSObject {
     
-    /// The base URL of the device.
-    public let baseURL: URL
-    
-    /// The IP address.
-    public let ipAddress: String
-    
-    /// The service port.
-    public let servicePort: UInt16
+    /// The DIAL URL.
+    public let dialURL: URL
     
     /// The unique device ID (aka USN).
     public let deviceID: String
@@ -42,10 +36,8 @@ import Foundation
     /// The model name.
     public let modelName: String
     
-    init(baseURL: URL, ipAddress: String, servicePort: UInt16, deviceID: String, friendlyName: String, manufacturer: String, modelName: String) {
-        self.baseURL = baseURL
-        self.ipAddress = ipAddress
-        self.servicePort = servicePort
+    init(dialURL: URL, deviceID: String, friendlyName: String, manufacturer: String, modelName: String) {
+        self.dialURL = dialURL
         self.deviceID = deviceID
         self.friendlyName = friendlyName
         self.manufacturer = manufacturer

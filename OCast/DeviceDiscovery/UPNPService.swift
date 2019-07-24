@@ -110,7 +110,6 @@ class UPNPService: UPNPServiceProtocol {
         guard let data = data,
             let applicationURLString = applicationURL(fromHttpHeaders: httpHeaders),
             let applicationURL = URL(string: applicationURLString),
-            let ipAddress = applicationURL.host,
             let xmlRootElement = XMLReader().parse(data: data),
             let xmlDeviceElement = xmlRootElement["root"]?["device"],
             let friendlyName = xmlDeviceElement["friendlyName"]?.value,
@@ -118,9 +117,7 @@ class UPNPService: UPNPServiceProtocol {
             let modelName = xmlDeviceElement["modelName"]?.value,
             let UDN = xmlDeviceElement["UDN"]?.value else { return nil }
         
-        return UPNPDevice(baseURL: applicationURL,
-                          ipAddress: ipAddress,
-                          servicePort: UInt16(applicationURL.port ?? 80),
+        return UPNPDevice(dialURL: applicationURL,
                           deviceID: UPNPService.extractUUID(from: UDN) ?? UDN,
                           friendlyName: friendlyName,
                           manufacturer: manufacturer,

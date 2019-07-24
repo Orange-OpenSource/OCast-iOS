@@ -90,7 +90,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
     // The delegate to receive the device discovery events.
     weak var delegate: DeviceDiscoveryDelegate?
     
-    /// The devices discovered on the network
+    /// The devices discovered on the network.
     var devices: [UPNPDevice] {
         return Array(discoveredDevices.values)
     }

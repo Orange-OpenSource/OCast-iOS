@@ -1,4 +1,6 @@
 //
+// ReferenceDevice.swift
+//
 // Copyright 2019 Orange
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,12 +13,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-//
-//  ReferenceDevice.swift
-//  OCast
-//
-//  Created by Christophe Azemar on 09/05/2019.
-//  Copyright © 2019 Orange. All rights reserved.
+// limitations under the License.
 //
 
 import Foundation
@@ -40,9 +37,13 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    public private(set) var ipAddress: String
+    public private(set) var upnpID: String
+    
+    public private(set) var host: String
     
     public private(set) var friendlyName: String
+    
+    public private(set) var modelName: String
     
     public var manufacturer: String
     
@@ -62,14 +63,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     private var isApplicationRunning = SynchronizedValue(false)
     
     /// The settings web socket URL.
-    private var settingsWebSocketURL: String {
-        let defaultSettingsWebSocketURL = "wss://\(ipAddress):4433/ocast"
-        #if TEST
-        return ProcessInfo.processInfo.environment["SETTINGSWEBSOCKET"] ?? defaultSettingsWebSocketURL
-        #else
-        return defaultSettingsWebSocketURL
-        #endif
-    }
+    private let settingsWebSocketURL: String
     
     /// The connection handler to trigger when the connected is ended.
     private var connectionHandler: NoResultHandler?
@@ -121,7 +115,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     public required convenience init(upnpDevice: UPNPDevice) {
         self.init(upnpDevice: upnpDevice,
                   webSocket: WebSocket(delegateQueue: DispatchQueue(label: "org.ocast.websocket")),
-                  dialService: DIALService(forURL: upnpDevice.baseURL.absoluteString),
+                  dialService: DIALService(forURL: upnpDevice.dialURL.absoluteString),
                   connectionEventTimeout: 60.0)
     }
     
@@ -133,12 +127,20 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     ///   - dialService: The DIAL service to use.
     ///   - connectionEventTimeout: The timeout for waiting the connection event.
     public init(upnpDevice: UPNPDevice, webSocket: WebSocketProtocol, dialService: DIALServiceProtocol, connectionEventTimeout: TimeInterval) {
-        ipAddress = upnpDevice.ipAddress
+        upnpID = upnpDevice.deviceID
+        host = upnpDevice.dialURL.host ?? ""
         friendlyName = upnpDevice.friendlyName
+        modelName = upnpDevice.modelName
         manufacturer = upnpDevice.manufacturer
         self.webSocket = webSocket
         self.dialService = dialService
         self.connectionEventTimeout = connectionEventTimeout
+        let defaultSettingsWebSocketURL = "wss://\(host):4433/ocast"
+        #if TEST
+        settingsWebSocketURL = ProcessInfo.processInfo.environment["SETTINGSWEBSOCKET"] ?? defaultSettingsWebSocketURL
+        #else
+        settingsWebSocketURL = defaultSettingsWebSocketURL
+        #endif
         
         super.init()
         
@@ -165,7 +167,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 case .success(let info):
                     Logger.shared.log(logLevel: .debug,
                                       "DIAL info request retrieved for \(applicationName): \(info.debugDescription)")
-                    self.connect(to: info.app2appURL ?? self.settingsWebSocketURL, sslConfiguration: sslConfiguration, completion)
+                    self.connect(to: info.webSocketURL ?? self.settingsWebSocketURL, sslConfiguration: sslConfiguration, completion)
                 case .failure(let error):
                     Logger.shared.log(logLevel: .error, "DIAL info request failed: \(error)")
                     self.state = .disconnected
@@ -177,7 +179,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    public func disconnect(_ completion: NoResultHandler?) {
+    public func disconnect(completion: NoResultHandler?) {
         let error = self.error(forForbiddenStates: [.connecting, .disconnecting])
         if error != nil || state == .disconnected {
             completion?(error)
@@ -189,7 +191,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         webSocket.disconnect()
     }
     
-    public func startApplication(_ completion: @escaping NoResultHandler) {
+    public func startApplication(completion: @escaping NoResultHandler) {
         guard let applicationName = applicationName else {
             completion(OCastError.applicationNameNotSet)
             return
@@ -221,7 +223,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         })
     }
     
-    public func stopApplication(_ completion: @escaping NoResultHandler) {
+    public func stopApplication(completion: @escaping NoResultHandler) {
         guard let applicationName = applicationName else {
             completion(OCastError.applicationNameNotSet)
             return
@@ -240,8 +242,8 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         }
     }
     
-    public func registerEvent(_ name: String, withHandler handler: @escaping EventHandler) {
-        registeredEvents[name] = handler
+    public func registerEvent(_ name: String, completion: @escaping EventHandler) {
+        registeredEvents[name] = completion
     }
     
     // MARK: Private methods
@@ -290,7 +292,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             }
         }
         registerEvent("updateStatus") { [weak self] data in
-            if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<SettingsUpdateStatus>.self, from: data) {
+            if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<UpdateStatus>.self, from: data) {
                 DispatchQueue.main.async {
                     guard let `self` = self else { return }
                     NotificationCenter.default.post(name: .updateStatusEventNotification,
@@ -420,33 +422,33 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     
     // MARK: Internal methods
     
-    /// Sends a message to an application.
+    /// Sends a command to an application.
     ///
     /// - Parameters:
-    ///   - layer: The device layer.
+    ///   - layer: The command to send.
     ///   - completion: The completion block called when the action completes.
-    /// If the error is nil, the message was successfully sent and is described in `U` parameter.
-    func sendToApplication<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping ResultHandler<U>) {
+    /// If the error is nil, the command was successfully sent and is described in `U` parameter.
+    func sendToApplication<T: Encodable, U: Codable>(command: OCastDeviceLayer<T>, completion: @escaping ResultHandler<U>) {
         if isApplicationRunning.synchronizedValue {
-            send(layer: layer, completion: completion)
+            send(command: command, completion: completion)
         } else {
             startApplication { [weak self] error in
                 if let error = error {
                     completion(nil, error)
                 } else {
-                    self?.send(layer: layer, completion: completion)
+                    self?.send(command: command, completion: completion)
                 }
             }
         }
     }
     
-    /// Sends a message with a result.
+    /// Sends a command with a result.
     ///
     /// - Parameters:
-    ///   - layer: The device layer.
+    ///   - layer: The command to send.
     ///   - completion: The completion block called when the action completes.
-    /// If the error is nil, the message was successfully sent and is described in `U` parameter.
-    func send<T: Encodable, U: Codable>(layer: OCastDeviceLayer<T>, completion: @escaping ResultHandler<U>) {
+    /// If the error is nil, the command was successfully sent and is described in `U` parameter.
+    func send<T: Encodable, U: Codable>(command: OCastDeviceLayer<T>, completion: @escaping ResultHandler<U>) {
         let completionBlock: CommandResult = { result in
             switch result {
             case .success(let data):
@@ -464,30 +466,30 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 completion(nil, error)
             }
         }
-        send(layer: layer, completion: completionBlock)
+        send(command: command, completion: completionBlock)
     }
     
-    /// Sends a message without result.
+    /// Sends a command without result.
     ///
     /// - Parameters:
-    ///   - layer: The device layer.
+    ///   - command: The command to send.
     ///   - completion: The completion block called when the action completes.
-    /// If the error is nil, the message was successfully sent.
-    func send<T: Encodable>(layer: OCastDeviceLayer<T>, completion: @escaping CommandResult) {
+    /// If the error is nil, the command was successfully sent.
+    func send<T: Encodable>(command: OCastDeviceLayer<T>, completion: @escaping CommandResult) {
         if let error = self.error(forForbiddenStates: [.connecting, .disconnecting, .disconnected]) {
             completion(.failure(error))
             return
         }
         
         do {
-            let jsonData = try JSONEncoder().encode(layer)
+            let jsonData = try JSONEncoder().encode(command)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
-                commandHandlers[layer.id] = completion
+                commandHandlers[command.id] = completion
                 Logger.shared.log(logLevel: .debug, jsonString)
                 let result = webSocket.send(jsonString)
                 if case .failure(_) = result {
                     completion(.failure(OCastError.unableToSendCommand))
-                    commandHandlers[layer.id] = nil
+                    commandHandlers[command.id] = nil
                 }
             } else {
                 completion(.failure(OCastError.misformedCommand))
@@ -560,27 +562,27 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     }
 }
 
-/// Extension to manage the custom streams.
-extension ReferenceDevice: OCastSenderDevice {
+/// Extension to send custom commands.
+extension ReferenceDevice: SenderDevice {
     
     public func send<T: OCastMessage>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping NoResultHandler) {
-        let deviceLayer = OCastDeviceLayer(source: deviceUUID, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
+        let command = OCastDeviceLayer(source: deviceUUID, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
         let completionBlock: ResultHandler<NoResult> = { _, error in
             completion(error)
         }
         if domain == .browser {
-            sendToApplication(layer: deviceLayer, completion: completionBlock)
+            sendToApplication(command: command, completion: completionBlock)
         } else {
-            send(layer: deviceLayer, completion: completionBlock)
+            send(command: command, completion: completionBlock)
         }
     }
     
     public func send<T: OCastMessage, U: Codable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName = .browser, completion: @escaping ResultHandler<U>) {
-        let deviceLayer = OCastDeviceLayer(source: deviceUUID, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
+        let command = OCastDeviceLayer(source: deviceUUID, destination: domain.rawValue, id: generateId(), status: nil, type: .command, message: message)
         if domain == .browser {
-            sendToApplication(layer: deviceLayer, completion: completion)
+            sendToApplication(command: command, completion: completion)
         } else {
-            send(layer: deviceLayer, completion: completion)
+            send(command: command, completion: completion)
         }
     }
 }

@@ -1,4 +1,8 @@
 //
+// OCastSettings.swift
+//
+// Copyright 2019 Orange
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -9,12 +13,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-//
-//  OCastSettings.swift
-//  OCast
-//
-//  Created by Christophe Azemar on 28/03/2019.
-//  Copyright © 2019 Orange. All rights reserved.
+// limitations under the License.
 //
 
 import Foundation
@@ -27,7 +26,7 @@ public let OCastInputSettingsServiceName = "org.ocast.settings.input"
 
 // MARK: - Settings objects
 
-/// The update status state.
+/// The update state.
 ///
 /// - notChecked: The firmware version is not check yet.
 /// - upToDate: The firmware version is up to date.
@@ -37,7 +36,7 @@ public let OCastInputSettingsServiceName = "org.ocast.settings.input"
 /// - error: An error occurs during the firmware update.
 /// - success: The firmware update has ended with success.
 @objc
-public enum UpdateStatusState: Int, RawRepresentable, Codable {
+public enum UpdateState: Int, RawRepresentable, Codable {
     case notChecked, upToDate, newVersionFound, newVersionReady, downloading, error, success
     
     public typealias RawValue = String
@@ -71,10 +70,10 @@ public enum UpdateStatusState: Int, RawRepresentable, Codable {
 /// The update status.
 @objc
 @objcMembers
-public class SettingsUpdateStatus: OCastMessage {
+public class UpdateStatus: OCastMessage {
     
-    /// The state. See `UpdateStatusState`
-    public let state: UpdateStatusState
+    /// The state. See `UpdateState`
+    public let state: UpdateState
     
     /// The version.
     public let version: String?
@@ -86,16 +85,16 @@ public class SettingsUpdateStatus: OCastMessage {
 /// The device identifier.
 @objc
 @objcMembers
-public class SettingsDeviceID: OCastMessage {
+public class DeviceID: OCastMessage {
     
     /// The identifier.
     public let id: String
 }
 
-/// The input gamepad axes.
+/// The gamepad axes.
 @objc
 @objcMembers
-public class InputGamepadAxes: OCastMessage {
+public class GamepadAxes: OCastMessage {
     
     /// The x axis (-1.0 -> 1.0).
     public let x: Float
@@ -106,17 +105,17 @@ public class InputGamepadAxes: OCastMessage {
     public let num: Int
 }
 
-// MARK: - Settings Commands
+// MARK: - Settings Parameters
 
-/// The update status command.
+/// The update status parameters.
 @objc
 @objcMembers
-public class SettingsGetUpdateStatusCommand: OCastMessage {}
+public class UpdateStatusCommandParams: OCastMessage {}
 
-/// The device id command.
+/// The device id parameters.
 @objc
 @objcMembers
-public class SettingsGetDeviceIDCommand: OCastMessage {}
+public class DeviceIDCommandParams: OCastMessage {}
 
 /// The location of a key.
 ///
@@ -124,22 +123,18 @@ public class SettingsGetDeviceIDCommand: OCastMessage {}
 /// - left: A left key is pressed.
 /// - right: A right key is pressed.
 /// - numpad: The key is pressed on the numeric keypad.
-/// - mobile: The key is pressed on a mobile device.
-/// - joystick: The key is pressed on a joystick.
 @objc
 public enum DOMKeyLocation: Int, Codable {
     case standard = 0
     case left = 1
     case right = 2
     case numpad = 3
-    case mobile = 4
-    case joystick = 5
 }
 
-/// The command to send a key.
+/// The parameters to send a key event.
 @objc
 @objcMembers
-public class SettingsKeyPressedCommand: OCastMessage {
+public class SendKeyEventCommandParams: OCastMessage {
     
     /// The key value.
     public let key: String
@@ -163,10 +158,10 @@ public class SettingsKeyPressedCommand: OCastMessage {
     public let location: DOMKeyLocation
 }
 
-/// The command to send a mouse event.
+/// The parameters to send a mouse event.
 @objc
 @objcMembers
-public class SettingsMouseEventCommand: OCastMessage {
+public class SendMouseEventCommandParams: OCastMessage {
     
     /// The x coordinate of the mouse pointer in local coordinates.
     public let x: Int
@@ -180,13 +175,13 @@ public class SettingsMouseEventCommand: OCastMessage {
     public let buttons: Int
 }
 
-/// The command to send a gamepad event.
+/// The parameters to send a gamepad event.
 @objc
 @objcMembers
-public class SettingsGamepadEventCommand: OCastMessage {
+public class SendGamepadEventCommandParams: OCastMessage {
     
     /// The axes.
-    public let axes: [InputGamepadAxes]
+    public let axes: [GamepadAxes]
     
     /// The buttons pressed.
     /// Several buttons can be pressed at the same time by providing the bitmask representation of each button
@@ -200,6 +195,6 @@ public class SettingsGamepadEventCommand: OCastMessage {
 ///
 /// - unknownError: An unknown error occurs.
 @objc
-public enum OCastDeviceSettingsError: Int, Error {
+public enum DeviceSettingsError: Int, Error {
     case unknownError = 1199
 }

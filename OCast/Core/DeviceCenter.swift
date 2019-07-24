@@ -1,4 +1,8 @@
 //
+// DeviceCenter.swift
+//
+// Copyright 2019 Orange
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -9,11 +13,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-//
-//  DeviceCenter.swift
-//  OCast
-//
-//  Created by Christophe Azemar on 06/12/2018.
+// limitations under the License.
 //
 
 import Foundation
@@ -25,14 +25,14 @@ import Foundation
     ///
     /// - Parameters:
     ///   - center: The device center informing the delegate.
-    ///   - devices: The new device found.
+    ///   - devices: The new devices found.
     func center(_ center: DeviceCenter, didAdd devices: [Device])
     
     /// Tells the delegate that devices are lost.
     ///
     /// - Parameters:
     ///   - center: The device center informing the delegate.
-    ///   - devices: The device lost.
+    ///   - devices: The devices lost.
     func center(_ center: DeviceCenter, didRemove devices: [Device])
     
     /// Tells the delegate that the discovery is stopped. All the devices are removed.
@@ -56,8 +56,8 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     /// The search targets used to search the devices.
     private var searchTargets: [String] = []
     
-    /// The detected devices.
-    private var detectedDevices: [String: Device] = [:]
+    /// The discovered devices.
+    private var discoveredDevices: [UPNPDevice: Device] = [:]
     
     /// The delegate to receive discovery events.
     private var deviceDiscovery: DeviceDiscovery?
@@ -66,15 +66,20 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     public weak var delegate: DeviceCenterDelegate?
     
     /// The interval in seconds to refresh the devices. The minimum value is 5 seconds.
-    public var deviceDiscoveryInterval: UInt16 {
+    public var discoveryInterval: UInt16 {
         get { return deviceDiscovery?.interval ?? 0 }
         set { deviceDiscovery?.interval = newValue }
     }
     
-    /// Registers a driver to discover devices of its manufacturer.
+    /// The devices discovered on the network.
+    public var devices: [Device] {
+        return Array(discoveredDevices.values)
+    }
+    
+    /// Registers a device type to discover devices of its manufacturer.
     ///
     /// - Parameters:
-    ///   - deviceType: The Type of the driver class to register (for example ReferenceDevice.self)
+    ///   - deviceType: The Type of the device class to register (for example ReferenceDevice.self)
     ///   - manufacturer: The device manufacturer used to identify it during the discovery.
     public func registerDevice(_ deviceType: Device.Type, forManufacturer manufacturer: String) {
         registeredDevices[manufacturer] = deviceType
@@ -82,9 +87,9 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     }
     
     /// Resumes the discovery process to found devices on the local network.
-    /// When a new devices are found the `DeviceCenterAddDevicesNotification` notification
+    /// When a new devices are found the `deviceCenterAddDevicesNotification` notification
     /// and the `center(_:didAdd:)` method are trigerred.
-    /// When devices are lost the `DeviceCenterRemoveDevicesNotification` notification
+    /// When devices are lost the `deviceCenterRemoveDevicesNotification` notification
     /// and the `center(_:didRemove:)` method are trigerred.
     ///
     /// - Returns: `true` if the discovery is correctly started, otherwise `false`.
@@ -99,9 +104,9 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         return deviceDiscovery?.resume() ?? false
     }
     
-    /// Stops to discovery process. The devices are removed so the `DeviceCenterRemoveDevicesNotification`
+    /// Stops to discovery process. The devices are removed so the `deviceCenterRemoveDevicesNotification`
     /// notification and the `center(_:didRemove:)` method will be triggered.
-    /// This method will alse trigger the `DeviceCenterDeviceDiscoveryErrorNotification` notification
+    /// This method will alse trigger the `deviceCenterDiscoveryErrorNotification` notification
     /// and the `deviceDiscoveryDidStop(_:withError:)` method.
     ///
     /// - Returns: `true` if the discovery is correctly stopped, otherwise `false`.
@@ -124,28 +129,30 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         var newDevices = [Device]()
         devices.forEach { device in
             if let type = registeredDevices[device.manufacturer] {
-                if detectedDevices[device.ipAddress] == nil {
                     let ocastDevice = type.init(upnpDevice: device)
-                    detectedDevices[device.ipAddress] = ocastDevice
                     newDevices.append(ocastDevice)
-                }
+                    discoveredDevices[device] = ocastDevice
+            } else {
+                Logger.shared.log(logLevel: .error,
+                                  "Device \(device.friendlyName) found but manufacturer \(device.manufacturer) not registered")
             }
         }
+        
         if !newDevices.isEmpty {
             delegate?.center(self, didAdd: newDevices)
             NotificationCenter.default.post(name: .deviceCenterAddDevicesNotification,
                                             object: self,
-                                            userInfo: [DeviceCenterUserInfoKey.deviceCenterDevicesUserInfoKey: newDevices])
+                                            userInfo: [DeviceCenterUserInfoKey.devicesUserInfoKey: newDevices])
         }
     }
     
     func deviceDiscovery(_ deviceDiscovery: DeviceDiscovery, didRemove devices: [UPNPDevice]) {
-        let ocastDevices = devices.compactMap({ return detectedDevices[$0.ipAddress] })
-        delegate?.center(self, didRemove: ocastDevices)
+        let removedDevices = devices.compactMap({ discoveredDevices[$0] })
+        devices.forEach({ discoveredDevices.removeValue(forKey: $0) })
+        delegate?.center(self, didRemove: removedDevices)
         NotificationCenter.default.post(name: .deviceCenterRemoveDevicesNotification,
                                         object: self,
-                                        userInfo: [DeviceCenterUserInfoKey.deviceCenterDevicesUserInfoKey: ocastDevices])
-        ocastDevices.forEach { detectedDevices.removeValue(forKey: $0.ipAddress) }
+                                        userInfo: [DeviceCenterUserInfoKey.devicesUserInfoKey: removedDevices])
     }
     
     func deviceDiscoveryDidStop(_ deviceDiscovery: DeviceDiscovery, with error: Error?) {
@@ -153,9 +160,9 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         
         var userInfo: [String: Any]?
         if let error = error {
-            userInfo = [DeviceCenterUserInfoKey.deviceCenterErrorUserInfoKey: error]
+            userInfo = [DeviceCenterUserInfoKey.errorUserInfoKey: error]
         }
-        NotificationCenter.default.post(name: .deviceCenterDeviceDiscoveryErrorNotification,
+        NotificationCenter.default.post(name: .deviceCenterDiscoveryErrorNotification,
                                         object: self,
                                         userInfo: userInfo)
     }

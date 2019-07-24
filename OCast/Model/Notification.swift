@@ -22,31 +22,31 @@ import Foundation
 public extension Notification.Name {
     
     /// The notification sent each time new devices is discovered.
-    /// The userinfo `DeviceCenterDevicesUserInfoKey` key contains an array with the new devices.
+    /// The userinfo `DeviceCenterUserInfoKey.devicesUserInfoKey` key contains an array with the new devices.
     static let deviceCenterAddDevicesNotification = Notification.Name("OCastDeviceCenterAddDevices")
     
     /// The notification sent each time devices has been removed.
-    /// The userinfo `DeviceCenterDevicesUserInfoKey` key contains an array with the devices removed.
+    /// The userinfo `DeviceCenterUserInfoKey.devicesUserInfoKey` key contains an array with the devices removed.
     static let deviceCenterRemoveDevicesNotification = Notification.Name("OCastDeviceCenterRemoveDevices")
     
     /// Notification sent each time an error has occured during discovery.
-    /// The userinfo `DeviceCenterErrorUserInfoKey` key contains an error if it occurs.
-    static let deviceCenterDeviceDiscoveryErrorNotification = Notification.Name("OCastDeviceCenterDeviceDiscoveryError")
+    /// The userinfo `DeviceCenterUserInfoKey.errorUserInfoKey` key contains an error if it occurs.
+    static let deviceCenterDiscoveryErrorNotification = Notification.Name("OCastDeviceCenterDiscoveryError")
     
     /// The notification sent when the device is disconnected
-    /// The userinfo `ErrorUserInfoKey` key contains error information.
+    /// The userinfo `DeviceUserInfoKey.errorUserInfoKey` key contains error information.
     static let deviceDisconnectedEventNotification = Notification.Name("OCastDeviceDisconnectedEvent")
 
     /// The notification sent when a playback status event is received.
-    /// The userinfo `PlaybackStatusUserInfoKey` key contains playback status information.
+    /// The userinfo `DeviceUserInfoKey.playbackStatusUserInfoKey` key contains playback status information.
     static let playbackStatusEventNotification = Notification.Name("OCastPlaybackStatusEvent")
     
     /// The notification sent when a metadata event is received.
-    /// The userinfo `MetadataUserInfoKey` key contains metadata information.
+    /// The userinfo `DeviceUserInfoKey.metadataUserInfoKey` key contains metadata information.
     static let metadataChangedEventNotification = Notification.Name("OCastMetadataChangedEvent")
     
     /// The notification sent when an update status event is received.
-    /// The userinfo `UpdateStatusUserInfoKey` key contains update status information.
+    /// The userinfo `DeviceUserInfoKey.updateStatusUserInfoKey` key contains update status information.
     static let updateStatusEventNotification = Notification.Name("OCastUpdateStatusEvent")
 }
 
@@ -55,31 +55,31 @@ public extension Notification.Name {
 public extension NSNotification {
     
     /// The notification sent each time new devices is discovered.
-    /// The userinfo `DeviceCenterDevicesUserInfoKey` key contains an array with the new devices.
+    /// The userinfo `DeviceCenterUserInfoKey.devicesUserInfoKey` key contains an array with the new devices.
     static let deviceCenterAddDevicesNotification = Notification.Name.deviceCenterAddDevicesNotification
     
     /// The notification sent each time devices has been removed.
-    /// The userinfo `DeviceCenterDevicesUserInfoKey` key contains an array with the devices removed.
+    /// The userinfo `DeviceCenterUserInfoKey.devicesUserInfoKey` key contains an array with the devices removed.
     static let deviceCenterRemoveDevicesNotification = Notification.Name.deviceCenterRemoveDevicesNotification
     
     /// Notification sent each time an error has occured during discovery.
-    /// The userinfo `DeviceCenterErrorUserInfoKey` key contains an error if it occurs.
-    static let deviceCenterDeviceDiscoveryErrorNotification = Notification.Name.deviceCenterDeviceDiscoveryErrorNotification
+    /// The userinfo `DeviceCenterUserInfoKey.errorUserInfoKey` key contains an error if it occurs.
+    static let deviceCenterDiscoveryErrorNotification = Notification.Name.deviceCenterDiscoveryErrorNotification
     
     /// The notification sent when the device is disconnected
-    /// The userinfo `ErrorUserInfoKey` key contains error information.
+    /// The userinfo `DeviceUserInfoKey.errorUserInfoKey` key contains error information.
     static let deviceDisconnectedEventNotification = Notification.Name.deviceDisconnectedEventNotification
     
     /// The notification sent when a playback status event is received.
-    /// The userinfo `PlaybackStatusUserInfoKey` key contains playback status information.
+    /// The userinfo `DeviceUserInfoKey.playbackStatusUserInfoKey` key contains playback status information.
     static let playbackStatusEventNotification = Notification.Name.playbackStatusEventNotification
     
     /// The notification sent when a metadata event is received.
-    /// The userinfo `MetadataUserInfoKey` key contains metadata information.
+    /// The userinfo `DeviceUserInfoKey.metadataUserInfoKey` key contains metadata information.
     static let metadataChangedEventNotification = Notification.Name.metadataChangedEventNotification
     
     /// The notification sent when an update status event is received.
-    /// The userinfo `UpdateStatusUserInfoKey` key contains update status information.
+    /// The userinfo `DeviceUserInfoKey.updateStatusUserInfoKey` key contains update status information.
     static let updateStatusEventNotification = Notification.Name.updateStatusEventNotification
 }
 
@@ -89,10 +89,10 @@ public extension NSNotification {
 public class DeviceCenterUserInfoKey: NSObject {
     
     /// The notification user info key representing the devices.
-    public static let deviceCenterDevicesUserInfoKey = "OCastDeviceCenterDevicesUserInfoKey"
+    public static let devicesUserInfoKey = "OCastDeviceCenterUserInfoKey.DevicesKey"
     
     /// The notification user info key representing the error when the discovery is stopped.
-    public static let deviceCenterErrorUserInfoKey = "OCastDeviceCenterErrorUserInfoKey"
+    public static let errorUserInfoKey = "OCastDeviceCenterUserInfoKey.ErrorKey"
 }
 
 /// The class to describe the device notification user info key constants to use it in Swift and Objective-C.
@@ -101,14 +101,14 @@ public class DeviceCenterUserInfoKey: NSObject {
 public class DeviceUserInfoKey: NSObject {
     
     /// The notification user info key representing the error.
-    public static let errorUserInfoKey = "OCastErrorKey"
+    public static let errorUserInfoKey = "OCastDeviceUserInfoKey.ErrorKey"
     
     /// The notification user info key representing the playback status.
-    public static let playbackStatusUserInfoKey = "OCastPlaybackStatusKey"
+    public static let playbackStatusUserInfoKey = "OCastDeviceUserInfoKey.PlaybackStatusKey"
     
     /// The notification user info key representing the metadata.
-    public static let metadataUserInfoKey = "OCastMetadataKey"
+    public static let metadataUserInfoKey = "OCastDeviceUserInfoKey.MetadataKey"
     
     /// The notification user info key representing the update status.
-    public static let updateStatusUserInfoKey = "OCastUpdateStatusKey"
+    public static let updateStatusUserInfoKey = "OCastDeviceUserInfoKey.UpdateStatusKey"
 }
