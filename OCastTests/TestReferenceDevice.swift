@@ -250,26 +250,6 @@ class TestReferenceDevice: XCTestCase {
         wait(for: [startAppExpectation], timeout: 5.0)
     }
     
-    func testStartApplicationTwice() {
-        let startAppExpectation = XCTestExpectation(description: "startAppExpectation")
-        let startAppExpectation2 = XCTestExpectation(description: "startAppExpectation2")
-        referenceDevice.connect(nil) { error in
-            XCTAssertNil(error)
-            self.mockWebSocket.triggerIncomingMessage(self.connectionEvent, after: 1.5)
-            self.referenceDevice.startApplication { error in
-                XCTAssertNil(error)
-                startAppExpectation.fulfill()
-            }
-            self.referenceDevice.startApplication { error in
-                let ocastError = error as? OCastError
-                XCTAssertNotNil(ocastError)
-                XCTAssertEqual(OCastError.websocketConnectionEventNotReceived, ocastError)
-                startAppExpectation2.fulfill()
-            }
-        }
-        wait(for: [startAppExpectation, startAppExpectation2], timeout: 10.0)
-    }
-    
     func testStartApplicationUpdatingApplicationName() {
         let startAppExpectation = XCTestExpectation(description: "startAppExpectation")
         let startAppExpectation2 = XCTestExpectation(description: "startAppExpectation2")
