@@ -111,6 +111,7 @@ public protocol Device {
     // MARK: - Events methods
     
     /// Registers a handler when the specifed event name is received.
+    /// - Warning: The completion block is not called on the main thread.
     ///
     /// - Parameters:
     ///   - name: The event name.
