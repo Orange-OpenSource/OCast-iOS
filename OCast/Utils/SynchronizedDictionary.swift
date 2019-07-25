@@ -19,13 +19,15 @@
 import Foundation
 
 /// Class to synchronize a dictionary.
-struct SynchronizedDictionary<T: Hashable, U> {
+public struct SynchronizedDictionary<T: Hashable, U> {
     
     /// The synchronized dictionary.
     private var synchronizedDictionary = SynchronizedValue([T: U]())
     
+    public init() {}
+    
     /// Thread-safe subscript
-    subscript(key: T) -> U? {
+    public subscript(key: T) -> U? {
         get {
             return synchronizedDictionary.read { $0[key] }
         }
@@ -39,14 +41,14 @@ struct SynchronizedDictionary<T: Hashable, U> {
     /// Removes an item safely.
     ///
     /// - Parameter key: The key to remove.
-    func removeItem(forKey key: T) {
+    public func removeItem(forKey key: T) {
         synchronizedDictionary.write { dictionary in
             dictionary.removeValue(forKey: key)
         }
     }
     
     /// Removes all items safely.
-    func removeAll() {
+    public func removeAll() {
         synchronizedDictionary.write { dictionary in
             dictionary.removeAll()
         }
@@ -55,7 +57,8 @@ struct SynchronizedDictionary<T: Hashable, U> {
     /// Iterates the dictionary safely.
     ///
     /// - Parameter body: The key, value of the dictionary.
-    func forEach(_ body: (T, U) -> Void) {
+    public func forEach(_ body: (T, U) -> Void) {
         synchronizedDictionary.read { $0.forEach(body) }
     }
 }
+

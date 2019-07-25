@@ -80,6 +80,12 @@ public class UpdateStatus: OCastMessage {
     
     /// The percentage downloaded.
     public let progress: Int
+    
+    public init(state: UpdateState, version: String?, progress: Int) {
+        self.state = state
+        self.version = version
+        self.progress = progress
+    }
 }
 
 /// The device identifier.

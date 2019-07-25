@@ -81,7 +81,7 @@ public protocol WebSocketProtocol {
     func send(_ message: String) -> Result<Void, WebSocketSendError>
 }
 
-public class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.WebSocketPongDelegate {
+public class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscream.WebSocketPongDelegate, Equatable {
     
     /// The websocket to manage the connection.
     private var socket: Starscream.WebSocket?
@@ -112,6 +112,10 @@ public class WebSocket: WebSocketProtocol, Starscream.WebSocketDelegate, Starscr
     
     public init(delegateQueue: DispatchQueue = DispatchQueue.main) {
         self.delegateQueue = delegateQueue
+    }
+    
+    public static func == (lhs: WebSocket, rhs: WebSocket) -> Bool {
+        return lhs.socket?.currentURL == rhs.socket?.currentURL
     }
     
     // MARK: - WebSocketProtocol properties & methods

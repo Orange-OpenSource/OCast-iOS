@@ -19,7 +19,7 @@
 import Foundation
 
 /// Class to synchronized a value to share it between threads.
-class SynchronizedValue<T> {
+public class SynchronizedValue<T> {
     
     /// The dispatch queue to manage the concurrency.
     private let queue: DispatchQueue
@@ -27,13 +27,13 @@ class SynchronizedValue<T> {
     /// The value to synchronize.
     private var value: T
     
-    init(_ value: T) {
+    public init(_ value: T) {
         queue = DispatchQueue(label: "org.ocast.syncronizedvalue-" + UUID().uuidString, qos: .default, attributes: .concurrent)
         self.value = value
     }
     
     /// The synchronized value.
-    var synchronizedValue: T {
+    public var synchronizedValue: T {
         get {
             return queue.sync { value }
         }
@@ -46,16 +46,17 @@ class SynchronizedValue<T> {
     ///
     /// - Parameter block: The block to execute.
     /// - Returns: The value read safely.
-    func read<U>(_ block: (T) -> U) -> U {
+    public func read<U>(_ block: (T) -> U) -> U {
         return queue.sync { block(value) }
     }
     
     /// Performs a write concurrent access.
     ///
     /// - Parameter block: The block to execute.
-    func write(_ block: @escaping (inout T) -> Void) {
+    public func write(_ block: @escaping (inout T) -> Void) {
         queue.async(flags: .barrier) {
             block(&self.value)
         }
     }
 }
+
