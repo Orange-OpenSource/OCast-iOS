@@ -88,9 +88,9 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     
     /// Resumes the discovery process to found devices on the local network.
     /// When a new devices are found the `deviceCenterAddDevicesNotification` notification
-    /// and the `center(_:didAdd:)` method are trigerred.
+    /// and the `center(_:didAdd:)` method are triggered.
     /// When devices are lost the `deviceCenterRemoveDevicesNotification` notification
-    /// and the `center(_:didRemove:)` method are trigerred.
+    /// and the `center(_:didRemove:)` method are triggered.
     ///
     /// - Returns: `true` if the discovery is correctly started, otherwise `false`.
     @discardableResult
@@ -104,10 +104,10 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         return deviceDiscovery?.resume() ?? false
     }
     
-    /// Stops to discovery process. The devices are removed so the `deviceCenterRemoveDevicesNotification`
+    /// Stops the discovery process. The devices are removed so the `deviceCenterRemoveDevicesNotification`
     /// notification and the `center(_:didRemove:)` method will be triggered.
-    /// This method will alse trigger the `deviceCenterDiscoveryErrorNotification` notification
-    /// and the `deviceDiscoveryDidStop(_:withError:)` method.
+    /// This method will also trigger the `deviceCenterDiscoveryStoppedNotification` notification
+    /// and the `centerDidStop(_:withError:)` method.
     ///
     /// - Returns: `true` if the discovery is correctly stopped, otherwise `false`.
     @discardableResult
@@ -162,7 +162,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         if let error = error {
             userInfo = [DeviceCenterUserInfoKey.errorUserInfoKey: error]
         }
-        NotificationCenter.default.post(name: .deviceCenterDiscoveryErrorNotification,
+        NotificationCenter.default.post(name: .deviceCenterDiscoveryStoppedNotification,
                                         object: self,
                                         userInfo: userInfo)
     }
