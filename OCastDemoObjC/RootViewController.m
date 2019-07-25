@@ -64,6 +64,18 @@
     [self.reachability startNotifier];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.deviceCenter.discoveryInterval = 5;
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    self.deviceCenter.discoveryInterval = 30;
+}
+
 // MARK: - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

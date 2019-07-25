@@ -59,6 +59,18 @@ class RootViewController: UITableViewController, DeviceCenterDelegate {
             try reachability?.startNotifier()
         } catch {}
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        deviceCenter.discoveryInterval = 5
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        deviceCenter.discoveryInterval = 30
+    }
 
     // MARK: - Table view data source
 
