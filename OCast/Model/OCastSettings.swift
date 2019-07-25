@@ -91,10 +91,27 @@ public class DeviceID: OCastMessage {
     public let id: String
 }
 
-/// The gamepad axes.
+/// The gamepad axe type (https://www.w3.org/TR/gamepad/#remapping).
+///
+/// - leftStickHorizontalAxes: The horizontal axis for left stick (negative left/positive right).
+/// - leftStickVerticalAxes: The vertical axis for left stick (negative up/positive down).
+/// - rightStickHorizontalAxes: The horizontal axis for right stick (negative left/positive right).
+/// - rightStickVerticalAxes: The vertical axis for right stick (negative up/positive down).
+@objc
+public enum GamepadAxeType: Int, Codable {
+    case leftStickHorizontalAxes = 0
+    case leftStickVerticalAxes = 1
+    case rightStickHorizontalAxes = 2
+    case rightStickVerticalAxes = 3
+}
+
+/// The gamepad axe.
 @objc
 @objcMembers
-public class GamepadAxes: OCastMessage {
+public class GamepadAxe: OCastMessage {
+    
+    /// The axis type. See `GamepadAxeType`.
+    public let type: GamepadAxeType
     
     /// The x axis (-1.0 -> 1.0).
     public let x: Float
@@ -102,8 +119,12 @@ public class GamepadAxes: OCastMessage {
     /// The y axis (-1.0 -> 1.0).
     public let y: Float
     
-    public let num: Int
+    enum CodingKeys: String, CodingKey {
+        case type = "num", x, y
+    }
 }
+
+/// The gamepad button
 
 // MARK: - Settings Parameters
 
@@ -163,16 +184,26 @@ public class SendKeyEventCommandParams: OCastMessage {
 @objcMembers
 public class SendMouseEventCommandParams: OCastMessage {
     
+    private let _buttons: Int
+    
     /// The x coordinate of the mouse pointer in local coordinates.
     public let x: Int
     
     /// The y coordinate of the mouse pointer in local coordinates.
     public let y: Int
     
-    /// The buttons pressed.
-    /// Several buttons can be pressed at the same time by providing the bitmask representation of each button
-    /// (0 no button, 1, 2 and 4 at least)
-    public let buttons: Int
+    /// The buttons pressed. Several buttons can be pressed at the same time. See `MouseButton`.
+    public var buttons: MouseButton { return MouseButton(rawValue: _buttons) }
+    
+    enum CodingKeys: String, CodingKey {
+        case x, y, _buttons = "buttons"
+    }
+    
+    public init(x: Int, y: Int, buttons: MouseButton) {
+        self.x = x
+        self.y = y
+        _buttons = buttons.rawValue
+    }
 }
 
 /// The parameters to send a gamepad event.
@@ -180,13 +211,22 @@ public class SendMouseEventCommandParams: OCastMessage {
 @objcMembers
 public class SendGamepadEventCommandParams: OCastMessage {
     
-    /// The axes.
-    public let axes: [GamepadAxes]
+    private let _buttons: Int
     
-    /// The buttons pressed.
-    /// Several buttons can be pressed at the same time by providing the bitmask representation of each button
-    /// (0 no button, 1, 2 and 4 at least)
-    public let buttons: Int
+    /// The axes used.
+    public let axes: [GamepadAxe]
+    
+    /// The buttons pressed. Several buttons can be pressed at the same time. See `GamepadButton`.
+    public var buttons: GamepadButton { return GamepadButton(rawValue: _buttons) }
+    
+    enum CodingKeys: String, CodingKey {
+        case axes, _buttons = "buttons"
+    }
+    
+    public init(axes: [GamepadAxe], buttons: GamepadButton) {
+        self.axes = axes
+        _buttons = buttons.rawValue
+    }
 }
 
 // MARK: - Settings error codes

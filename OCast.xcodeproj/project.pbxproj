@@ -56,6 +56,8 @@
 		9790E00B227C70940031A70F /* MockUDPSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E003227C70930031A70F /* MockUDPSocket.swift */; };
 		9790E00C227C70940031A70F /* MockUPNPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E004227C70940031A70F /* MockUPNPService.swift */; };
 		9790E00D227C70940031A70F /* TestDeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790E005227C70940031A70F /* TestDeviceDiscovery.swift */; };
+		979667F922E8C38F005A6D1D /* GamepadButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 979667F622E8BEFB005A6D1D /* GamepadButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		979667FC22E8C5A8005A6D1D /* MouseButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 979667FA22E8C58A005A6D1D /* MouseButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		97AF814220EA0EAD00C502D5 /* OCast.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97AF813820EA0EAD00C502D5 /* OCast.framework */; };
 		97AF814920EA0EAD00C502D5 /* OCast.h in Headers */ = {isa = PBXBuildFile; fileRef = 97AF813B20EA0EAD00C502D5 /* OCast.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		97DC97C220EA313800DBB1B0 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97DC97C120EA313800DBB1B0 /* libz.tbd */; };
@@ -114,6 +116,8 @@
 		9790E003227C70930031A70F /* MockUDPSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockUDPSocket.swift; sourceTree = "<group>"; };
 		9790E004227C70940031A70F /* MockUPNPService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockUPNPService.swift; sourceTree = "<group>"; };
 		9790E005227C70940031A70F /* TestDeviceDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDeviceDiscovery.swift; sourceTree = "<group>"; };
+		979667F622E8BEFB005A6D1D /* GamepadButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GamepadButton.h; sourceTree = "<group>"; };
+		979667FA22E8C58A005A6D1D /* MouseButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MouseButton.h; sourceTree = "<group>"; };
 		97AF813820EA0EAD00C502D5 /* OCast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		97AF813B20EA0EAD00C502D5 /* OCast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCast.h; sourceTree = "<group>"; };
 		97AF813C20EA0EAD00C502D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -178,6 +182,8 @@
 				8549ACF22296E80700E205A3 /* OCastSettings.swift */,
 				8549ACF32296E80700E205A3 /* OCastWebApp.swift */,
 				8549ACF42296E80700E205A3 /* OCastMedia.swift */,
+				979667F622E8BEFB005A6D1D /* GamepadButton.h */,
+				979667FA22E8C58A005A6D1D /* MouseButton.h */,
 			);
 			name = Model;
 			path = OCast/Model;
@@ -285,6 +291,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				97AF814920EA0EAD00C502D5 /* OCast.h in Headers */,
+				979667F922E8C38F005A6D1D /* GamepadButton.h in Headers */,
+				979667FC22E8C5A8005A6D1D /* MouseButton.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -676,6 +684,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DFFDB7FF2F910EBFFBFEA46A /* Pods-OCast.debug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -692,6 +701,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.orange.OCast;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -701,6 +711,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DF8CEC5050DAF5A730C15073 /* Pods-OCast.release.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
