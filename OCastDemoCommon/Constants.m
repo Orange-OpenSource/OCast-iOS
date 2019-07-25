@@ -19,6 +19,6 @@
 
 NSString * const OCastDemoManufacturerName = @"Orange SA";
 
-NSString * const OCastDemoApplicationName = @"Orange-DefaultReceiver-DEV";
+NSString * const OCastDemoApplicationName = @"OCAST-SAMPLE";
 
 NSString * const OCastDemoMovieURLString = @"http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4";
