@@ -9,7 +9,7 @@ The Orange OCast SDK provides all required API methods to implement cast applica
 
 Both Objective-C and Swift applications may use the Orange OCast SDK to use the APIs defined by the OCast protocol. However Swift is required to use the API to send custom commands.
 
-The sample project aims to demonstrating the basic instruction set of the Orange OCast SDK to help you get started.
+The sample project aims to demonstrate the basic instruction set of the Orange OCast SDK to help you get started.
 
 ## Installation
 
@@ -39,22 +39,22 @@ Here's how to import the framework from Objctive-C applications:
 
 ## Usage
 
-### 1. Register your device(s)
+### 1. Register your device type
 
-You have to register your device(s) to the `DeviceCenter` for your manufacturer. The manufacturer must be the same as the one in the UPNP device description response.
+You have to register your device type into the `DeviceCenter` for your manufacturer. The manufacturer must be the same as the one in the UPNP device description response.
 
 ```swift
 let deviceCenter = DeviceCenter()
 center.registerDevice(ReferenceDevice.self, forManufacturer: "Manufacturer")
 ```
 
-### 2. Discovering device(s)
+### 2. Discovering devices
 
-You need to set the `DeviceCenter` delegate and call the `resumeDiscovery` method to start to device discovery.
+You need to call the `resumeDiscovery()` method to start the device discovery. Then you can be informed by the `DeviceCenter` setting the delegate or registering notifications.
 
 If devices are found on your network, the `center(_:didAdd:)` method and the `deviceCenterAddDevicesNotification` notification are triggered.
 
-If devices are lost (network problem or turned-off), the `center(_:didRemove:)` method and the `deviceCenterRemoveDevicesNotification` notification are triggered.
+If devices are lost (network problem or device is turned-off), the `center(_:didRemove:)` method and the `deviceCenterRemoveDevicesNotification` notification are triggered.
 
 ```swift
 deviceCenter.delegate = self
@@ -66,19 +66,21 @@ func center(_ center: DeviceCenter, didRemove devices: [Device]) {}
 func centerDidStop(_ center: DeviceCenter, withError error: Error?) {}
 ```
 
-You can stop the device discovery calling `stopDiscovery` method. This will trigger the `centerDidStop(_:withError:)` method and the `deviceCenterDiscoveryStoppedNotification` notification. The found devices will be removed, so if you want to keep them you should call `pauseDiscovery` instead. This is useful to manage application background state.
+You can stop the device discovery calling `stopDiscovery()` method. This will trigger the `centerDidStop(_:withError:)` method and the `deviceCenterDiscoveryStoppedNotification` notification. The list of discovered devices will be cleaned, so if you want to keep them you should call `pauseDiscovery()` instead. This is useful to manage application background state.
 
-If a network error occurs, the `centerDidStop(_:withError:)` method and the `deviceCenterDiscoveryStoppedNotification` are also called but the error parameter is filled with the issue reason. 
+If a network error occurs, the `centerDidStop(_:withError:)` method and the `deviceCenterDiscoveryStoppedNotification` are also called but the error parameter is filled with the issue reason.
 
-### 3. Use the device
+By default, the list of devices is refreshed every 30 seconds. You can decrease this interval setting the `discoveryInterval` property. You should do this when the list of devices is displayed and restore the default value later to avoid draining the phone battery.
 
-To use OCast media commands on your own application, you must set the device `applicationName`.
+### 3. Connect to the device
+
+To connect to the device and use OCast media commands on your own application, you must set the device `applicationName` property. When you connect to the device, the application is started automatically if needed. You can also manage the application state manually. See [Manage application state](#8-manage-application-state).
 
 ```swift
 device.applicationName = "MyWebApp"
 ```
 
-If you want to perform a secure connection, you can set an `SSLConfiguration` object with your custom settings. Then you must call the `connect(_:completion::)` method. The completion block is called without an error if the connection was performed successfully. Then, you can send commands to your device.
+If you want to perform a secure connection, you can set a `SSLConfiguration` object with your custom settings. Then you must call the `connect(_:completion:)` method. The completion block is called without an error if the connection was performed successfully. Thus, you can send commands to your device.
 
 ```swift
 let sslConfiguration = SSLConfiguration()
@@ -92,23 +94,29 @@ device.connect(sslConfiguration, completion: { error in
 })
 ```
 
-You can disconnect from the device using `disconnect(completion:)`. This is useful to manage application background state for example.
+You can disconnect from the device using `disconnect(completion:)` method. This is useful to manage application background state.
 
-If a network occurs, the `deviceDisconnectedEventNotification` notification is triggered with the issue reason.
+If a network error occurs, the `deviceDisconnectedEventNotification` notification is triggered with the issue reason.
 
-### 4. Send an OCast command
+### 4. Send OCast commands
 
-You can use the OCast commands provided by the SDK in the `Device` protocol. The command list is described here:  http://ocast.kmt.orange.com/OCast-Protocol.pdf
+You can use the OCast commands provided by the SDK in the `Device` protocol. The command list is described here: https://www.ocast.org/OCast-Protocol.pdf
 
 ```swift
-device.deviceID(completion: { deviceID, error in
-    // ...
-})
+let params = PrepareMediaCommandParams(url: "http://myMovie.mp4",
+                                       frequency: 1,
+                                       title: "Movie Sample",
+                                       subtitle: "OCast",
+                                       logo: "",
+                                       mediaType: .video,
+                                       transferMode: .buffered,
+                                       autoPlay: true)
+device.prepareMedia(params, completion: { error in })
 ```
 
 ### 5. Receive OCast events
 
-The device can send events defined in the OCast protocol. The following notifications will be triggered depending the event : `playbackStatusEventNotification`, `metadataChangedEventNotification` and `updateStatusEventNotification`.
+The device can send events defined in the OCast protocol. The following notifications will be triggered depending on the event : `playbackStatusEventNotification`, `metadataChangedEventNotification` and `updateStatusEventNotification`.
 
 ```swift
 // Register to the notification
@@ -121,34 +129,34 @@ NotificationCenter.default.addObserver(self,
 @objc func playbackStatusNotification(_ notification: Notification) {}
 ```
 
-### 6. Send a custom command
+### 6. Send custom commands
 
 If you need to send a command not defined in the OCast protocol, you can use the `send(_:on:completion)` method.
 You must build `OCastMessage` objects for the command and the reply.
 
 ```swift
-public class CustomCommandCommandParams: OCastMessage {
+public class CustomCommandParams: OCastMessage {
         
     public let myParameter: String
         
-    init (myParameter: String) {
+    public init(myParameter: String) {
         self.myParameter = myParameter
     }
         
     // ...
 }
     
-public class CustomCommandReplyParams: OCastMessage {
+public class CustomReplyParams: OCastMessage {
         
     public let myValue: String
         
     // ...
 }
 
-let data = OCastDataLayer(name: "customCommand", params: CustomCommandCommandParams(myParameter: "param"))
+let data = OCastDataLayer(name: "customCommand", params: CustomCommandParams(myParameter: "paramValue"))
 let message = OCastApplicationLayer(service: "customService", data: data)
-let completionBlock: ResultHandler<CustomCommandReplyParams> = { result, error in
-    // result is a CustomCommandReplyParams?
+let completionBlock: ResultHandler<CustomReplyParams> = { result, error in
+    // result is a CustomReplyParams?
 }
 device.sender?.send(message, on: .browser, completion: completionBlock)
 ````
@@ -175,6 +183,10 @@ device.registerEvent("customEvent", completion: { [weak self] data in
     }
 })
 ```
+
+### 8. Manage application state
+
+You can manage the application state manually. The `startApplication(completion:)` method starts the application identified by the `applicationName` property whereas the `stopApplication(completion:)` method stops it.
 
 ## Sample applications
 
