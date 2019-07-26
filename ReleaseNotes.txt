@@ -2,7 +2,7 @@ OCast Release notes
 ============================
 Version 2.0.0, July 2019
 ============================
-- new version 2.0.0
+- full rewriting with new API
 
 ============================
 Version 1.5.0, April 2019
