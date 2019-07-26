@@ -19,18 +19,19 @@
 import Foundation
 
 /// The web app service name
-let OCastWebAppServiceName = "org.ocast.webapp"
+public let OCastWebAppServiceName = "org.ocast.webapp"
 
 /// The web app state
 ///
 /// - connected: The web app is started and connected.
 /// - disconnected: The web app is stopped and disconnected.
-enum WebAppState: String, Codable {
+public enum WebAppState: String, Codable {
     case connected
     case disconnected
 }
 
 /// The connection status event.
-class WebAppConnectedStatusEvent: OCastMessage {
+public class WebAppConnectedStatusEvent: OCastMessage {
     public let status: WebAppState
 }
+

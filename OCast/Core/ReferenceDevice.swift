@@ -19,7 +19,7 @@
 import Foundation
 
 /// The handler used to manage the command results.
-internal typealias CommandResult = (Result<Data?, Error>) -> Void
+public typealias CommandResult = (Result<Data?, Error>) -> Void
 
 /// The Reference device which conforms to the OCast specification.
 @objc @objcMembers
