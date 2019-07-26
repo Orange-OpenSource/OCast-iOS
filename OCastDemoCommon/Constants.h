@@ -17,8 +17,11 @@
 
 #import <Foundation/Foundation.h>
 
-/// The driver name
-extern NSString * const OCastDemoDriverName;
+/// The driver name.
+extern NSString * const OCastDemoManufacturerName;
 
-/// The application name
+/// The application name.
 extern NSString * const OCastDemoApplicationName;
+
+/// The movie URL.
+extern NSString * const OCastDemoMovieURLString;
