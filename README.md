@@ -58,7 +58,7 @@ If devices are lost (network problem or device is turned-off), the `center(_:did
 
 ```swift
 deviceCenter.delegate = self
-deviceCenter.reumeDiscovery()
+deviceCenter.resumeDiscovery()
 
 // DeviceCenter delegate methods
 func center(_ center: DeviceCenter, didAdd devices: [Device]) {}
@@ -100,7 +100,7 @@ If a network error occurs, the `deviceDisconnectedEventNotification` notificatio
 
 ### 4. Send OCast commands
 
-You can use the OCast commands provided by the SDK in the `Device` protocol. The command list is described here: https://www.ocast.org/OCast-Protocol.pdf
+You can use the OCast commands provided by the SDK in the `Device` protocol. The command list is described here: http://www.ocast.org/OCast-Protocol.pdf
 
 ```swift
 let params = PrepareMediaCommandParams(url: "http://myMovie.mp4",
