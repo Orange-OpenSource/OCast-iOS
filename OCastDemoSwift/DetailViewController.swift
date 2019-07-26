@@ -66,6 +66,10 @@ class DetailViewController: UIViewController {
                                                name: .playbackStatusEventNotification,
                                                object: device)
         NotificationCenter.default.addObserver(self,
+                                               selector: #selector(deviceDisconnectedEventNotification),
+                                               name: .deviceDisconnectedEventNotification,
+                                               object: device)
+        NotificationCenter.default.addObserver(self,
                                                selector: #selector(applicationDidEnterBackground),
                                                name: UIApplication.didEnterBackgroundNotification,
                                                object: nil)
@@ -97,7 +101,11 @@ class DetailViewController: UIViewController {
     }
     
     private func show(_ error: Error, beforeControllerDismissed: Bool = false) {
-        let alertController = UIAlertController(title: "OCastDemo", message: error.localizedDescription, preferredStyle: .alert)
+        show(error.localizedDescription, beforeControllerDismissed: beforeControllerDismissed)
+    }
+    
+    private func show(_ message: String, beforeControllerDismissed: Bool = false) {
+        let alertController = UIAlertController(title: "OCastDemo", message: message, preferredStyle: .alert)
         let alertAction = UIAlertAction(title: "OK", style: .default, handler: { _ in
             if beforeControllerDismissed {
                 self.navigationController?.popToRootViewController(animated: true)
@@ -258,6 +266,12 @@ class DetailViewController: UIViewController {
     
     @objc func playbackStatusNotification(_ notification: Notification) {
         currentPlaybackStatus = notification.userInfo?[DeviceUserInfoKey.playbackStatusUserInfoKey] as? MediaPlaybackStatus
+    }
+    
+    @objc func deviceDisconnectedEventNotification(_ notification: Notification) {
+        if (notification.userInfo?[DeviceUserInfoKey.errorUserInfoKey] as? OCastError) != nil {
+            show("Device disconnected", beforeControllerDismissed: true)
+        }
     }
     
     @objc func applicationDidEnterBackground() {

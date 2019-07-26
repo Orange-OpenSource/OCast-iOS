@@ -32,7 +32,10 @@ import Foundation
 /// - misformedCommand: The command is misformed and can't be sent.
 /// - unableToSendCommand: The command has not been sent.
 /// - transportError: A transport error occurs.
-/// - wrongStateDisconnected: The command can't be sent because the device is disconnected.
+/// - deviceHasBeenDisconnected: The command can't be sent because the device is disconnected.
+/// - webSocketConnectionFailed: The web socket connection failed.
+/// - webSocketDisconnectionFailed: The web socket disconnection failed.
+/// - webSocketDisconnected: The websocket is disconnect due to a network error.
 @objc
 public enum OCastError: Int, Error {
     case wrongStateDisconnected
@@ -51,6 +54,7 @@ public enum OCastError: Int, Error {
     case deviceHasBeenDisconnected
     case webSocketConnectionFailed
     case webSocketDisconnectionFailed
+    case webSocketDisconnected
 }
 
 /// Due to Objective-C restrictions (lack of enumeration with associated value),

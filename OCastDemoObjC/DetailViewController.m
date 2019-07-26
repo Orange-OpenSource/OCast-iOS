@@ -62,6 +62,10 @@
                                                name:NSNotification.playbackStatusEventNotification
                                              object:self.device];
     [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(deviceDisconnectedEventNotification:)
+                                               name:NSNotification.deviceDisconnectedEventNotification
+                                             object:self.device];
+    [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(applicationDidEnterBackground)
                                                name:UIApplicationDidEnterBackgroundNotification
                                              object:nil];
@@ -85,7 +89,7 @@
     __weak DetailViewController * weakSelf = self;
     [self.device connect:sslConfiguration completion:^(NSError * _Nullable error) {
         if (error != nil) {
-            [weakSelf show:error beforeControllerDismissed:YES];
+            [weakSelf showError:error beforeControllerDismissed:YES];
             completion(NO);
         } else {
             completion(YES);
@@ -93,9 +97,13 @@
     }];
 }
 
-- (void)show:(NSError *)error beforeControllerDismissed:(BOOL)dismissesController {
+- (void)showError:(NSError *)error beforeControllerDismissed:(BOOL)dismissesController {
+    [self showMessage:error.localizedDescription beforeControllerDismissed:dismissesController];
+}
+
+- (void)showMessage:(NSString *)message beforeControllerDismissed:(BOOL)dismissesController {
     UIAlertController * alertController = [UIAlertController alertControllerWithTitle:@"OCastDemo"
-                                                                              message:error.localizedDescription
+                                                                              message:message
                                                                        preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction * alertAction = [UIAlertAction actionWithTitle:@"OK"
                                                            style:UIAlertActionStyleDefault
@@ -122,7 +130,7 @@
         if (connected) {
             [weakSelf.device mediaPlaybackStatusWithCompletion:^(MediaPlaybackStatus * _Nullable playbackStatus, NSError * _Nullable error) {
                 if (error != nil) {
-                    [weakSelf show:error beforeControllerDismissed:NO];
+                    [weakSelf showError:error beforeControllerDismissed:NO];
                 } else {
                     weakSelf.currentPlaybackStatus = playbackStatus;
                 }
@@ -185,7 +193,7 @@
         if (connected) {
             [weakSelf.device prepareMedia:params withOptions:nil completion:^(NSError * _Nullable error) {
                 if (error != nil) {
-                    [weakSelf show:error beforeControllerDismissed:NO];
+                    [weakSelf showError:error beforeControllerDismissed:NO];
                 }
             }];
         }
@@ -198,7 +206,7 @@
         if (connected) {
             [weakSelf.device stopMediaWithCompletion:^(NSError * _Nullable error) {
                 if (error != nil) {
-                    [weakSelf show:error beforeControllerDismissed:NO];
+                    [weakSelf showError:error beforeControllerDismissed:NO];
                 }
             }];
         }
@@ -212,13 +220,13 @@
             if (weakSelf.currentPlaybackStatus.state == MediaPlaybackStatePaused) {
                 [weakSelf.device resumeMediaWithCompletion:^(NSError * _Nullable error) {
                     if (error != nil) {
-                        [weakSelf show:error beforeControllerDismissed:NO];
+                        [weakSelf showError:error beforeControllerDismissed:NO];
                     }
                 }];
             } else {
                 [weakSelf.device pauseMediaWithCompletion:^(NSError * _Nullable error) {
                     if (error != nil) {
-                        [weakSelf show:error beforeControllerDismissed:NO];
+                        [weakSelf showError:error beforeControllerDismissed:NO];
                     }
                 }];
             }
@@ -234,7 +242,7 @@
                 double position = weakSelf.progressionSlider.value * weakSelf.currentPlaybackStatus.duration;
                 [weakSelf.device seekMediaTo:position completion:^(NSError * _Nullable error) {
                     if (error != nil) {
-                        [weakSelf show:error beforeControllerDismissed:NO];
+                        [weakSelf showError:error beforeControllerDismissed:NO];
                     }
                 }];
             }
@@ -247,7 +255,7 @@
         if (connected) {
             [weakSelf.device setMediaVolume:weakSelf.volumeSlider.value completion:^(NSError * _Nullable error) {
                 if (error != nil) {
-                    [weakSelf show:error beforeControllerDismissed:NO];
+                    [weakSelf showError:error beforeControllerDismissed:NO];
                 }
             }];
         }
@@ -260,7 +268,7 @@
         if (connected) {
             [self.device mediaMetadataWithCompletion:^(MediaMetadata * _Nullable metadata, NSError * _Nullable error) {
                 if (error != nil) {
-                    [weakSelf show:error beforeControllerDismissed:NO];
+                    [weakSelf showError:error beforeControllerDismissed:NO];
                 } else {
                     weakSelf.titleLabel.text = [NSString stringWithFormat:@"Titre: %@", metadata.title];
                     weakSelf.subtitleLabel.text = [NSString stringWithFormat:@"Sous-titre: %@", metadata.subtitle];
@@ -274,6 +282,12 @@
 
 - (void)playbackStatusNotification:(NSNotification *)notification {
     self.currentPlaybackStatus = notification.userInfo[DeviceUserInfoKey.playbackStatusUserInfoKey];
+}
+
+- (void)deviceDisconnectedEventNotification:(NSNotification *)notification {
+    if ((NSError *)(notification.userInfo[DeviceUserInfoKey.errorUserInfoKey]) != nil) {
+        [self showMessage:@"Device disconnected" beforeControllerDismissed:YES];
+    }
 }
 
 - (void)applicationDidEnterBackground {
