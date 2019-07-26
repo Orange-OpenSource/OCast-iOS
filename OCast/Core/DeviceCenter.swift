@@ -45,8 +45,8 @@ import Foundation
 
 /// The center which discover OCast devices on the network.
 /// You must register a device for a manufacturer using the `registerDevice(_:forManufacturer:)` method.
-/// Then you can start the discovery with the `resumeDiscovery` method.
-/// If you want to release this object, you must call `stopDiscovery` before to avoid memory leaks.
+/// Then you can start the discovery with the `resumeDiscovery()` method.
+/// - Warning: If you want to release this object, you must call `stopDiscovery()` before to avoid memory leaks.
 @objcMembers
 public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
 
@@ -79,7 +79,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     /// Registers a device type to discover devices of its manufacturer.
     ///
     /// - Parameters:
-    ///   - deviceType: The Type of the device class to register (for example ReferenceDevice.self)
+    ///   - deviceType: The Type of the device class to register (for example ReferenceDevice.self).
     ///   - manufacturer: The device manufacturer used to identify it during the discovery.
     public func registerDevice(_ deviceType: Device.Type, forManufacturer manufacturer: String) {
         registeredDevices[manufacturer] = deviceType
@@ -87,7 +87,7 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
     }
     
     /// Resumes the discovery process to found devices on the local network.
-    /// When a new devices are found the `deviceCenterAddDevicesNotification` notification
+    /// When new devices are found the `deviceCenterAddDevicesNotification` notification
     /// and the `center(_:didAdd:)` method are triggered.
     /// When devices are lost the `deviceCenterRemoveDevicesNotification` notification
     /// and the `center(_:didRemove:)` method are triggered.

@@ -151,7 +151,7 @@ public class MediaPlaybackStatus: OCastMessage {
     public var volume: Float { return _volume ?? 0.0 }
     
     /// `true` if the media is muted, otherwise `false`.
-    public var mute: Bool { return _mute ?? false }
+    public var muted: Bool { return _mute ?? false }
     
     /// The media state.
     public let state: MediaPlaybackState
@@ -243,10 +243,6 @@ public class MediaTrack: OCastMessage {
     case unknownTransferMode = 2416
     case internalError = 2500
     case unknownError = 2999
-    /// :nodoc:
-    case invalidMetadata = 9997
-    case invalidPlaybackStatus = 9998
-    case invalidErrorCode = 9999
 }
 
 // MARK: - Media parameters
@@ -271,13 +267,13 @@ public class PrepareMediaCommandParams: OCastMessage {
     /// The media logo.
     public let logo: String
     
-    /// The media type. See `MediaType`
+    /// The media type. See `MediaType`.
     public let mediaType: MediaType
     
-    /// The media transfer mode. See `MediaTransferMode`
+    /// The media transfer mode. See `MediaTransferMode`.
     public let transferMode: MediaTransferMode
     
-    /// `true` if the media must be lauched automatically, othewise `false` (can be done with play).
+    /// `true` if the media must be lauched automatically, othewise `false`.
     public let autoplay: Bool
     
     public init(url: String, frequency: UInt, title: String, subtitle: String, logo: String, mediaType: MediaType, transferMode: MediaTransferMode, autoPlay: Bool) {
@@ -300,16 +296,20 @@ public class SetMediaTrackCommandParams: OCastMessage {
     /// The track identifier.
     public let trackId: String
 
-    /// The media track type. See `MediaTrackType`
+    /// The media track type. See `MediaTrackType`.
     public let type: MediaTrackType
     
     /// `true` to enable the track, `false` to disable it.
-    public let enable: Bool
+    public let enabled: Bool
     
-    public init(trackId: String, type: MediaTrackType, enable: Bool) {
+    public init(trackId: String, type: MediaTrackType, enabled: Bool) {
         self.type = type
         self.trackId = trackId
-        self.enable = enable
+        self.enabled = enabled
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case trackId, type, enabled = "enable"
     }
 }
 
@@ -336,7 +336,7 @@ public class StopMediaCommandParams: OCastMessage {}
 @objcMembers
 public class ResumeMediaCommandParams: OCastMessage {}
 
-/// The parameters to set the volume of a media
+/// The parameters to set the volume of a media.
 @objc
 @objcMembers
 public class SetMediaVolumeCommandParams: OCastMessage {
@@ -383,9 +383,13 @@ public class MediaMetadataCommandParams: OCastMessage {}
 public class MuteMediaCommandParams: OCastMessage {
     
     /// `true`to mute the media, `false` to unmute it.
-    public let mute: Bool
+    public let muted: Bool
     
-    public init(mute: Bool) {
-        self.mute = mute
+    public init(muted: Bool) {
+        self.muted = muted
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case muted = "mute"
     }
 }

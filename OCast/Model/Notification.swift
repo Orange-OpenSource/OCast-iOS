@@ -33,7 +33,7 @@ public extension Notification.Name {
     /// The userinfo `DeviceCenterUserInfoKey.errorUserInfoKey` key contains an error if it occured.
     static let deviceCenterDiscoveryStoppedNotification = Notification.Name("OCastDeviceCenterDiscoveryStopped")
     
-    /// The notification sent when the device is disconnected
+    /// The notification sent when the device is disconnected.
     /// The userinfo `DeviceUserInfoKey.errorUserInfoKey` key contains error information.
     static let deviceDisconnectedEventNotification = Notification.Name("OCastDeviceDisconnectedEvent")
 
@@ -66,7 +66,7 @@ public extension NSNotification {
     /// The userinfo `DeviceCenterUserInfoKey.errorUserInfoKey` key contains an error if it occured.
     static let deviceCenterDiscoveryStoppedNotification = Notification.Name.deviceCenterDiscoveryStoppedNotification
     
-    /// The notification sent when the device is disconnected
+    /// The notification sent when the device is disconnected.
     /// The userinfo `DeviceUserInfoKey.errorUserInfoKey` key contains error information.
     static let deviceDisconnectedEventNotification = Notification.Name.deviceDisconnectedEventNotification
     
@@ -100,7 +100,7 @@ public class DeviceCenterUserInfoKey: NSObject {
 @objcMembers
 public class DeviceUserInfoKey: NSObject {
     
-    /// The notification user info key representing the error.
+    /// The notification user info key representing the error when the device is disconnected.
     public static let errorUserInfoKey = "OCastDeviceUserInfoKey.ErrorKey"
     
     /// The notification user info key representing the playback status.

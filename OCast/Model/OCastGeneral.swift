@@ -21,21 +21,23 @@ import Foundation
 
 /// The OCast errors.
 ///
-/// - wrongStateDisconnected: The operation can be performed because the device is disconnected.
-/// - wrongStateConnecting: The operation can be performed because the device is connecting.
-/// - wrongStateConnected: The operation can be performed because the device is connected.
-/// - wrongStateDisconnecting: The operation can be performed because the device is disconnecting.
-/// - applicationNameNotSet: The operation can be performed because the application name is not set.
-/// - badApplicationURL: The operation can be performed because the application URL is misformed.
+/// - wrongStateDisconnected: The operation can't be performed because the device is disconnected.
+/// - wrongStateConnecting: The operation can't be performed because the device is connecting.
+/// - wrongStateConnected: The operation can't be performed because the device is connected.
+/// - wrongStateDisconnecting: The operation can't be performed because the device is disconnecting.
+/// - applicationNameNotSet: The operation can't be performed because the application name is not set.
+/// - dialError: A DIAL error occurs.
+/// - badApplicationURL: The operation can't be performed because the application URL is misformed.
 /// - websocketConnectionEventNotReceived: The application has not sent the websocket connection event.
 /// - emptyReplyReceived: An empty reply has been received.
+/// - badReplyFormatReceived: The reply can't be decoded.
 /// - misformedCommand: The command is misformed and can't be sent.
 /// - unableToSendCommand: The command has not been sent.
 /// - transportError: A transport error occurs.
 /// - deviceHasBeenDisconnected: The command can't be sent because the device is disconnected.
 /// - webSocketConnectionFailed: The web socket connection failed.
 /// - webSocketDisconnectionFailed: The web socket disconnection failed.
-/// - webSocketDisconnected: The websocket is disconnect due to a network error.
+/// - webSocketDisconnected: The websocket is disconnected due to a network error.
 @objc
 public enum OCastError: Int, Error {
     case wrongStateDisconnected

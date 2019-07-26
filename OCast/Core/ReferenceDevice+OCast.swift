@@ -105,7 +105,7 @@ extension ReferenceDevice {
     }
     
     public func muteMedia(_ flag: Bool, completion: @escaping NoResultHandler) {
-        let data = OCastDataLayer(name: "mute", params: MuteMediaCommandParams(mute: flag), options: nil)
+        let data = OCastDataLayer(name: "mute", params: MuteMediaCommandParams(muted: flag), options: nil)
         sendMediaMessage(from: data, completion: completion)
     }
     
