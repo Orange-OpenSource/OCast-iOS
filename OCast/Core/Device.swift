@@ -111,6 +111,7 @@ public protocol Device {
     // MARK: - Events methods
     
     /// Registers a handler when the specifed event name is received.
+    /// - Warning: The completion block is not called on the main thread.
     ///
     /// - Parameters:
     ///   - name: The event name.
@@ -266,8 +267,13 @@ public protocol SenderDevice {
     func send<T: OCastMessage, U: Codable>(_ message: OCastApplicationLayer<T>, on domain: OCastDomainName, completion: @escaping ResultHandler<U>)
 }
 
-/// Extension to manage default parameter values (forbidden in a protocol).
+/// Extension to manage default parameter values (forbidden in a protocol) and Objective-C restrictions.
 public extension Device {
+    
+    /// Adds a way to access to the custom commands API.
+    var sender: SenderDevice? {
+        return self as? SenderDevice
+    }
     
     func disconnect(completion: NoResultHandler? = nil) {
         disconnect(completion: completion)

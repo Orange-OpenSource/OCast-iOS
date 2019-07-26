@@ -37,7 +37,7 @@ import Foundation
     /// `true` to use self-signed certificates, otherwise `false` (default).
     public var disablesSSLCertificateValidation: Bool
     
-    /// Intializes a SSLConfiguration by default
+    /// Intializes a SSLConfiguration by default.
     public override init() {
         validatesHost = true
         validatesCertificateChain = true

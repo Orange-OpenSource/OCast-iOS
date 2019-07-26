@@ -72,7 +72,7 @@ public enum UpdateState: Int, RawRepresentable, Codable {
 @objcMembers
 public class UpdateStatus: OCastMessage {
     
-    /// The state. See `UpdateState`
+    /// The state. See `UpdateState`.
     public let state: UpdateState
     
     /// The version.
