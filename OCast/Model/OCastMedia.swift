@@ -195,6 +195,16 @@ public class MediaMetadata: OCastMessage {
     /// The video tracks. See `MediaTrack`.
     public let videoTracks: [MediaTrack]
     
+    public init(title: String, subtitle: String, logo: String, mediaType: MediaType, subtitleTracks: [MediaTrack], audioTracks: [MediaTrack], videoTracks: [MediaTrack]) {
+        self.title = title
+        self.subtitle = subtitle
+        self.logo = logo
+        self._mediaType = mediaType.rawValue
+        self.subtitleTracks = subtitleTracks
+        self.audioTracks = audioTracks
+        self.videoTracks = videoTracks
+    }
+    
     enum CodingKeys: String, CodingKey {
         case title = "title", subtitle = "subtitle", logo = "logo", _mediaType = "mediaType", subtitleTracks = "textTracks", audioTracks = "audioTracks", videoTracks = "videoTracks"
     }
@@ -216,6 +226,13 @@ public class MediaTrack: OCastMessage {
     
     /// `true` if the track is enabled, otherwise `false`.
     public let enabled: Bool
+    
+    public init(trackId: String, language: String, label: String, enabled: Bool) {
+        self.trackId = trackId
+        self.language = language
+        self.label = label
+        self.enabled = enabled
+    }
 }
 
 // MARK: - Media error codes
