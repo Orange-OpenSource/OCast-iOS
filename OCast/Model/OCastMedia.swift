@@ -165,6 +165,14 @@ public class MediaPlaybackStatus: OCastMessage {
     enum CodingKeys: String, CodingKey {
         case _volume = "volume", _mute = "mute", state = "state", _position = "position", _duration = "duration"
     }
+    
+    public init(volume: Float?, mute: Bool?, position: Double?, duration: Double?, state: MediaPlaybackState) {
+        self._volume = volume
+        self._mute = mute
+        self._position = position
+        self._duration = duration
+        self.state = state
+    }
 }
 
 /// The media metadata.
