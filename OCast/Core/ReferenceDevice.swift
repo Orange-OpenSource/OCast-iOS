@@ -137,7 +137,11 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         self.connectionEventTimeout = connectionEventTimeout
         let defaultSettingsWebSocketURL = "wss://\(host):4433/ocast"
         #if TEST
-        settingsWebSocketURL = ProcessInfo.processInfo.environment["SETTINGSWEBSOCKET"] ?? defaultSettingsWebSocketURL
+        if let webSocketBaseURL = ProcessInfo.processInfo.environment["SETTINGSWEBSOCKET"] {
+            settingsWebSocketURL = webSocketBaseURL + upnpID
+        } else {
+            settingsWebSocketURL = defaultSettingsWebSocketURL
+        }
         #else
         settingsWebSocketURL = defaultSettingsWebSocketURL
         #endif
