@@ -83,7 +83,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
     private var isStopped = true
     
     /// `true` if the discovery is running, otherwise `false`
-    private var isRunning: Bool {
+    var isRunning: Bool {
         return !isStopped && !isPaused
     }
     

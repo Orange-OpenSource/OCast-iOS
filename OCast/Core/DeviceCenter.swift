@@ -71,6 +71,11 @@ public class DeviceCenter: NSObject, DeviceDiscoveryDelegate {
         set { deviceDiscovery?.interval = newValue }
     }
     
+    /// A Boolean value that indicates whether the discovery process is currently running.
+    public var discoveryIsRunning: Bool {
+        return deviceDiscovery?.isRunning ?? false
+    }
+    
     /// The devices discovered on the network.
     public var devices: [Device] {
         return Array(discoveredDevices.values)
