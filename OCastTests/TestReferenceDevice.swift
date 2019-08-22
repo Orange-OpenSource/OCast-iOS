@@ -176,7 +176,24 @@ class TestReferenceDevice: XCTestCase {
                 disconnectionExpectation.fulfill()
             }
         }
-        wait(for: [disconnectionExpectation], timeout: 5.0)
+        
+    }
+    
+    func testDisconnectWithoutCompletionHandler() {
+        let disconnectionExpectation = XCTestExpectation(description: "disconnectionExpectation")
+        disconnectionExpectation.isInverted = true
+        referenceDevice.connect(nil) { error in
+            XCTAssertNil(error)
+            self.referenceDevice.disconnect()
+        }
+        let observer = NotificationCenter.default.addObserver(forName: .deviceDisconnectedEventNotification,
+                                                              object: nil,
+                                                              queue: nil) { _ in
+                                                                XCTAssertEqual(.disconnected, self.referenceDevice.state)
+                                                                disconnectionExpectation.fulfill()
+        }
+        wait(for: [disconnectionExpectation], timeout: 10.0)
+        NotificationCenter.default.removeObserver(observer)
     }
     
     func testDisconnectDuringConnection() {
