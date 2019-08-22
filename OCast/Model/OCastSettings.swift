@@ -97,27 +97,27 @@ public class DeviceID: OCastMessage {
     public let id: String
 }
 
-/// The gamepad axe type (https://www.w3.org/TR/gamepad/#remapping).
+/// The gamepad axis type (https://www.w3.org/TR/gamepad/#remapping).
 ///
-/// - leftStickHorizontalAxes: The horizontal axis for left stick (negative left/positive right).
-/// - leftStickVerticalAxes: The vertical axis for left stick (negative up/positive down).
-/// - rightStickHorizontalAxes: The horizontal axis for right stick (negative left/positive right).
-/// - rightStickVerticalAxes: The vertical axis for right stick (negative up/positive down).
+/// - leftStickHorizontal: The horizontal axis for left stick (negative left/positive right).
+/// - leftStickVertical: The vertical axis for left stick (negative up/positive down).
+/// - rightStickHorizontal: The horizontal axis for right stick (negative left/positive right).
+/// - rightStickVertical: The vertical axis for right stick (negative up/positive down).
 @objc
-public enum GamepadAxeType: Int, Codable {
-    case leftStickHorizontalAxes = 0
-    case leftStickVerticalAxes = 1
-    case rightStickHorizontalAxes = 2
-    case rightStickVerticalAxes = 3
+public enum GamepadAxisType: Int, Codable {
+    case leftStickHorizontal = 0
+    case leftStickVertical = 1
+    case rightStickHorizontal = 2
+    case rightStickVertical = 3
 }
 
-/// The gamepad axe.
+/// The gamepad axis.
 @objc
 @objcMembers
-public class GamepadAxe: OCastMessage {
+public class GamepadAxis: OCastMessage {
     
-    /// The axis type. See `GamepadAxeType`.
-    public let type: GamepadAxeType
+    /// The axis type. See `GamepadAxisType`.
+    public let type: GamepadAxisType
     
     /// The x axis (-1.0 -> 1.0).
     public let x: Float
@@ -220,7 +220,7 @@ public class SendGamepadEventCommandParams: OCastMessage {
     private let _buttons: Int
     
     /// The axes used.
-    public let axes: [GamepadAxe]
+    public let axes: [GamepadAxis]
     
     /// The buttons pressed. Several buttons can be pressed at the same time. See `GamepadButton`.
     public var buttons: GamepadButton { return GamepadButton(rawValue: _buttons) }
@@ -229,7 +229,7 @@ public class SendGamepadEventCommandParams: OCastMessage {
         case axes, _buttons = "buttons"
     }
     
-    public init(axes: [GamepadAxe], buttons: GamepadButton) {
+    public init(axes: [GamepadAxis], buttons: GamepadButton) {
         self.axes = axes
         _buttons = buttons.rawValue
     }
