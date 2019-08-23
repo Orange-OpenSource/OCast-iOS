@@ -111,7 +111,7 @@ class TestDeviceDiscovery: XCTestCase {
         
         let devicesRemovedExpectation = assertDevicesRemoved()
         
-        wait(for: [devicesRemovedExpectation], timeout: 10.0)
+        wait(for: [devicesRemovedExpectation], timeout: 13.0)
         XCTAssertTrue(deviceDiscovery.devices.isEmpty)
     }
     
