@@ -519,6 +519,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
             
+            let previousState = self.state
             self.state = .disconnected
             
             self.commandHandlers.forEach { _, completion in
@@ -532,7 +533,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
             } else if let connectionHandler = self.connectionHandler {
                 connectionHandler(error != nil ? OCastError.webSocketConnectionFailed : nil)
                 self.connectionHandler = nil
-            } else {
+            } else if previousState == .connected {
                 NotificationCenter.default.post(name: .deviceDisconnectedEventNotification,
                                                 object: self,
                                                 userInfo: [DeviceUserInfoKey.errorUserInfoKey: OCastError.webSocketDisconnected])
