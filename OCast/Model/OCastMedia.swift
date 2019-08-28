@@ -332,10 +332,6 @@ public class SetMediaTrackCommandParams: OCastMessage {
         self.trackId = trackId
         self.enabled = enabled
     }
-    
-    enum CodingKeys: String, CodingKey {
-        case trackId, type, enabled = "enable"
-    }
 }
 
 /// The parameters to play a media.
