@@ -46,6 +46,15 @@ protocol DeviceDiscoveryDelegate: class {
 /// Class to manage the device discovery using the SSDP protocol.
 class DeviceDiscovery: NSObject, UDPSocketDelegate {
     
+    /// The device discovery state.
+    ///
+    /// - stopped: The discovery is stopped.
+    /// - paused: The discovery is paused.
+    /// - running: The discovery is running.
+    private enum State {
+        case stopped, paused, running
+    }
+    
     /// The UDP socket.
     private var udpSocket: UDPSocketProtocol
     
@@ -76,15 +85,12 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
     /// The current tasks to remove devices.
     private var removeDevicesTasks = [DispatchWorkItem]()
     
-    /// `true` if the discovery is paused, otherwise `false`
-    private var isPaused = false
-    
-    /// `true` if the discovery is stopped, otherwise `false`
-    private var isStopped = true
+    /// The device discovery state.
+    private var state: State = .stopped
     
     /// `true` if the discovery is running, otherwise `false`
     var isRunning: Bool {
-        return !isStopped && !isPaused
+        return state == .running
     }
     
     // The delegate to receive the device discovery events.
@@ -141,8 +147,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
         
         do {
             try udpSocket.open(port: 0)
-            isPaused = false
-            isStopped = false
+            state = .running
             refresh()
             
             return true
@@ -158,10 +163,9 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
     /// - Returns: `true` if the discovery is correctly stopped, otherwise `false`.
     @discardableResult
     func stop() -> Bool {
-        guard !isStopped else { return false }
+        guard state != .stopped else { return false }
         
-        isPaused = false
-        isStopped = true
+        state = .stopped
         close()
         
         return true
@@ -174,8 +178,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
     func pause() -> Bool {
         guard isRunning else { return false }
         
-        isPaused = true
-        isStopped = false
+        state = .paused
         close()
         
         return true
@@ -213,7 +216,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
         cancelAllTasks()
         
         // Don't remove the devices when the discovery is paused
-        guard !isPaused else { return }
+        guard state != .paused else { return }
         
         delegate?.deviceDiscovery(self, didRemove: devices)
         
@@ -313,6 +316,7 @@ class DeviceDiscovery: NSObject, UDPSocketDelegate {
         Logger.shared.log(logLevel: .warning, "UDP socket closed unexpectedly")
         
         DispatchQueue.main.sync {
+            self.state = .stopped
             self.clean(with: error)
         }
     }

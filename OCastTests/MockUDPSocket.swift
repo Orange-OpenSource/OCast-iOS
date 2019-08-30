@@ -52,4 +52,10 @@ class MockUDPSocket: UDPSocketProtocol {
             self.delegate?.udpSocket(self, didReceive: self.responsePayload.data(using: .utf8)!, fromHost: "127.0.0.1")
         }
     }
+    
+    func triggerSocketError(after delay: TimeInterval) {
+        dispatchQueue.asyncAfter(deadline: .now() + delay) {
+            self.delegate?.udpSocketDidClose(self, with: NSError(domain: "MockUDPSocketDomain", code: 1234, userInfo: nil))
+        }
+    }
 }
