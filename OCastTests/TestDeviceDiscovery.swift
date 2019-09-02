@@ -194,6 +194,15 @@ class TestDeviceDiscovery: XCTestCase {
         XCTAssertFalse(deviceDiscovery.pause())
     }
     
+    func testDeviceDiscoveryError() {
+        XCTAssertTrue(deviceDiscovery.resume())
+        
+        mockUDPSocket.triggerSocketError(after: 1.0)
+        
+        let discoveryStoppedExpectation = assertDiscoveryStopped(errorExpected: true)
+        wait(for: [discoveryStoppedExpectation], timeout: 5.0)
+    }
+    
     private func assertDevicesAdded() -> XCTestExpectation {
         let expectation = self.expectation(description: "devicesAdded")
         testDeviceDiscoveryDelegate?.devicesAdded = { devices in
@@ -215,12 +224,17 @@ class TestDeviceDiscovery: XCTestCase {
         return expectation
     }
     
-    private func assertDiscoveryStopped() -> XCTestExpectation {
+    private func assertDiscoveryStopped(errorExpected: Bool = false) -> XCTestExpectation {
         let expectation = self.expectation(description: "discoveryStopped")
         testDeviceDiscoveryDelegate?.discoveryStopped = { error in
             expectation.fulfill()
-            XCTAssertNil(error)
+            if errorExpected {
+                XCTAssertNotNil(error)
+            } else {
+                XCTAssertNil(error)
+            }
             XCTAssertTrue(self.deviceDiscovery.devices.isEmpty)
+            XCTAssertFalse(self.deviceDiscovery.isRunning)
         }
         
         return expectation
