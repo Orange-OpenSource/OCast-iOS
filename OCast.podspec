@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
 s.name             = 'OCast'
-s.version          = '2.0.0'
+s.version          = '2.0.1'
 s.summary          = 'OCast SDK provides an implementation of OCast protocol.'
 
 # This description is used to generate tags and improve search results.

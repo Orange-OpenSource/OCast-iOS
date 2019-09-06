@@ -1,4 +1,11 @@
 OCast Release notes
+
+============================
+Version 2.0.1, September 2019
+============================
+- Bug fixes
+- Add discoveryIsRunning property
+
 ============================
 Version 2.0.0, July 2019
 ============================
