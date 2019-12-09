@@ -2,7 +2,7 @@ PODS:
   - AppleReachability (5.0)
   - CocoaAsyncSocket (7.6.3)
   - DynamicCodable (1.0)
-  - OCast (2.0.1):
+  - OCast (2.0.2):
     - CocoaAsyncSocket (~> 7.6.3)
     - DynamicCodable (~> 1.0)
     - Starscream (~> 3.1.0)
@@ -20,7 +20,7 @@ DEPENDENCIES:
   - SwiftLint
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - AppleReachability
     - CocoaAsyncSocket
     - DynamicCodable
@@ -36,7 +36,7 @@ SPEC CHECKSUMS:
   AppleReachability: 517ec01d04f74575708635a292136cd68f113d76
   CocoaAsyncSocket: eafaa68a7e0ec99ead0a7b35015e0bf25d2c8987
   DynamicCodable: 2cf558d057b3e6540552943254e1c9eeb706dde2
-  OCast: 2087d72a97ab19ecbbc3195028d554aba88be02f
+  OCast: 16b56636cc7efb19ffd8ce9674e3e7a346b25650
   ReachabilitySwift: 4032e2f59586e11e3b0ebe15b167abdd587a388b
   Starscream: 08172b481e145289c4930cb567230fb55897cfa4
   SwiftLint: fed9c66336e41fc74dc48a73678380718f0c8b0e
