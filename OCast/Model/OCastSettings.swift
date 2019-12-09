@@ -183,6 +183,16 @@ public class SendKeyEventCommandParams: OCastMessage {
     
     /// The location.
     public let location: DOMKeyLocation
+    
+    public init(key: String, code: String, ctrl: Bool = false, alt: Bool = false, shift: Bool = false, meta: Bool = false, location: DOMKeyLocation = .standard) {
+        self.key = key
+        self.code = code
+        self.ctrl = ctrl
+        self.alt = alt
+        self.shift = shift
+        self.meta = meta
+        self.location = location
+    }
 }
 
 /// The parameters to send a mouse event.
