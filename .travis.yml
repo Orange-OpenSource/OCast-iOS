@@ -1,4 +1,4 @@
-osx_image: xcode10.2
+osx_image: xcode11.6
 language: swift
 
 branches:
@@ -13,7 +13,7 @@ install:
 
 script:
   - set -o pipefail
-  - xcodebuild build -workspace OCast.xcworkspace -scheme OCast -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 7,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
-  - xcodebuild test -workspace OCast.xcworkspace -scheme 'OCastTests' -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 7,OS=latest' | xcpretty -s
-  - xcodebuild build -workspace OCast.xcworkspace -scheme OCastDemoSwift -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 7,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
-  - xcodebuild build -workspace OCast.xcworkspace -scheme OCastDemoObjC -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 7,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
+  - xcodebuild build -workspace OCast.xcworkspace -scheme OCast -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
+  - xcodebuild test -workspace OCast.xcworkspace -scheme 'OCastTests' -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 11,OS=latest' | xcpretty -s
+  - xcodebuild build -workspace OCast.xcworkspace -scheme OCastDemoSwift -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
+  - xcodebuild build -workspace OCast.xcworkspace -scheme OCastDemoObjC -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11,OS=latest" GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty -s
