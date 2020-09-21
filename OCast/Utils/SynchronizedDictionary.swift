@@ -24,6 +24,11 @@ public struct SynchronizedDictionary<T: Hashable, U> {
     /// The synchronized dictionary.
     private var synchronizedDictionary = SynchronizedValue([T: U]())
     
+    /// Thread-safe keys accessor.
+    public var keys: Dictionary<T, U>.Keys {
+        return synchronizedDictionary.read { $0.keys }
+    }
+    
     public init() {}
     
     /// Thread-safe subscript

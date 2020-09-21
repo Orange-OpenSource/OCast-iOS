@@ -33,7 +33,13 @@ import Foundation
 /// - badReplyFormatReceived: The reply can't be decoded.
 /// - misformedCommand: The command is misformed and can't be sent.
 /// - unableToSendCommand: The command has not been sent.
-/// - transportError: A transport error occurs.
+/// - transportJsonFormatError: The JSON is malformatted.
+/// - transportValueFormatError: A value is malformatted.
+/// - transportMissingMandatoryField: A mandantory field is missing.
+/// - transportInternalError: A internal error occured.
+/// - transportForbiddenUnsecureMode: The packet has no right to access the required destination or service.
+/// - transportUnknownError: An unknown error has occured.
+/// - transportMissingStatusError: The status is missing.
 /// - deviceHasBeenDisconnected: The command can't be sent because the device is disconnected.
 /// - webSocketConnectionFailed: The web socket connection failed.
 /// - webSocketDisconnectionFailed: The web socket disconnection failed.
@@ -52,7 +58,13 @@ public enum OCastError: Int, Error {
     case badReplyFormatReceived
     case misformedCommand
     case unableToSendCommand
-    case transportError
+    case transportJsonFormatError
+    case transportValueFormatError
+    case transportMissingMandatoryField
+    case transportInternalError
+    case transportForbiddenUnsecureMode
+    case transportUnknownError
+    case transportMissingStatusError
     case deviceHasBeenDisconnected
     case webSocketConnectionFailed
     case webSocketDisconnectionFailed
@@ -68,15 +80,6 @@ public struct OCastReplyError: Error {
         self.code = code
     }
 }
-
-/// The OCast transport errors.
-public let OCastTransportErrors = [
-    "json_format_error": "There is an error in the JSON formatting",
-    "value_format_error": "This is an error in the packet, typically caused by a malformatted value",
-    "missing_mandatory_field": "This is an error in the packet, typically caused by missing a field",
-    "internal_error": "All other cases",
-    "forbidden_unsecure_mode": "Packet has no right to access the required destination or service."
-]
 
 /// The base OCast message.
 public typealias OCastMessage = NSObject & Codable
@@ -103,7 +106,7 @@ public enum OCastDeviceLayerType: String, Codable {
 /// - ok: The command successed.
 /// - error: The command failed (with the string error).
 public enum OCastStatusType: Codable, Equatable {
-    case ok, error(String)
+    case ok, error(OCastError)
     
     public init(from decoder: Decoder) throws {
         let value = try decoder.singleValueContainer().decode(String.self).lowercased()
@@ -111,7 +114,7 @@ public enum OCastStatusType: Codable, Equatable {
         if value == "ok" {
             self = .ok
         } else {
-            self = .error(OCastTransportErrors[value] ?? "unknown transport error")
+            self = .error(OCastStatusType.transportErrorToOCastError(transportError: value))
         }
     }
     
@@ -130,6 +133,26 @@ public enum OCastStatusType: Codable, Equatable {
             return false
         }
     }
+    
+    /// Converts a transport error to an OCast error.
+    /// - Parameter transportError: The source transport error.
+    /// - Returns: The OCast error based on the source transport error.
+    private static func transportErrorToOCastError(transportError: String) -> OCastError {
+        switch transportError {
+        case "json_format_error":
+            return .transportJsonFormatError
+        case "value_format_error":
+            return .transportValueFormatError
+        case "missing_mandatory_field":
+            return .transportMissingMandatoryField
+        case "internal_error":
+            return .transportInternalError
+        case "forbidden_unsecure_mode":
+            return .transportForbiddenUnsecureMode
+        default:
+            return .transportUnknownError
+        }
+    }
 }
 
 /// The OCast device layer.
@@ -139,10 +162,10 @@ public class OCastDeviceLayer<T: Codable>: OCastMessage {
     public let id: Int
     
     /// The sender.
-    public let source: String
+    public let source: String?
     
     /// The recipient.
-    public let destination: String
+    public let destination: String?
     
     /// The message status (only for reply). See `OCastStatusType`
     public let status: OCastStatusType?
@@ -181,10 +204,10 @@ public class OCastDeviceLayer<T: Codable>: OCastMessage {
 public class OCastApplicationLayer<T: Codable>: OCastMessage {
     
     /// The service name.
-    public let service: String
+    public let service: String?
     
     /// The message data.
-    public let data: OCastDataLayer<T>
+    public let data: OCastDataLayer<T>?
     
     public init(service: String, data: OCastDataLayer<T>) {
         self.service = service

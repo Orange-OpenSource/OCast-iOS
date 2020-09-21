@@ -274,33 +274,36 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     /// Register media and settings event
     private func registerEvents() {
         registerEvent("playbackStatus") { [weak self] data in
-            if let playbackStatus = try? JSONDecoder().decode(OCastDeviceLayer<MediaPlaybackStatus>.self, from: data) {
+            if let playbackStatus = try? JSONDecoder().decode(OCastDeviceLayer<MediaPlaybackStatus>.self, from: data),
+                let playbackStatusParams = playbackStatus.message.data?.params {
                 DispatchQueue.main.async {
                     guard let `self` = self else { return }
                     NotificationCenter.default.post(name: .playbackStatusEventNotification,
-                                                    object: self, userInfo: [DeviceUserInfoKey.playbackStatusUserInfoKey: playbackStatus.message.data.params])
+                                                    object: self, userInfo: [DeviceUserInfoKey.playbackStatusUserInfoKey: playbackStatusParams])
                 }
             } else {
                 Logger.shared.log(logLevel: .error, "Can't decode playbackStatus event")
             }
         }
         registerEvent("metadataChanged") { [weak self] data in
-            if let metadata = try? JSONDecoder().decode(OCastDeviceLayer<MediaMetadata>.self, from: data) {
+            if let metadata = try? JSONDecoder().decode(OCastDeviceLayer<MediaMetadata>.self, from: data),
+                let metadataParams = metadata.message.data?.params {
                 DispatchQueue.main.async {
                     guard let `self` = self else { return }
                     NotificationCenter.default.post(name: .metadataChangedEventNotification,
-                                                    object: self, userInfo: [DeviceUserInfoKey.metadataUserInfoKey: metadata.message.data.params])
+                                                    object: self, userInfo: [DeviceUserInfoKey.metadataUserInfoKey: metadataParams])
                 }
             } else {
                 Logger.shared.log(logLevel: .error, "Can't decode metadataChanged event")
             }
         }
         registerEvent("updateStatus") { [weak self] data in
-            if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<UpdateStatus>.self, from: data) {
+            if let updateStatus = try? JSONDecoder().decode(OCastDeviceLayer<UpdateStatus>.self, from: data),
+                let updateStatusParams = updateStatus.message.data?.params {
                 DispatchQueue.main.async {
                     guard let `self` = self else { return }
                     NotificationCenter.default.post(name: .updateStatusEventNotification,
-                                                    object: self, userInfo: [DeviceUserInfoKey.updateStatusUserInfoKey: updateStatus.message.data.params])
+                                                    object: self, userInfo: [DeviceUserInfoKey.updateStatusUserInfoKey: updateStatusParams])
                 }
             } else {
                 Logger.shared.log(logLevel: .error, "Can't decode updateStatus event")
@@ -374,23 +377,39 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     ///   - jsonData: The JSON response.
     ///   - deviceLayer: The response device layer.
     private func handleReply(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {
-        let commandHandler = commandHandlers[deviceLayer.id]
+        let (commandHandler, replyID) = handlerForReply(deviceLayer)
         switch deviceLayer.status {
         case .ok?:
-            if let code = deviceLayer.message.data.params.code, code != OCastDefaultResponseDataLayer.successCode {
+            if let code = deviceLayer.message.data?.params.code, code != OCastDefaultResponseDataLayer.successCode {
                 DispatchQueue.main.async { commandHandler?(.failure(OCastReplyError(code: code))) }
             } else {
                 DispatchQueue.main.async { commandHandler?(.success(jsonData)) }
             }
         case .error(let error)?:
-            Logger.shared.log(logLevel: .error, "Can't handle reply: \(String(describing: error))")
-            DispatchQueue.main.async { commandHandler?(.failure(OCastError.transportError)) }
+            Logger.shared.log(logLevel: .error, "Can't handle reply: \(error.rawValue)")
+            DispatchQueue.main.async { commandHandler?(.failure(error)) }
         case .none:
             Logger.shared.log(logLevel: .warning, "The status is missing in the reply")
-            DispatchQueue.main.async { commandHandler?(.failure(OCastError.transportError)) }
+            DispatchQueue.main.async { commandHandler?(.failure(OCastError.transportMissingStatusError)) }
         }
         
-        commandHandlers.removeItem(forKey: deviceLayer.id)
+        commandHandlers.removeItem(forKey: replyID)
+    }
+    
+    /// Returns the correct handler for a reply
+    /// - Parameter deviceLayer: The response device layer
+    /// - Returns: The command handler and the id used.
+    private func handlerForReply(_ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) -> (CommandResult?, Int) {
+        let replyID = deviceLayer.id
+        var usedID = replyID
+        var commandHandler = commandHandlers[replyID]
+        if commandHandler == nil {
+            let fallbackID = commandHandlers.keys.min() ?? -1
+            usedID = fallbackID
+            commandHandler = commandHandlers[fallbackID]
+        }
+        
+        return (commandHandler, usedID)
     }
     
     /// Handles the connection event replies.
@@ -399,11 +418,11 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     /// - Throws: Throws an error if the JSON can't be decoded.
     private func handleConnectionEvent(_ jsonData: Data) throws {
         let connectEvent = try JSONDecoder().decode(OCastDeviceLayer<WebAppConnectedStatusEvent>.self, from: jsonData)
-        if connectEvent.message.data.params.status == .connected {
+        if connectEvent.message.data?.params.status == .connected {
             Logger.shared.log(logLevel: .debug, "The connected event has been received")
             isApplicationRunning.synchronizedValue = true
             semaphore?.signal()
-        } else if connectEvent.message.data.params.status == .disconnected {
+        } else if connectEvent.message.data?.params.status == .disconnected {
             Logger.shared.log(logLevel: .debug, "The disconnected event has been received")
             isApplicationRunning.synchronizedValue = false
         }
@@ -415,12 +434,12 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
     ///   - jsonData: The JSON response.
     ///   - deviceLayer: The response device layer.
     private func handleRegisteredEvents(from jsonData: Data, _ deviceLayer: OCastDeviceLayer<OCastDefaultResponseDataLayer>) {
-        if let eventName = deviceLayer.message.data.name,
+        if let eventName = deviceLayer.message.data?.name,
             let handler = registeredEvents[eventName] {
             handler(jsonData)
         } else {
             Logger.shared.log(logLevel: .warning,
-                              "Unregistered event received: \(String(describing: deviceLayer.message.data.name))")
+                              "Unregistered event received: \(String(describing: deviceLayer.message.data?.name ?? "No name provided"))")
         }
     }
     
@@ -462,7 +481,7 @@ open class ReferenceDevice: NSObject, Device, WebSocketDelegate {
                 }
                 do {
                     let result = try JSONDecoder().decode(OCastDeviceLayer<U>.self, from: data)
-                    completion(result.message.data.params, nil)
+                    completion(result.message.data?.params, nil)
                 } catch {
                     completion(nil, OCastError.badReplyFormatReceived)
                 }

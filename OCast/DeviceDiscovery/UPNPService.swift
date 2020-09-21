@@ -72,7 +72,7 @@ class UPNPService: UPNPServiceProtocol {
                            httpHeaders: headers,
                            completion: { [weak self] result in
             switch result {
-            case .success(let data, let responseHeaders):
+            case .success((let data, let responseHeaders)):
                 if let device = self?.device(from: data, httpHeaders: responseHeaders) {
                     DispatchQueue.main.async {
                         completionHandler(.success(device))

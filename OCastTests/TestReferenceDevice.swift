@@ -492,6 +492,28 @@ class TestReferenceDevice: XCTestCase {
         wait(for: [sendExpectation], timeout: 10.0)
     }
     
+    func testSendMessageWithForbiddenUnsecureMode() {
+        testStartApplication()
+        let name = "TestMessage"
+        let serviceName = "org.ocast.testService"
+        let data = OCastDataLayer(name: name, params: TestCommandParams(), options: nil)
+        let message = OCastApplicationLayer(service: serviceName, data: data)
+        let sendExpectation = XCTestExpectation(description: "sendExpectation")
+        let reply = """
+        { "dst": null, "src": null, "type": "reply", "id": -1, "message": { }, "status": "forbidden_unsecure_mode" }
+        """
+        let completionBlock: ResultHandler<TestReply> = { result, error in
+            let ocastError = error as? OCastError
+            XCTAssertNotNil(ocastError)
+            XCTAssertEqual(OCastError.transportForbiddenUnsecureMode, ocastError)
+            XCTAssertNil(result)
+            sendExpectation.fulfill()
+        }
+        referenceDevice.send(message, on: .browser, completion: completionBlock)
+        mockWebSocket.triggerIncomingMessage(reply, after: 1.0)
+        wait(for: [sendExpectation], timeout: 10.0)
+    }
+    
     func testSendMessageDisconnected() {
         let name = "TestMessage"
         let serviceName = "org.ocast.testService"
