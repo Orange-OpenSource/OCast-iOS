@@ -50,6 +50,8 @@ center.registerDevice(ReferenceDevice.self, forManufacturer: "Manufacturer")
 
 ### 2. Discovering devices
 
+<span style="color:red">WARNING</span>: To discover devices you need to add the Multicast Networking Additional Capability to your application, as described here : https://developer.apple.com/forums/thread/663271
+
 You need to call the `resumeDiscovery()` method to start the device discovery. Then you can be informed by the `DeviceCenter` setting the delegate or registering notifications.
 
 If devices are found on your network, the `center(_:didAdd:)` method and the `deviceCenterAddDevicesNotification` notification are triggered.
